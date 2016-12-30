@@ -1,0 +1,23 @@
+{
+  "name": "myclinic-records",
+  "version": "1.0.0",
+  "description": "Presentation of visiting records",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/hangilc/myclinic-records.git"
+  },
+  "author": "Hangil Chang",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hangilc/myclinic-records/issues"
+  },
+  "homepage": "https://github.com/hangilc/myclinic-records#readme",
+  "devDependencies": {
+    "@types/jquery": "^2.0.34",
+    "jquery": "^3.1.1"
+  }
+}

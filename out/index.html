@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>診療録閲覧</title>
+		<style>
+		    a { text-decoration: none; }
+		</style>
+	</head>
+	<body>
+		<h1>診療日ごとの診療録リスト</h1>
+		<div>
+		  <form>
+		    平成<input size="4" name="visits-sheet-year" 
+		    		style="ime-mode: disabled;">年
+		        <input size="4" name="visits-sheet-month" 
+		        	style="ime-mode: disabled;">月 
+		        <input size="4" name="visits-sheet-day" 
+		        	style="ime-mode: disabled;">日
+		    	<input value="選択" type="submit">
+			    <a href="javascript:void(0)" class="goto-today">[本日]</a>
+		  </form>
+		</div>
+		<script src="require.js" data-main="start.js"></script>
+	</body>
+</html>
