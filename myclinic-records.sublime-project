@@ -3,7 +3,8 @@
 	[
 		{
 			"path": ".",
-			"folder_exclude_patterns": ["node_modules", "out", ".git"]
+			"folder_exclude_patterns": ["node_modules", ".git"],
+			"file_include_patterns": ["out/*.html", "out/*.css"]
 		}
 	]
 }
