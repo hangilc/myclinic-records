@@ -97,3 +97,10 @@ function getRoujin(roujinId) {
     return request("get_roujin", { roujin_id: roujinId }, "GET", model.fromJsonToRoujin);
 }
 exports.getRoujin = getRoujin;
+function getKouhi(kouhiId) {
+    if (!(Number.isInteger(kouhiId) && kouhiId > 0)) {
+        return Promise.reject("invalid kouhiId");
+    }
+    return request("get_kouhi", { kouhi_id: kouhiId }, "GET", model.fromJsonToKouhi);
+}
+exports.getKouhi = getKouhi;

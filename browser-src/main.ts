@@ -47,8 +47,8 @@ $("form#date-input-form").submit(function(event){
 	console.log(m.format("YYYY-MM-DD"));
 });
 
-import { getRoujin } from "./service";
-getRoujin(100).then(function(result){
+import { getKouhi } from "./service";
+getKouhi(100).then(function(result){
 	console.log(JSON.stringify(result, null, 2));
 })
 .catch(function(err){

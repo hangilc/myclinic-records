@@ -8,6 +8,7 @@ import Text = model.Text;
 import Shahokokuho = model.Shahokokuho;
 import Koukikourei = model.Koukikourei;
 import Roujin = model.Roujin;
+import Kouhi = model.Kouhi;
 
 export class HttpError {
 	constructor(
@@ -113,6 +114,14 @@ export function getRoujin(roujinId: number): Promise<Roujin> {
 	}
 	return request<Roujin>("get_roujin", { roujin_id: roujinId }, 
 		"GET", model.fromJsonToRoujin);
+}
+
+export function getKouhi(kouhiId: number): Promise<Kouhi> {
+	if( !(Number.isInteger(kouhiId) && kouhiId > 0) ){
+		return Promise.reject("invalid kouhiId");
+	}
+	return request<Kouhi>("get_kouhi", { kouhi_id: kouhiId }, 
+		"GET", model.fromJsonToKouhi);
 }
 
 
