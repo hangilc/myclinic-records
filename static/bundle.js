@@ -87,7 +87,7 @@
 	    console.log(m.format("YYYY-MM-DD"));
 	});
 	const service_1 = __webpack_require__(192);
-	service_1.listVisitsByDate("2016-06-03").then(function (result) {
+	service_1.getText(1000).then(function (result) {
 	    console.log(JSON.stringify(result, null, 2));
 	})
 	    .catch(function (err) {
@@ -25747,7 +25747,7 @@
 	}
 	function getPatient(patientId) {
 	    if (!(Number.isInteger(patientId) && patientId > 0)) {
-	        return Promise.reject("invalid patient_id");
+	        return Promise.reject("invalid patientId");
 	    }
 	    return request("get_patient", { patient_id: patientId }, "GET", model.fromJsonToPatient);
 	}
@@ -25759,6 +25759,13 @@
 	    return request("list_visits_by_date", { at: at }, "GET", fromJsonArray(model.fromJsonToVisit));
 	}
 	exports.listVisitsByDate = listVisitsByDate;
+	function getText(textId) {
+	    if (!(Number.isInteger(textId) && textId > 0)) {
+	        return Promise.reject("invalid textId");
+	    }
+	    return request("get_text", { text_id: textId }, "GET", model.fromJsonToText);
+	}
+	exports.getText = getText;
 
 
 /***/ },
@@ -25771,6 +25778,7 @@
 	}
 	__export(__webpack_require__(194));
 	__export(__webpack_require__(196));
+	__export(__webpack_require__(197));
 
 
 /***/ },
@@ -25979,12 +25987,12 @@
 	        V.isDefined, V.isInteger, V.isPositive
 	    ]);
 	    V.validate("診察時刻", visit.visitedAt, errs, [V.isSqlDateTime]);
-	    V.validate("shahokokuhoId", visit.shahokokuhoId, errs, [V.isZeroOrPositive]);
-	    V.validate("koukikoureiId", visit.koukikoureiId, errs, [V.isZeroOrPositive]);
-	    V.validate("roujinId", visit.roujinId, errs, [V.isZeroOrPositive]);
-	    V.validate("kouhi1Id", visit.kouhi1Id, errs, [V.isZeroOrPositive]);
-	    V.validate("kouhi2Id", visit.kouhi2Id, errs, [V.isZeroOrPositive]);
-	    V.validate("kouhi3Id", visit.kouhi3Id, errs, [V.isZeroOrPositive]);
+	    V.validate("shahokokuhoId", visit.shahokokuhoId, errs, [V.isInteger, V.isZeroOrPositive]);
+	    V.validate("koukikoureiId", visit.koukikoureiId, errs, [V.isInteger, V.isZeroOrPositive]);
+	    V.validate("roujinId", visit.roujinId, errs, [V.isInteger, V.isZeroOrPositive]);
+	    V.validate("kouhi1Id", visit.kouhi1Id, errs, [V.isInteger, V.isZeroOrPositive]);
+	    V.validate("kouhi2Id", visit.kouhi2Id, errs, [V.isInteger, V.isZeroOrPositive]);
+	    V.validate("kouhi3Id", visit.kouhi3Id, errs, [V.isInteger, V.isZeroOrPositive]);
 	    return errs;
 	}
 	exports.validateVisit = validateVisit;
@@ -25999,6 +26007,47 @@
 	    }
 	}
 	exports.fromJsonToVisit = fromJsonToVisit;
+
+
+/***/ },
+/* 197 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	const V = __webpack_require__(195);
+	class Text {
+	    constructor(textId, visitId, content) {
+	        this.textId = textId;
+	        this.visitId = visitId;
+	        this.content = content;
+	    }
+	}
+	exports.Text = Text;
+	function validateText(text, checkTextId = true) {
+	    let errs = [];
+	    if (checkTextId) {
+	        V.validate("textId", text.textId, errs, [
+	            V.isDefined, V.isInteger, V.isPositive
+	        ]);
+	    }
+	    V.validate("visitId", text.visitId, errs, [
+	        V.isInteger, V.isPositive
+	    ]);
+	    V.validate("content", text.content, errs, [V.isString]);
+	    return errs;
+	}
+	exports.validateText = validateText;
+	function fromJsonToText(src) {
+	    let text = new Text(src.text_id, src.visit_id, src.content);
+	    let errs = validateText(text, true);
+	    if (errs.length > 0) {
+	        return [undefined, new V.ValidationError(errs)];
+	    }
+	    else {
+	        return [text, null];
+	    }
+	}
+	exports.fromJsonToText = fromJsonToText;
 
 
 /***/ }

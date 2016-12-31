@@ -57,7 +57,7 @@ function request(service, data, method, cvtor) {
 }
 function getPatient(patientId) {
     if (!(Number.isInteger(patientId) && patientId > 0)) {
-        return Promise.reject("invalid patient_id");
+        return Promise.reject("invalid patientId");
     }
     return request("get_patient", { patient_id: patientId }, "GET", model.fromJsonToPatient);
 }
@@ -69,3 +69,10 @@ function listVisitsByDate(at) {
     return request("list_visits_by_date", { at: at }, "GET", fromJsonArray(model.fromJsonToVisit));
 }
 exports.listVisitsByDate = listVisitsByDate;
+function getText(textId) {
+    if (!(Number.isInteger(textId) && textId > 0)) {
+        return Promise.reject("invalid textId");
+    }
+    return request("get_text", { text_id: textId }, "GET", model.fromJsonToText);
+}
+exports.getText = getText;

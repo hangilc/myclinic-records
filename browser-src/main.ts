@@ -47,8 +47,8 @@ $("form#date-input-form").submit(function(event){
 	console.log(m.format("YYYY-MM-DD"));
 });
 
-import { listVisitsByDate } from "./service";
-listVisitsByDate("2016-06-03").then(function(result){
+import { getText } from "./service";
+getText(1000).then(function(result){
 	console.log(JSON.stringify(result, null, 2));
 })
 .catch(function(err){

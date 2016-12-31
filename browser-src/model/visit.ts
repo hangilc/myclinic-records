@@ -26,12 +26,18 @@ export function validateVisit(visit: Visit,
 		V.isDefined, V.isInteger, V.isPositive
 	]);
 	V.validate("診察時刻", visit.visitedAt, errs, [V.isSqlDateTime]);
-	V.validate("shahokokuhoId", visit.shahokokuhoId, errs, [V.isZeroOrPositive]);
-	V.validate("koukikoureiId", visit.koukikoureiId, errs, [V.isZeroOrPositive]);
-	V.validate("roujinId", visit.roujinId, errs, [V.isZeroOrPositive]);
-	V.validate("kouhi1Id", visit.kouhi1Id, errs, [V.isZeroOrPositive]);
-	V.validate("kouhi2Id", visit.kouhi2Id, errs, [V.isZeroOrPositive]);
-	V.validate("kouhi3Id", visit.kouhi3Id, errs, [V.isZeroOrPositive]);
+	V.validate("shahokokuhoId", visit.shahokokuhoId, errs, 
+		[V.isInteger, V.isZeroOrPositive]);
+	V.validate("koukikoureiId", visit.koukikoureiId, errs, 
+		[V.isInteger, V.isZeroOrPositive]);
+	V.validate("roujinId", visit.roujinId, errs, 
+		[V.isInteger, V.isZeroOrPositive]);
+	V.validate("kouhi1Id", visit.kouhi1Id, errs, 
+		[V.isInteger, V.isZeroOrPositive]);
+	V.validate("kouhi2Id", visit.kouhi2Id, errs, 
+		[V.isInteger, V.isZeroOrPositive]);
+	V.validate("kouhi3Id", visit.kouhi3Id, errs, 
+		[V.isInteger, V.isZeroOrPositive]);
 	return errs;
 }
 

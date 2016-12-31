@@ -4,6 +4,7 @@ import * as model from "./model";
 
 import Patient = model.Patient;
 import Visit = model.Visit;
+import Text = model.Text;
 
 export class HttpError {
 	constructor(
@@ -65,7 +66,7 @@ function request<T>(service: string, data: Object,
 
 export function getPatient(patientId: number): Promise<Patient> {
 	if( !(Number.isInteger(patientId) && patientId > 0) ){
-		return Promise.reject("invalid patient_id");
+		return Promise.reject("invalid patientId");
 	}
 	return request<Patient>("get_patient", { patient_id: patientId }, 
 		"GET", model.fromJsonToPatient);
@@ -77,5 +78,13 @@ export function listVisitsByDate(at: string): Promise<Visit[]> {
 	}
 	return request<Visit[]>("list_visits_by_date", { at: at }, "GET",
 		fromJsonArray(model.fromJsonToVisit));
+}
+
+export function getText(textId: number): Promise<Text> {
+	if( !(Number.isInteger(textId) && textId > 0) ){
+		return Promise.reject("invalid textId");
+	}
+	return request<Text>("get_text", { text_id: textId }, 
+		"GET", model.fromJsonToText);
 }
 

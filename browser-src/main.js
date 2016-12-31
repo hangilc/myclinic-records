@@ -41,7 +41,7 @@ $("form#date-input-form").submit(function (event) {
     console.log(m.format("YYYY-MM-DD"));
 });
 const service_1 = require("./service");
-service_1.listVisitsByDate("2016-06-03").then(function (result) {
+service_1.getText(1000).then(function (result) {
     console.log(JSON.stringify(result, null, 2));
 })
     .catch(function (err) {
