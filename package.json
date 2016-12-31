@@ -23,7 +23,7 @@
     "@types/jquery": "^2.0.34",
     "@types/node": "^6.0.55",
     "jquery": "^3.1.1",
-    "kanjidate": "^1.1.1",
+    "kanjidate": "^1.1.2",
     "myclinic-web": "^1.0.10",
     "raw-loader": "^0.5.1",
     "webpack": "^1.14.0"

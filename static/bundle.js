@@ -45,14 +45,6 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-	    return new (P || (P = Promise))(function (resolve, reject) {
-	        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-	        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-	        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-	        step((generator = generator.apply(thisArg, _arguments)).next());
-	    });
-	};
 	const $ = __webpack_require__(113);
 	const moment = __webpack_require__(1);
 	const kanjidate = __webpack_require__(112);
@@ -94,130 +86,10 @@
 	    }
 	    console.log(m.format("YYYY-MM-DD"));
 	});
-	class UnRegisteredPatient {
-	    constructor(theLastName, theFirstName, theLastNameYomi, theFirstNameYomi, theBirthday, theSex, thePhone, theAddress) {
-	        if (theLastName === "") {
-	            throw new Error("姓が不適切です。");
-	        }
-	        if (theFirstName === "") {
-	            throw new Error("名が不適切です。");
-	        }
-	        if (theLastNameYomi === "") {
-	            throw new Error("姓のよみが不適切です。");
-	        }
-	        if (theFirstNameYomi === "") {
-	            throw new Error("名のよみが不適切です。");
-	        }
-	        if (/^\d{4}-\d{2}-\d{2}$/.test(theBirthday)) {
-	            if (theBirthday !== "0000-00-00") {
-	                let m = moment(theBirthday);
-	                if (!m.isValid()) {
-	                    throw new Error("生年月日が不適切です。");
-	                }
-	            }
-	        }
-	        else {
-	            throw new Error("生年月日が不適切です。");
-	        }
-	        if (!(theSex === "M" || theSex === "F")) {
-	            throw new Error("性が不適切です。");
-	        }
-	        this.lastName = theLastName;
-	        this.firstName = theFirstName;
-	        this.lastNameYomi = theLastNameYomi;
-	        this.firstNameYomi = theFirstNameYomi;
-	        this.birthday = theBirthday;
-	        this.sex = theSex;
-	        this.phone = thePhone;
-	        this.address = theAddress;
-	    }
-	}
-	class Patient extends UnRegisteredPatient {
-	    constructor(thePatientId, theLastName, theFirstName, theLastNameYomi, theFirstNameYomi, theBirthday, theSex, thePhone, theAddress) {
-	        super(theLastName, theFirstName, theLastNameYomi, theFirstNameYomi, theBirthday, theSex, thePhone, theAddress);
-	        if (!(thePatientId > 0)) {
-	            throw new Error("患者番号が不適切です。");
-	        }
-	        this.patientId = thePatientId;
-	    }
-	}
-	function fromObjectToPatient(obj) {
-	    let patientId = obj.patient_id;
-	    let lastName = obj.last_name;
-	    let firstName = obj.first_name;
-	    let lastNameYomi = obj.last_name_yomi;
-	    let firstNameYomi = obj.first_name_yomi;
-	    let birthday = obj.birth_day;
-	    let sex = obj.sex;
-	    let phone = obj.phone;
-	    let address = obj.address;
-	    if (typeof patientId !== "number") {
-	        throw new Error("患者番号が不適切です。");
-	    }
-	    if (typeof lastName !== "string") {
-	        throw new Error("姓が不適切です。");
-	    }
-	    if (typeof firstName !== "string") {
-	        throw new Error("名が不適切です。");
-	    }
-	    if (typeof lastNameYomi !== "string") {
-	        throw new Error("姓のよみが不適切です。");
-	    }
-	    if (typeof firstNameYomi !== "string") {
-	        throw new Error("名のよみが不適切です。");
-	    }
-	    if (typeof birthday !== "string") {
-	        throw new Error("生年月日が不適切です。");
-	    }
-	    if (typeof phone !== "string") {
-	        throw new Error("電話番号が不適切です。");
-	    }
-	    if (typeof address !== "string") {
-	        throw new Error("住所が不適切です。");
-	    }
-	    return new Patient(patientId, lastName, firstName, lastNameYomi, firstNameYomi, birthday, sex, phone, address);
-	}
-	function request(service, data, method, cvtor) {
-	    return new Promise(function (resolve, reject) {
-	        $.ajax({
-	            url: '/service',
-	            type: method,
-	            data: Object.assign({
-	                _q: service
-	            }, data),
-	            dataType: "json",
-	            timeout: 15000,
-	            success: function (result) {
-	                let ret = cvtor(result);
-	                try {
-	                    resolve(ret);
-	                }
-	                catch (err) {
-	                    reject(err);
-	                }
-	            },
-	            error: function (xhr, status, ex) {
-	                reject({
-	                    status: status,
-	                    text: xhr.responseText,
-	                    ex: ex
-	                });
-	            }
-	        });
-	    });
-	}
-	function getPatient(patientId) {
-	    return request("get_patient", { patient_id: patientId }, "GET", fromObjectToPatient);
-	}
-	function test() {
-	    return __awaiter(this, void 0, void 0, function* () {
-	        let patient1 = yield getPatient(199);
-	        let patient2 = yield getPatient(patient1.patientId + 1);
-	        console.log(patient1);
-	        console.log(patient2);
-	    });
-	}
-	test();
+	const service_1 = __webpack_require__(192);
+	service_1.getPatient(198).then(function (patient) {
+	    console.log(patient);
+	});
 
 
 /***/ },
@@ -25729,6 +25601,297 @@
 
 	return jQuery;
 	} );
+
+
+/***/ },
+/* 114 */,
+/* 115 */,
+/* 116 */,
+/* 117 */,
+/* 118 */,
+/* 119 */,
+/* 120 */,
+/* 121 */,
+/* 122 */,
+/* 123 */,
+/* 124 */,
+/* 125 */,
+/* 126 */,
+/* 127 */,
+/* 128 */,
+/* 129 */,
+/* 130 */,
+/* 131 */,
+/* 132 */,
+/* 133 */,
+/* 134 */,
+/* 135 */,
+/* 136 */,
+/* 137 */,
+/* 138 */,
+/* 139 */,
+/* 140 */,
+/* 141 */,
+/* 142 */,
+/* 143 */,
+/* 144 */,
+/* 145 */,
+/* 146 */,
+/* 147 */,
+/* 148 */,
+/* 149 */,
+/* 150 */,
+/* 151 */,
+/* 152 */,
+/* 153 */,
+/* 154 */,
+/* 155 */,
+/* 156 */,
+/* 157 */,
+/* 158 */,
+/* 159 */,
+/* 160 */,
+/* 161 */,
+/* 162 */,
+/* 163 */,
+/* 164 */,
+/* 165 */,
+/* 166 */,
+/* 167 */,
+/* 168 */,
+/* 169 */,
+/* 170 */,
+/* 171 */,
+/* 172 */,
+/* 173 */,
+/* 174 */,
+/* 175 */,
+/* 176 */,
+/* 177 */,
+/* 178 */,
+/* 179 */,
+/* 180 */,
+/* 181 */,
+/* 182 */,
+/* 183 */,
+/* 184 */,
+/* 185 */,
+/* 186 */,
+/* 187 */,
+/* 188 */,
+/* 189 */,
+/* 190 */,
+/* 191 */,
+/* 192 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	const $ = __webpack_require__(113);
+	const model = __webpack_require__(193);
+	class HttpError {
+	    constructor(status, text, exception) {
+	        this.status = status;
+	        this.text = text;
+	        this.exception = exception;
+	    }
+	}
+	exports.HttpError = HttpError;
+	function request(service, data, method, cvtor) {
+	    return new Promise(function (resolve, reject) {
+	        $.ajax({
+	            url: '/service',
+	            type: method,
+	            data: Object.assign({
+	                _q: service
+	            }, data),
+	            dataType: "json",
+	            timeout: 15000,
+	            success: function (result) {
+	                let [ret, err] = cvtor(result);
+	                if (err) {
+	                    reject(err);
+	                }
+	                else {
+	                    resolve(ret);
+	                }
+	            },
+	            error: function (xhr, status, ex) {
+	                reject(new HttpError(status, xhr.responseText, ex));
+	            }
+	        });
+	    });
+	}
+	function getPatient(patientId) {
+	    return request("get_patient", { patient_id: patientId }, "GET", model.fromJsonToPatient);
+	}
+	exports.getPatient = getPatient;
+
+
+/***/ },
+/* 193 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	function __export(m) {
+	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+	}
+	__export(__webpack_require__(194));
+
+
+/***/ },
+/* 194 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	const V = __webpack_require__(195);
+	class Patient {
+	    constructor(patientId, lastName, firstName, lastNameYomi, firstNameYomi, birthday, sex, address, phone) {
+	        this.patientId = patientId;
+	        this.lastName = lastName;
+	        this.firstName = firstName;
+	        this.lastNameYomi = lastNameYomi;
+	        this.firstNameYomi = firstNameYomi;
+	        this.birthday = birthday;
+	        this.sex = sex;
+	        this.address = address;
+	        this.phone = phone;
+	    }
+	}
+	exports.Patient = Patient;
+	;
+	function validatePatient(patient, checkPatientId = true) {
+	    let errs = [];
+	    if (checkPatientId) {
+	        V.validate("患者番号", patient.patientId, errs, [
+	            V.isDefined, V.isInteger, V.isPositive
+	        ]);
+	    }
+	    V.validate("姓", patient.lastName, errs, [V.isString, V.isNotEmpty]);
+	    V.validate("名", patient.firstName, errs, [V.isString, V.isNotEmpty]);
+	    V.validate("姓のよみ", patient.lastNameYomi, errs, [V.isString, V.isNotEmpty]);
+	    V.validate("名のよみ", patient.firstNameYomi, errs, [V.isString, V.isNotEmpty]);
+	    V.validate("生年月日", patient.birthday, errs, [V.isString, V.isSqlDateOrZero]);
+	    V.validate("性別", patient.sex, errs, [V.isDefined, V.isString, V.isNotEmpty, V.isOneOf("M", "F")]);
+	    V.validate("住所", patient.address, errs, [V.isDefined, V.isString]);
+	    V.validate("電話番号", patient.phone, errs, [V.isDefined, V.isString]);
+	    return errs;
+	}
+	exports.validatePatient = validatePatient;
+	function fromJsonToPatient(src) {
+	    let patient = new Patient(src.patient_id, src.last_name, src.first_name, src.last_name_yomi, src.first_name_yomi, src.birth_day, src.sex, src.address, src.phone);
+	    let errs = validatePatient(patient, true);
+	    if (errs.length > 0) {
+	        return [undefined, new V.ValidationError(errs)];
+	    }
+	    else {
+	        return [patient, null];
+	    }
+	}
+	exports.fromJsonToPatient = fromJsonToPatient;
+
+
+/***/ },
+/* 195 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	const moment = __webpack_require__(1);
+	class ValidationError {
+	    constructor(errors) {
+	        this.errors = errors;
+	    }
+	}
+	exports.ValidationError = ValidationError;
+	function isDefined(name, value) {
+	    if (value === undefined) {
+	        return `${name}の値が指摘されていません。`;
+	    }
+	    else {
+	        return null;
+	    }
+	}
+	exports.isDefined = isDefined;
+	function isInteger(name, value) {
+	    if (Number.isInteger(value)) {
+	        return null;
+	    }
+	    else {
+	        return `${name}の値が整数でありません。`;
+	    }
+	}
+	exports.isInteger = isInteger;
+	function isString(name, value) {
+	    if (typeof value === "string") {
+	        return null;
+	    }
+	    else {
+	        return `${name}の値が文字列でありません。`;
+	    }
+	}
+	exports.isString = isString;
+	function isPositive(name, value) {
+	    if (value > 0) {
+	        return null;
+	    }
+	    else {
+	        return `${name}の値が正数でありません。`;
+	    }
+	}
+	exports.isPositive = isPositive;
+	function isNotEmpty(name, value) {
+	    if (value === "" || value == null) {
+	        return `${name}の値が空白です。`;
+	    }
+	    else {
+	        return null;
+	    }
+	}
+	exports.isNotEmpty = isNotEmpty;
+	function isSqlDate(name, value) {
+	    if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+	        let m = moment(value);
+	        if (m.isValid()) {
+	            return null;
+	        }
+	    }
+	    return `${name}の値が不適切です。`;
+	}
+	exports.isSqlDate = isSqlDate;
+	function isSqlDateOrZero(name, value) {
+	    if (value === "0000-00-00") {
+	        return null;
+	    }
+	    if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+	        let m = moment(value);
+	        if (m.isValid()) {
+	            return null;
+	        }
+	    }
+	    return `${name}の値が不適切です。`;
+	}
+	exports.isSqlDateOrZero = isSqlDateOrZero;
+	function isOneOf(...list) {
+	    return function (name, value) {
+	        for (let i = 0; i < list.length; i++) {
+	            if (value === list[i]) {
+	                return null;
+	            }
+	        }
+	        return `${name}の値が不適切です。`;
+	    };
+	}
+	exports.isOneOf = isOneOf;
+	function validate(name, value, errs, validators) {
+	    for (let i = 0; i < validators.length; i++) {
+	        let validator = validators[i];
+	        let err = validator(name, value);
+	        if (err) {
+	            errs.push(err);
+	            return;
+	        }
+	    }
+	}
+	exports.validate = validate;
 
 
 /***/ }
