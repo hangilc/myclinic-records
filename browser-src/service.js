@@ -76,3 +76,10 @@ function getText(textId) {
     return request("get_text", { text_id: textId }, "GET", model.fromJsonToText);
 }
 exports.getText = getText;
+function getShahokokuho(shahokokuhoId) {
+    if (!(Number.isInteger(shahokokuhoId) && shahokokuhoId > 0)) {
+        return Promise.reject("invalid shahokokuhoId");
+    }
+    return request("get_shahokokuho", { shahokokuho_id: shahokokuhoId }, "GET", model.fromJsonToShahokokuho);
+}
+exports.getShahokokuho = getShahokokuho;

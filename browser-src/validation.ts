@@ -32,6 +32,14 @@ export function isString(name, value): string {
 	}
 }
 
+export function isBoolean(name, value): string {
+	if( typeof value === "boolean" ){
+		return null;
+	} else {
+		return `${ name }の値が真偽値でありません。`;
+	}
+}
+
 export function isPositive(name, value): string {
 	if( value > 0 ){
 		return null;

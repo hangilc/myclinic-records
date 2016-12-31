@@ -5,3 +5,4 @@ function __export(m) {
 __export(require("./model/patient"));
 __export(require("./model/visit"));
 __export(require("./model/text"));
+__export(require("./model/shahokokuho"));

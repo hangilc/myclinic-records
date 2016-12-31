@@ -33,6 +33,15 @@ function isString(name, value) {
     }
 }
 exports.isString = isString;
+function isBoolean(name, value) {
+    if (typeof value === "boolean") {
+        return null;
+    }
+    else {
+        return `${name}の値が真偽値でありません。`;
+    }
+}
+exports.isBoolean = isBoolean;
 function isPositive(name, value) {
     if (value > 0) {
         return null;

@@ -87,7 +87,7 @@
 	    console.log(m.format("YYYY-MM-DD"));
 	});
 	const service_1 = __webpack_require__(192);
-	service_1.getText(1000).then(function (result) {
+	service_1.getShahokokuho(100).then(function (result) {
 	    console.log(JSON.stringify(result, null, 2));
 	})
 	    .catch(function (err) {
@@ -25766,6 +25766,13 @@
 	    return request("get_text", { text_id: textId }, "GET", model.fromJsonToText);
 	}
 	exports.getText = getText;
+	function getShahokokuho(shahokokuhoId) {
+	    if (!(Number.isInteger(shahokokuhoId) && shahokokuhoId > 0)) {
+	        return Promise.reject("invalid shahokokuhoId");
+	    }
+	    return request("get_shahokokuho", { shahokokuho_id: shahokokuhoId }, "GET", model.fromJsonToShahokokuho);
+	}
+	exports.getShahokokuho = getShahokokuho;
 
 
 /***/ },
@@ -25779,6 +25786,7 @@
 	__export(__webpack_require__(194));
 	__export(__webpack_require__(196));
 	__export(__webpack_require__(197));
+	__export(__webpack_require__(198));
 
 
 /***/ },
@@ -25872,6 +25880,15 @@
 	    }
 	}
 	exports.isString = isString;
+	function isBoolean(name, value) {
+	    if (typeof value === "boolean") {
+	        return null;
+	    }
+	    else {
+	        return `${name}の値が真偽値でありません。`;
+	    }
+	}
+	exports.isBoolean = isBoolean;
 	function isPositive(name, value) {
 	    if (value > 0) {
 	        return null;
@@ -26048,6 +26065,73 @@
 	    }
 	}
 	exports.fromJsonToText = fromJsonToText;
+
+
+/***/ },
+/* 198 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	const V = __webpack_require__(195);
+	class Shahokokuho {
+	    constructor(shahokokuhoId, patientId, hokenshaBangou, hihokenshaKigou, hihokenshaBangou, honnin, validFrom, validUpto, kourei) {
+	        this.shahokokuhoId = shahokokuhoId;
+	        this.patientId = patientId;
+	        this.hokenshaBangou = hokenshaBangou;
+	        this.hihokenshaKigou = hihokenshaKigou;
+	        this.hihokenshaBangou = hihokenshaBangou;
+	        this.honnin = honnin;
+	        this.validFrom = validFrom;
+	        this.validUpto = validUpto;
+	        this.kourei = kourei;
+	    }
+	}
+	exports.Shahokokuho = Shahokokuho;
+	function validateShahokokuho(shahokokuho, checkShahokokuhoId = true) {
+	    let errs = [];
+	    if (checkShahokokuhoId) {
+	        V.validate("shahokokuhoId", shahokokuho.shahokokuhoId, errs, [
+	            V.isDefined, V.isInteger, V.isPositive
+	        ]);
+	    }
+	    V.validate("患者番号", shahokokuho.patientId, errs, [
+	        V.isDefined, V.isInteger, V.isPositive
+	    ]);
+	    V.validate("保険者番号", shahokokuho.hokenshaBangou, errs, [
+	        V.isDefined, V.isInteger, V.isPositive
+	    ]);
+	    V.validate("被保険者記号", shahokokuho.hihokenshaKigou, errs, [
+	        V.isDefined, V.isString, V.isNotEmpty
+	    ]);
+	    V.validate("被保険者番号", shahokokuho.hihokenshaBangou, errs, [
+	        V.isDefined, V.isString, V.isNotEmpty
+	    ]);
+	    V.validate("本人", shahokokuho.honnin, errs, [
+	        V.isDefined, V.isBoolean
+	    ]);
+	    V.validate("有効期限（開始）", shahokokuho.validFrom, errs, [
+	        V.isDefined, V.isSqlDate
+	    ]);
+	    V.validate("有効期限（終了）", shahokokuho.validFrom, errs, [
+	        V.isDefined, V.isSqlDateOrZero
+	    ]);
+	    V.validate("高齢", shahokokuho.kourei, errs, [
+	        V.isDefined, V.isInteger, V.isZeroOrPositive
+	    ]);
+	    return errs;
+	}
+	exports.validateShahokokuho = validateShahokokuho;
+	function fromJsonToShahokokuho(src) {
+	    let shahokokuho = new Shahokokuho(src.shahokokuho_id, src.patient_id, src.hokensha_bangou, src.hihokensha_kigou, src.hihokensha_bangou, src.honnin === 0 ? false : true, src.valid_from, src.valid_upto, src.kourei);
+	    let errs = validateShahokokuho(shahokokuho, true);
+	    if (errs.length > 0) {
+	        return [undefined, new V.ValidationError(errs)];
+	    }
+	    else {
+	        return [shahokokuho, null];
+	    }
+	}
+	exports.fromJsonToShahokokuho = fromJsonToShahokokuho;
 
 
 /***/ }
