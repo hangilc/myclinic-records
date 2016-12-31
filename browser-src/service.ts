@@ -10,6 +10,7 @@ import Koukikourei = model.Koukikourei;
 import Roujin = model.Roujin;
 import Kouhi = model.Kouhi;
 import Drug = model.Drug;
+import Shinryou = model.Shinryou;
 
 export class HttpError {
 	constructor(
@@ -131,6 +132,14 @@ export function getDrug(drugId: number): Promise<Drug> {
 	}
 	return request<Drug>("get_drug", { drug_id: drugId }, 
 		"GET", model.fromJsonToDrug);
+}
+
+export function getShinryou(shinryouId: number): Promise<Shinryou> {
+	if( !(Number.isInteger(shinryouId) && shinryouId > 0) ){
+		return Promise.reject("invalid shinryouId");
+	}
+	return request<Shinryou>("get_shinryou", { shinryou_id: shinryouId }, 
+		"GET", model.fromJsonToShinryou);
 }
 
 

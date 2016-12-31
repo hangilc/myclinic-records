@@ -10,3 +10,4 @@ __export(require("./model/koukikourei"));
 __export(require("./model/roujin"));
 __export(require("./model/kouhi"));
 __export(require("./model/drug"));
+__export(require("./model/shinryou"));

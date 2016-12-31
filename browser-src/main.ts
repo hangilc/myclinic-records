@@ -47,8 +47,8 @@ $("form#date-input-form").submit(function(event){
 	console.log(m.format("YYYY-MM-DD"));
 });
 
-import { getDrug } from "./service";
-getDrug(100).then(function(result){
+import { getShinryou } from "./service";
+getShinryou(100).then(function(result){
 	console.log(JSON.stringify(result, null, 2));
 })
 .catch(function(err){

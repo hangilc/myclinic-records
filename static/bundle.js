@@ -87,7 +87,7 @@
 	    console.log(m.format("YYYY-MM-DD"));
 	});
 	const service_1 = __webpack_require__(192);
-	service_1.getDrug(100).then(function (result) {
+	service_1.getShinryou(100).then(function (result) {
 	    console.log(JSON.stringify(result, null, 2));
 	})
 	    .catch(function (err) {
@@ -25801,6 +25801,13 @@
 	    return request("get_drug", { drug_id: drugId }, "GET", model.fromJsonToDrug);
 	}
 	exports.getDrug = getDrug;
+	function getShinryou(shinryouId) {
+	    if (!(Number.isInteger(shinryouId) && shinryouId > 0)) {
+	        return Promise.reject("invalid shinryouId");
+	    }
+	    return request("get_shinryou", { shinryou_id: shinryouId }, "GET", model.fromJsonToShinryou);
+	}
+	exports.getShinryou = getShinryou;
 
 
 /***/ },
@@ -25819,6 +25826,7 @@
 	__export(__webpack_require__(200));
 	__export(__webpack_require__(201));
 	__export(__webpack_require__(202));
+	__export(__webpack_require__(203));
 
 
 /***/ },
@@ -26409,6 +26417,49 @@
 	    }
 	}
 	exports.fromJsonToDrug = fromJsonToDrug;
+
+
+/***/ },
+/* 203 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	const V = __webpack_require__(195);
+	class Shinryou {
+	    constructor(shinryouId, visitId, shinryoucode) {
+	        this.shinryouId = shinryouId;
+	        this.visitId = visitId;
+	        this.shinryoucode = shinryoucode;
+	    }
+	}
+	exports.Shinryou = Shinryou;
+	function validateShinryou(shinryou, checkShinryouId = true) {
+	    let errs = [];
+	    if (checkShinryouId) {
+	        V.validate("shinryouId", shinryou.shinryouId, errs, [
+	            V.isDefined, V.isInteger, V.isPositive
+	        ]);
+	    }
+	    V.validate("visitId", shinryou.visitId, errs, [
+	        V.isDefined, V.isInteger, V.isPositive
+	    ]);
+	    V.validate("診療コード", shinryou.shinryoucode, errs, [
+	        V.isDefined, V.isInteger, V.isPositive
+	    ]);
+	    return errs;
+	}
+	exports.validateShinryou = validateShinryou;
+	function fromJsonToShinryou(src) {
+	    let shinryou = new Shinryou(src.shinryou_id, src.visit_id, src.shinryoucode);
+	    let errs = validateShinryou(shinryou, true);
+	    if (errs.length > 0) {
+	        return [undefined, new V.ValidationError(errs)];
+	    }
+	    else {
+	        return [shinryou, null];
+	    }
+	}
+	exports.fromJsonToShinryou = fromJsonToShinryou;
 
 
 /***/ }

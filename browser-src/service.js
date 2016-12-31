@@ -111,3 +111,10 @@ function getDrug(drugId) {
     return request("get_drug", { drug_id: drugId }, "GET", model.fromJsonToDrug);
 }
 exports.getDrug = getDrug;
+function getShinryou(shinryouId) {
+    if (!(Number.isInteger(shinryouId) && shinryouId > 0)) {
+        return Promise.reject("invalid shinryouId");
+    }
+    return request("get_shinryou", { shinryou_id: shinryouId }, "GET", model.fromJsonToShinryou);
+}
+exports.getShinryou = getShinryou;

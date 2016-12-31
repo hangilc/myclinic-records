@@ -6,3 +6,4 @@ export * from "./model/koukikourei";
 export * from "./model/roujin";
 export * from "./model/kouhi";
 export * from "./model/drug";
+export * from "./model/shinryou";
