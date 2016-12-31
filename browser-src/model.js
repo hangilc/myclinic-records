@@ -12,3 +12,4 @@ __export(require("./model/kouhi"));
 __export(require("./model/drug"));
 __export(require("./model/shinryou"));
 __export(require("./model/conduct"));
+__export(require("./model/gazou-label"));

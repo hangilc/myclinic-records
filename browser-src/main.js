@@ -41,7 +41,7 @@ $("form#date-input-form").submit(function (event) {
     console.log(m.format("YYYY-MM-DD"));
 });
 const service_1 = require("./service");
-service_1.getConduct(101).then(function (result) {
+service_1.getGazouLabel(101).then(function (result) {
     console.log(JSON.stringify(result, null, 2));
 })
     .catch(function (err) {

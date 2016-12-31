@@ -87,7 +87,7 @@
 	    console.log(m.format("YYYY-MM-DD"));
 	});
 	const service_1 = __webpack_require__(192);
-	service_1.getConduct(101).then(function (result) {
+	service_1.getGazouLabel(101).then(function (result) {
 	    console.log(JSON.stringify(result, null, 2));
 	})
 	    .catch(function (err) {
@@ -25815,6 +25815,13 @@
 	    return request("get_conduct", { conduct_id: conductId }, "GET", model.fromJsonToConduct);
 	}
 	exports.getConduct = getConduct;
+	function getGazouLabel(conductId) {
+	    if (!(Number.isInteger(conductId) && conductId > 0)) {
+	        return Promise.reject("invalid conductId");
+	    }
+	    return request("get_gazou_label", { conduct_id: conductId }, "GET", model.fromJsonToGazouLabel);
+	}
+	exports.getGazouLabel = getGazouLabel;
 
 
 /***/ },
@@ -25835,6 +25842,7 @@
 	__export(__webpack_require__(202));
 	__export(__webpack_require__(203));
 	__export(__webpack_require__(204));
+	__export(__webpack_require__(205));
 
 
 /***/ },
@@ -26511,6 +26519,43 @@
 	    }
 	}
 	exports.fromJsonToConduct = fromJsonToConduct;
+
+
+/***/ },
+/* 205 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	const V = __webpack_require__(195);
+	class GazouLabel {
+	    constructor(conductId, label) {
+	        this.conductId = conductId;
+	        this.label = label;
+	    }
+	}
+	exports.GazouLabel = GazouLabel;
+	function validateGazouLabel(gazouLabel) {
+	    let errs = [];
+	    V.validate("conductId", gazouLabel.conductId, errs, [
+	        V.isDefined, V.isInteger, V.isPositive
+	    ]);
+	    V.validate("ラベル", gazouLabel.label, errs, [
+	        V.isDefined, V.isString
+	    ]);
+	    return errs;
+	}
+	exports.validateGazouLabel = validateGazouLabel;
+	function fromJsonToGazouLabel(src) {
+	    let gazouLabel = new GazouLabel(src.visit_conduct_id, src.label);
+	    let errs = validateGazouLabel(gazouLabel);
+	    if (errs.length > 0) {
+	        return [undefined, new V.ValidationError(errs)];
+	    }
+	    else {
+	        return [gazouLabel, null];
+	    }
+	}
+	exports.fromJsonToGazouLabel = fromJsonToGazouLabel;
 
 
 /***/ }

@@ -47,8 +47,8 @@ $("form#date-input-form").submit(function(event){
 	console.log(m.format("YYYY-MM-DD"));
 });
 
-import { getConduct } from "./service";
-getConduct(101).then(function(result){
+import { getGazouLabel } from "./service";
+getGazouLabel(101).then(function(result){
 	console.log(JSON.stringify(result, null, 2));
 })
 .catch(function(err){

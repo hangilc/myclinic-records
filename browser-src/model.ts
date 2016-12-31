@@ -8,3 +8,4 @@ export * from "./model/kouhi";
 export * from "./model/drug";
 export * from "./model/shinryou";
 export * from "./model/conduct";
+export * from "./model/gazou-label";

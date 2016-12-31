@@ -125,3 +125,10 @@ function getConduct(conductId) {
     return request("get_conduct", { conduct_id: conductId }, "GET", model.fromJsonToConduct);
 }
 exports.getConduct = getConduct;
+function getGazouLabel(conductId) {
+    if (!(Number.isInteger(conductId) && conductId > 0)) {
+        return Promise.reject("invalid conductId");
+    }
+    return request("get_gazou_label", { conduct_id: conductId }, "GET", model.fromJsonToGazouLabel);
+}
+exports.getGazouLabel = getGazouLabel;

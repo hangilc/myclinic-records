@@ -12,6 +12,7 @@ import Kouhi = model.Kouhi;
 import Drug = model.Drug;
 import Shinryou = model.Shinryou;
 import Conduct = model.Conduct;
+import GazouLabel = model.GazouLabel;
 
 export class HttpError {
 	constructor(
@@ -149,6 +150,14 @@ export function getConduct(conductId: number): Promise<Conduct> {
 	}
 	return request<Conduct>("get_conduct", { conduct_id: conductId }, 
 		"GET", model.fromJsonToConduct);
+}
+
+export function getGazouLabel(conductId: number): Promise<GazouLabel> {
+	if( !(Number.isInteger(conductId) && conductId > 0) ){
+		return Promise.reject("invalid conductId");
+	}
+	return request<GazouLabel>("get_gazou_label", { conduct_id: conductId }, 
+		"GET", model.fromJsonToGazouLabel);
 }
 
 
