@@ -87,7 +87,7 @@
 	    console.log(m.format("YYYY-MM-DD"));
 	});
 	const service_1 = __webpack_require__(192);
-	service_1.getKouhi(100).then(function (result) {
+	service_1.getDrug(100).then(function (result) {
 	    console.log(JSON.stringify(result, null, 2));
 	})
 	    .catch(function (err) {
@@ -25794,6 +25794,13 @@
 	    return request("get_kouhi", { kouhi_id: kouhiId }, "GET", model.fromJsonToKouhi);
 	}
 	exports.getKouhi = getKouhi;
+	function getDrug(drugId) {
+	    if (!(Number.isInteger(drugId) && drugId > 0)) {
+	        return Promise.reject("invalid drugId");
+	    }
+	    return request("get_drug", { drug_id: drugId }, "GET", model.fromJsonToDrug);
+	}
+	exports.getDrug = getDrug;
 
 
 /***/ },
@@ -25811,6 +25818,7 @@
 	__export(__webpack_require__(199));
 	__export(__webpack_require__(200));
 	__export(__webpack_require__(201));
+	__export(__webpack_require__(202));
 
 
 /***/ },
@@ -25984,6 +25992,15 @@
 	    };
 	}
 	exports.isOneOf = isOneOf;
+	function isFloatCompatibleString(name, value) {
+	    if (/^\d+(\.\d+)?$/.test(value)) {
+	        return null;
+	    }
+	    else {
+	        return `${name}の値が数値をあらわす文字列でありません。`;
+	    }
+	}
+	exports.isFloatCompatibleString = isFloatCompatibleString;
 	function validate(name, value, errs, validators) {
 	    for (let i = 0; i < validators.length; i++) {
 	        let validator = validators[i];
@@ -26329,6 +26346,69 @@
 	    }
 	}
 	exports.fromJsonToKouhi = fromJsonToKouhi;
+
+
+/***/ },
+/* 202 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	const V = __webpack_require__(195);
+	class Drug {
+	    constructor(drugId, visitId, iyakuhincode, amount, usage, days, category, prescribed) {
+	        this.drugId = drugId;
+	        this.visitId = visitId;
+	        this.iyakuhincode = iyakuhincode;
+	        this.amount = amount;
+	        this.usage = usage;
+	        this.days = days;
+	        this.category = category;
+	        this.prescribed = prescribed;
+	    }
+	}
+	exports.Drug = Drug;
+	function validateDrug(drug, checkDrugId = true) {
+	    let errs = [];
+	    if (checkDrugId) {
+	        V.validate("drugId", drug.drugId, errs, [
+	            V.isDefined, V.isInteger, V.isPositive
+	        ]);
+	    }
+	    V.validate("visitId", drug.visitId, errs, [
+	        V.isDefined, V.isInteger, V.isPositive
+	    ]);
+	    V.validate("医薬品コード", drug.iyakuhincode, errs, [
+	        V.isDefined, V.isInteger, V.isPositive
+	    ]);
+	    V.validate("用量", drug.amount, errs, [
+	        V.isDefined, V.isString, V.isFloatCompatibleString
+	    ]);
+	    V.validate("用法", drug.usage, errs, [
+	        V.isDefined, V.isString, V.isNotEmpty
+	    ]);
+	    V.validate("日数", drug.days, errs, [
+	        V.isDefined, V.isInteger, V.isZeroOrPositive
+	    ]);
+	    V.validate("種類", drug.category, errs, [
+	        V.isDefined, V.isInteger, V.isZeroOrPositive
+	    ]);
+	    V.validate("処方済", drug.prescribed, errs, [
+	        V.isDefined, V.isBoolean
+	    ]);
+	    return errs;
+	}
+	exports.validateDrug = validateDrug;
+	function fromJsonToDrug(src) {
+	    let drug = new Drug(src.drug_id, src.visit_id, src.d_iyakuhincode, src.d_amount, src.d_usage, src.d_days, src.d_category, src.d_prescribed === 0 ? false : true);
+	    let errs = validateDrug(drug, true);
+	    if (errs.length > 0) {
+	        return [undefined, new V.ValidationError(errs)];
+	    }
+	    else {
+	        return [drug, null];
+	    }
+	}
+	exports.fromJsonToDrug = fromJsonToDrug;
 
 
 /***/ }

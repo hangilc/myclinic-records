@@ -9,6 +9,7 @@ import Shahokokuho = model.Shahokokuho;
 import Koukikourei = model.Koukikourei;
 import Roujin = model.Roujin;
 import Kouhi = model.Kouhi;
+import Drug = model.Drug;
 
 export class HttpError {
 	constructor(
@@ -122,6 +123,14 @@ export function getKouhi(kouhiId: number): Promise<Kouhi> {
 	}
 	return request<Kouhi>("get_kouhi", { kouhi_id: kouhiId }, 
 		"GET", model.fromJsonToKouhi);
+}
+
+export function getDrug(drugId: number): Promise<Drug> {
+	if( !(Number.isInteger(drugId) && drugId > 0) ){
+		return Promise.reject("invalid drugId");
+	}
+	return request<Drug>("get_drug", { drug_id: drugId }, 
+		"GET", model.fromJsonToDrug);
 }
 
 

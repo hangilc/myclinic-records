@@ -113,6 +113,15 @@ function isOneOf(...list) {
     };
 }
 exports.isOneOf = isOneOf;
+function isFloatCompatibleString(name, value) {
+    if (/^\d+(\.\d+)?$/.test(value)) {
+        return null;
+    }
+    else {
+        return `${name}の値が数値をあらわす文字列でありません。`;
+    }
+}
+exports.isFloatCompatibleString = isFloatCompatibleString;
 function validate(name, value, errs, validators) {
     for (let i = 0; i < validators.length; i++) {
         let validator = validators[i];

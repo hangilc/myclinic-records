@@ -104,3 +104,10 @@ function getKouhi(kouhiId) {
     return request("get_kouhi", { kouhi_id: kouhiId }, "GET", model.fromJsonToKouhi);
 }
 exports.getKouhi = getKouhi;
+function getDrug(drugId) {
+    if (!(Number.isInteger(drugId) && drugId > 0)) {
+        return Promise.reject("invalid drugId");
+    }
+    return request("get_drug", { drug_id: drugId }, "GET", model.fromJsonToDrug);
+}
+exports.getDrug = getDrug;

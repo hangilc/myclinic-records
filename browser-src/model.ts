@@ -5,3 +5,4 @@ export * from "./model/shahokokuho";
 export * from "./model/koukikourei";
 export * from "./model/roujin";
 export * from "./model/kouhi";
+export * from "./model/drug";

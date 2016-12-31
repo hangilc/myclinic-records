@@ -8,7 +8,7 @@ export interface Validator {
 	(name: string, o: any) : string
 }
 
-export function isDefined(name, value): string {
+export function isDefined(name: string, value: any): string {
 	if( value === undefined ){
 		return `${ name }の値が指摘されていません。`;
 	} else {
@@ -16,7 +16,7 @@ export function isDefined(name, value): string {
 	}
 }
 
-export function isInteger(name, value): string {
+export function isInteger(name: string, value: any): string {
 	if( Number.isInteger(value) ){
 		return null;
 	} else {
@@ -24,7 +24,7 @@ export function isInteger(name, value): string {
 	}
 }
 
-export function isString(name, value): string {
+export function isString(name: string, value: any): string {
 	if( typeof value === "string" ){
 		return null;
 	} else {
@@ -32,7 +32,7 @@ export function isString(name, value): string {
 	}
 }
 
-export function isBoolean(name, value): string {
+export function isBoolean(name: string, value: any): string {
 	if( typeof value === "boolean" ){
 		return null;
 	} else {
@@ -40,7 +40,7 @@ export function isBoolean(name, value): string {
 	}
 }
 
-export function isPositive(name, value): string {
+export function isPositive(name: string, value: any): string {
 	if( value > 0 ){
 		return null;
 	} else {
@@ -48,7 +48,7 @@ export function isPositive(name, value): string {
 	}
 }
 
-export function isZeroOrPositive(name, value): string {
+export function isZeroOrPositive(name: string, value: any): string {
 	if( value >= 0 ){
 		return null;
 	} else {
@@ -56,7 +56,7 @@ export function isZeroOrPositive(name, value): string {
 	}
 }
 
-export function isNotEmpty(name, value): string {
+export function isNotEmpty(name: string, value: any): string {
 	if( value === "" || value == null ){
 		return `${ name}の値が空白です。`;
 	} else {
@@ -64,7 +64,7 @@ export function isNotEmpty(name, value): string {
 	}
 }
 
-export function isSqlDate(name, value): string {
+export function isSqlDate(name: string, value: any): string {
 	if( /^\d{4}-\d{2}-\d{2}$/.test(value) ){
 		let m = moment(value);
 		if( m.isValid() ){
@@ -74,7 +74,7 @@ export function isSqlDate(name, value): string {
 	return `${ name }の値が不適切です。`;
 }
 
-export function isSqlDateOrZero(name, value): string {
+export function isSqlDateOrZero(name: string, value: any): string {
 	if( value === "0000-00-00" ){
 		return null;
 	}
@@ -87,7 +87,7 @@ export function isSqlDateOrZero(name, value): string {
 	return `${ name }の値が不適切です。`;
 }
 
-export function isSqlDateTime(name, value): string {
+export function isSqlDateTime(name: string, value: any): string {
 	if( /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(value) ){
 		let m = moment(value);
 		if( m.isValid() ){
@@ -98,13 +98,21 @@ export function isSqlDateTime(name, value): string {
 }
 
 export function isOneOf(...list: any[]): Validator {
-	return function(name, value): string {
+	return function(name: string, value: any): string {
 		for(let i=0;i<list.length;i++){
 			if( value === list[i] ){
 				return null;
 			}
 		}
 		return `${ name }の値が不適切です。`;
+	}
+}
+
+export function isFloatCompatibleString(name: string, value: any): string {
+	if( /^\d+(\.\d+)?$/.test(value) ){
+		return null;
+	} else {
+		return `${ name }の値が数値をあらわす文字列でありません。`;
 	}
 }
 
