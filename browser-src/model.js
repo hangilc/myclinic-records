@@ -11,3 +11,4 @@ __export(require("./model/roujin"));
 __export(require("./model/kouhi"));
 __export(require("./model/drug"));
 __export(require("./model/shinryou"));
+__export(require("./model/conduct"));

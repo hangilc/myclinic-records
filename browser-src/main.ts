@@ -47,8 +47,8 @@ $("form#date-input-form").submit(function(event){
 	console.log(m.format("YYYY-MM-DD"));
 });
 
-import { getShinryou } from "./service";
-getShinryou(100).then(function(result){
+import { getConduct } from "./service";
+getConduct(101).then(function(result){
 	console.log(JSON.stringify(result, null, 2));
 })
 .catch(function(err){

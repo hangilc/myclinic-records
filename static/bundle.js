@@ -87,7 +87,7 @@
 	    console.log(m.format("YYYY-MM-DD"));
 	});
 	const service_1 = __webpack_require__(192);
-	service_1.getShinryou(100).then(function (result) {
+	service_1.getConduct(101).then(function (result) {
 	    console.log(JSON.stringify(result, null, 2));
 	})
 	    .catch(function (err) {
@@ -25808,6 +25808,13 @@
 	    return request("get_shinryou", { shinryou_id: shinryouId }, "GET", model.fromJsonToShinryou);
 	}
 	exports.getShinryou = getShinryou;
+	function getConduct(conductId) {
+	    if (!(Number.isInteger(conductId) && conductId > 0)) {
+	        return Promise.reject("invalid conductId");
+	    }
+	    return request("get_conduct", { conduct_id: conductId }, "GET", model.fromJsonToConduct);
+	}
+	exports.getConduct = getConduct;
 
 
 /***/ },
@@ -25827,6 +25834,7 @@
 	__export(__webpack_require__(201));
 	__export(__webpack_require__(202));
 	__export(__webpack_require__(203));
+	__export(__webpack_require__(204));
 
 
 /***/ },
@@ -26460,6 +26468,49 @@
 	    }
 	}
 	exports.fromJsonToShinryou = fromJsonToShinryou;
+
+
+/***/ },
+/* 204 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	const V = __webpack_require__(195);
+	class Conduct {
+	    constructor(conductId, visitId, kind) {
+	        this.conductId = conductId;
+	        this.visitId = visitId;
+	        this.kind = kind;
+	    }
+	}
+	exports.Conduct = Conduct;
+	function validateConduct(conduct, checkConductId = true) {
+	    let errs = [];
+	    if (checkConductId) {
+	        V.validate("conductId", conduct.conductId, errs, [
+	            V.isDefined, V.isInteger, V.isPositive
+	        ]);
+	    }
+	    V.validate("visitId", conduct.visitId, errs, [
+	        V.isDefined, V.isInteger, V.isPositive
+	    ]);
+	    V.validate("種類", conduct.kind, errs, [
+	        V.isDefined, V.isInteger, V.isZeroOrPositive
+	    ]);
+	    return errs;
+	}
+	exports.validateConduct = validateConduct;
+	function fromJsonToConduct(src) {
+	    let conduct = new Conduct(src.id, src.visit_id, src.kind);
+	    let errs = validateConduct(conduct, true);
+	    if (errs.length > 0) {
+	        return [undefined, new V.ValidationError(errs)];
+	    }
+	    else {
+	        return [conduct, null];
+	    }
+	}
+	exports.fromJsonToConduct = fromJsonToConduct;
 
 
 /***/ }

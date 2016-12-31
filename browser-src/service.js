@@ -118,3 +118,10 @@ function getShinryou(shinryouId) {
     return request("get_shinryou", { shinryou_id: shinryouId }, "GET", model.fromJsonToShinryou);
 }
 exports.getShinryou = getShinryou;
+function getConduct(conductId) {
+    if (!(Number.isInteger(conductId) && conductId > 0)) {
+        return Promise.reject("invalid conductId");
+    }
+    return request("get_conduct", { conduct_id: conductId }, "GET", model.fromJsonToConduct);
+}
+exports.getConduct = getConduct;
