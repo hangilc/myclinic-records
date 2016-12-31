@@ -54,3 +54,49 @@ getGazouLabel(101).then(function(result){
 .catch(function(err){
 	console.log(err);
 })
+
+
+interface DomCreator {
+	create(): Node;
+}
+
+class SimpleDomCreator implements DomCreator {
+	constructor(readonly tag: string, readonly attrs: any, 
+		protected children: DomCreator[]){}
+
+	create(): Node {
+		let e = document.createElement(this.tag);
+		for(let key in this.attrs){
+			let val = this.attrs[key];
+			if( key === "style" ){
+				if( typeof val === "string" ){
+					e.style.cssText = val;
+				} else {
+					for(let cssKey in val){
+						console.log(cssKey, val);
+						e.style[cssKey] = val[cssKey];
+					}
+				}
+			} else {
+				e.setAttribute(key, val);
+			}
+		}
+		this.children.forEach(function(child){
+			e.appendChild(child.create());
+		})
+		return e;
+	}
+}
+
+class TextCreator implements DomCreator {
+	constructor(readonly text: string){}
+
+	create(): Node {
+		return document.createTextNode(this.text);
+	}
+}
+
+let creator = new SimpleDomCreator("div", 
+	{style: {border: "1px solid black", width:"100px", height: "200px"}}, 
+	[new TextCreator("Hello, world")]);
+document.body.appendChild(creator.create());
