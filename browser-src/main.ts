@@ -47,8 +47,8 @@ $("form#date-input-form").submit(function(event){
 	console.log(m.format("YYYY-MM-DD"));
 });
 
-import { getShahokokuho } from "./service";
-getShahokokuho(100).then(function(result){
+import { getKoukikourei } from "./service";
+getKoukikourei(100).then(function(result){
 	console.log(JSON.stringify(result, null, 2));
 })
 .catch(function(err){

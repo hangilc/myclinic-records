@@ -83,3 +83,10 @@ function getShahokokuho(shahokokuhoId) {
     return request("get_shahokokuho", { shahokokuho_id: shahokokuhoId }, "GET", model.fromJsonToShahokokuho);
 }
 exports.getShahokokuho = getShahokokuho;
+function getKoukikourei(koukikoureiId) {
+    if (!(Number.isInteger(koukikoureiId) && koukikoureiId > 0)) {
+        return Promise.reject("invalid koukikoureiId");
+    }
+    return request("get_koukikourei", { koukikourei_id: koukikoureiId }, "GET", model.fromJsonToKoukikourei);
+}
+exports.getKoukikourei = getKoukikourei;

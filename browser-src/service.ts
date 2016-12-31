@@ -6,6 +6,7 @@ import Patient = model.Patient;
 import Visit = model.Visit;
 import Text = model.Text;
 import Shahokokuho = model.Shahokokuho;
+import Koukikourei = model.Koukikourei;
 
 export class HttpError {
 	constructor(
@@ -95,6 +96,14 @@ export function getShahokokuho(shahokokuhoId: number): Promise<Shahokokuho> {
 	}
 	return request<Shahokokuho>("get_shahokokuho", { shahokokuho_id: shahokokuhoId }, 
 		"GET", model.fromJsonToShahokokuho);
+}
+
+export function getKoukikourei(koukikoureiId: number): Promise<Koukikourei> {
+	if( !(Number.isInteger(koukikoureiId) && koukikoureiId > 0) ){
+		return Promise.reject("invalid koukikoureiId");
+	}
+	return request<Koukikourei>("get_koukikourei", { koukikourei_id: koukikoureiId }, 
+		"GET", model.fromJsonToKoukikourei);
 }
 
 
