@@ -1,5 +1,6 @@
 "use strict";
 const $ = require("jquery");
+const validation_1 = require("./validation");
 const model = require("./model");
 class HttpError {
     constructor(status, text, exception) {
@@ -9,6 +10,26 @@ class HttpError {
     }
 }
 exports.HttpError = HttpError;
+function fromJsonArray(cvtor) {
+    return function (json) {
+        if (Array.isArray(json)) {
+            let list = json;
+            let ret = [];
+            for (let i = 0; i < list.length; i++) {
+                let item = list[i];
+                let [v, e] = cvtor(item);
+                if (e) {
+                    return [undefined, e];
+                }
+                ret.push(v);
+            }
+            return [ret, undefined];
+        }
+        else {
+            return [undefined, new validation_1.ValidationError(["array expected"])];
+        }
+    };
+}
 function request(service, data, method, cvtor) {
     return new Promise(function (resolve, reject) {
         $.ajax({
@@ -35,6 +56,16 @@ function request(service, data, method, cvtor) {
     });
 }
 function getPatient(patientId) {
+    if (!(Number.isInteger(patientId) && patientId > 0)) {
+        return Promise.reject("invalid patient_id");
+    }
     return request("get_patient", { patient_id: patientId }, "GET", model.fromJsonToPatient);
 }
 exports.getPatient = getPatient;
+function listVisitsByDate(at) {
+    if (!(/^\d{4}-\d{2}-\d{2}( \d{2}:\d{2}:\d{2})?$/.test(at))) {
+        return Promise.reject("invalid at");
+    }
+    return request("list_visits_by_date", { at: at }, "GET", fromJsonArray(model.fromJsonToVisit));
+}
+exports.listVisitsByDate = listVisitsByDate;

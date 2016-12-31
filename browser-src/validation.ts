@@ -40,6 +40,14 @@ export function isPositive(name, value): string {
 	}
 }
 
+export function isZeroOrPositive(name, value): string {
+	if( value >= 0 ){
+		return null;
+	} else {
+		return `${ name }の値がゼロあるいは正数でありません。`;
+	}
+}
+
 export function isNotEmpty(name, value): string {
 	if( value === "" || value == null ){
 		return `${ name}の値が空白です。`;
@@ -63,6 +71,16 @@ export function isSqlDateOrZero(name, value): string {
 		return null;
 	}
 	if( /^\d{4}-\d{2}-\d{2}$/.test(value) ){
+		let m = moment(value);
+		if( m.isValid() ){
+			return null;
+		}
+	}
+	return `${ name }の値が不適切です。`;
+}
+
+export function isSqlDateTime(name, value): string {
+	if( /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(value) ){
 		let m = moment(value);
 		if( m.isValid() ){
 			return null;

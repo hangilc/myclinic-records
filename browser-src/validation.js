@@ -42,6 +42,15 @@ function isPositive(name, value) {
     }
 }
 exports.isPositive = isPositive;
+function isZeroOrPositive(name, value) {
+    if (value >= 0) {
+        return null;
+    }
+    else {
+        return `${name}の値がゼロあるいは正数でありません。`;
+    }
+}
+exports.isZeroOrPositive = isZeroOrPositive;
 function isNotEmpty(name, value) {
     if (value === "" || value == null) {
         return `${name}の値が空白です。`;
@@ -74,6 +83,16 @@ function isSqlDateOrZero(name, value) {
     return `${name}の値が不適切です。`;
 }
 exports.isSqlDateOrZero = isSqlDateOrZero;
+function isSqlDateTime(name, value) {
+    if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(value)) {
+        let m = moment(value);
+        if (m.isValid()) {
+            return null;
+        }
+    }
+    return `${name}の値が不適切です。`;
+}
+exports.isSqlDateTime = isSqlDateTime;
 function isOneOf(...list) {
     return function (name, value) {
         for (let i = 0; i < list.length; i++) {

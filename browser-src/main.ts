@@ -47,8 +47,10 @@ $("form#date-input-form").submit(function(event){
 	console.log(m.format("YYYY-MM-DD"));
 });
 
-import { getPatient } from "./service";
-
-getPatient(198).then(function(patient){
-	console.log(patient);
+import { listVisitsByDate } from "./service";
+listVisitsByDate("2016-06-03").then(function(result){
+	console.log(JSON.stringify(result, null, 2));
+})
+.catch(function(err){
+	console.log(err);
 })

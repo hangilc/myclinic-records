@@ -87,8 +87,11 @@
 	    console.log(m.format("YYYY-MM-DD"));
 	});
 	const service_1 = __webpack_require__(192);
-	service_1.getPatient(198).then(function (patient) {
-	    console.log(patient);
+	service_1.listVisitsByDate("2016-06-03").then(function (result) {
+	    console.log(JSON.stringify(result, null, 2));
+	})
+	    .catch(function (err) {
+	    console.log(err);
 	});
 
 
@@ -25687,6 +25690,7 @@
 
 	"use strict";
 	const $ = __webpack_require__(113);
+	const validation_1 = __webpack_require__(195);
 	const model = __webpack_require__(193);
 	class HttpError {
 	    constructor(status, text, exception) {
@@ -25696,6 +25700,26 @@
 	    }
 	}
 	exports.HttpError = HttpError;
+	function fromJsonArray(cvtor) {
+	    return function (json) {
+	        if (Array.isArray(json)) {
+	            let list = json;
+	            let ret = [];
+	            for (let i = 0; i < list.length; i++) {
+	                let item = list[i];
+	                let [v, e] = cvtor(item);
+	                if (e) {
+	                    return [undefined, e];
+	                }
+	                ret.push(v);
+	            }
+	            return [ret, undefined];
+	        }
+	        else {
+	            return [undefined, new validation_1.ValidationError(["array expected"])];
+	        }
+	    };
+	}
 	function request(service, data, method, cvtor) {
 	    return new Promise(function (resolve, reject) {
 	        $.ajax({
@@ -25722,9 +25746,19 @@
 	    });
 	}
 	function getPatient(patientId) {
+	    if (!(Number.isInteger(patientId) && patientId > 0)) {
+	        return Promise.reject("invalid patient_id");
+	    }
 	    return request("get_patient", { patient_id: patientId }, "GET", model.fromJsonToPatient);
 	}
 	exports.getPatient = getPatient;
+	function listVisitsByDate(at) {
+	    if (!(/^\d{4}-\d{2}-\d{2}( \d{2}:\d{2}:\d{2})?$/.test(at))) {
+	        return Promise.reject("invalid at");
+	    }
+	    return request("list_visits_by_date", { at: at }, "GET", fromJsonArray(model.fromJsonToVisit));
+	}
+	exports.listVisitsByDate = listVisitsByDate;
 
 
 /***/ },
@@ -25736,6 +25770,7 @@
 	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 	}
 	__export(__webpack_require__(194));
+	__export(__webpack_require__(196));
 
 
 /***/ },
@@ -25838,6 +25873,15 @@
 	    }
 	}
 	exports.isPositive = isPositive;
+	function isZeroOrPositive(name, value) {
+	    if (value >= 0) {
+	        return null;
+	    }
+	    else {
+	        return `${name}の値がゼロあるいは正数でありません。`;
+	    }
+	}
+	exports.isZeroOrPositive = isZeroOrPositive;
 	function isNotEmpty(name, value) {
 	    if (value === "" || value == null) {
 	        return `${name}の値が空白です。`;
@@ -25870,6 +25914,16 @@
 	    return `${name}の値が不適切です。`;
 	}
 	exports.isSqlDateOrZero = isSqlDateOrZero;
+	function isSqlDateTime(name, value) {
+	    if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(value)) {
+	        let m = moment(value);
+	        if (m.isValid()) {
+	            return null;
+	        }
+	    }
+	    return `${name}の値が不適切です。`;
+	}
+	exports.isSqlDateTime = isSqlDateTime;
 	function isOneOf(...list) {
 	    return function (name, value) {
 	        for (let i = 0; i < list.length; i++) {
@@ -25892,6 +25946,59 @@
 	    }
 	}
 	exports.validate = validate;
+
+
+/***/ },
+/* 196 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	const V = __webpack_require__(195);
+	class Visit {
+	    constructor(visitId, patientId, visitedAt, shahokokuhoId, koukikoureiId, roujinId, kouhi1Id, kouhi2Id, kouhi3Id) {
+	        this.visitId = visitId;
+	        this.patientId = patientId;
+	        this.visitedAt = visitedAt;
+	        this.shahokokuhoId = shahokokuhoId;
+	        this.koukikoureiId = koukikoureiId;
+	        this.roujinId = roujinId;
+	        this.kouhi1Id = kouhi1Id;
+	        this.kouhi2Id = kouhi2Id;
+	        this.kouhi3Id = kouhi3Id;
+	    }
+	}
+	exports.Visit = Visit;
+	function validateVisit(visit, checkVisitId = true) {
+	    let errs = [];
+	    if (checkVisitId) {
+	        V.validate("visitId", visit.visitId, errs, [
+	            V.isDefined, V.isInteger, V.isPositive
+	        ]);
+	    }
+	    V.validate("患者番号", visit.patientId, errs, [
+	        V.isDefined, V.isInteger, V.isPositive
+	    ]);
+	    V.validate("診察時刻", visit.visitedAt, errs, [V.isSqlDateTime]);
+	    V.validate("shahokokuhoId", visit.shahokokuhoId, errs, [V.isZeroOrPositive]);
+	    V.validate("koukikoureiId", visit.koukikoureiId, errs, [V.isZeroOrPositive]);
+	    V.validate("roujinId", visit.roujinId, errs, [V.isZeroOrPositive]);
+	    V.validate("kouhi1Id", visit.kouhi1Id, errs, [V.isZeroOrPositive]);
+	    V.validate("kouhi2Id", visit.kouhi2Id, errs, [V.isZeroOrPositive]);
+	    V.validate("kouhi3Id", visit.kouhi3Id, errs, [V.isZeroOrPositive]);
+	    return errs;
+	}
+	exports.validateVisit = validateVisit;
+	function fromJsonToVisit(src) {
+	    let visit = new Visit(src.visit_id, src.patient_id, src.v_datetime, src.shahokokuho_id, src.koukikourei_id, src.roujin_id, src.kouhi_1_id, src.kouhi_2_id, src.kouhi_3_id);
+	    let errs = validateVisit(visit, true);
+	    if (errs.length > 0) {
+	        return [undefined, new V.ValidationError(errs)];
+	    }
+	    else {
+	        return [visit, null];
+	    }
+	}
+	exports.fromJsonToVisit = fromJsonToVisit;
 
 
 /***/ }
