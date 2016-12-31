@@ -7,6 +7,7 @@ import Visit = model.Visit;
 import Text = model.Text;
 import Shahokokuho = model.Shahokokuho;
 import Koukikourei = model.Koukikourei;
+import Roujin = model.Roujin;
 
 export class HttpError {
 	constructor(
@@ -104,6 +105,14 @@ export function getKoukikourei(koukikoureiId: number): Promise<Koukikourei> {
 	}
 	return request<Koukikourei>("get_koukikourei", { koukikourei_id: koukikoureiId }, 
 		"GET", model.fromJsonToKoukikourei);
+}
+
+export function getRoujin(roujinId: number): Promise<Roujin> {
+	if( !(Number.isInteger(roujinId) && roujinId > 0) ){
+		return Promise.reject("invalid roujinId");
+	}
+	return request<Roujin>("get_roujin", { roujin_id: roujinId }, 
+		"GET", model.fromJsonToRoujin);
 }
 
 

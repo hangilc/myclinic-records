@@ -87,7 +87,7 @@
 	    console.log(m.format("YYYY-MM-DD"));
 	});
 	const service_1 = __webpack_require__(192);
-	service_1.getKoukikourei(100).then(function (result) {
+	service_1.getRoujin(100).then(function (result) {
 	    console.log(JSON.stringify(result, null, 2));
 	})
 	    .catch(function (err) {
@@ -25780,6 +25780,13 @@
 	    return request("get_koukikourei", { koukikourei_id: koukikoureiId }, "GET", model.fromJsonToKoukikourei);
 	}
 	exports.getKoukikourei = getKoukikourei;
+	function getRoujin(roujinId) {
+	    if (!(Number.isInteger(roujinId) && roujinId > 0)) {
+	        return Promise.reject("invalid roujinId");
+	    }
+	    return request("get_roujin", { roujin_id: roujinId }, "GET", model.fromJsonToRoujin);
+	}
+	exports.getRoujin = getRoujin;
 
 
 /***/ },
@@ -25795,6 +25802,7 @@
 	__export(__webpack_require__(197));
 	__export(__webpack_require__(198));
 	__export(__webpack_require__(199));
+	__export(__webpack_require__(200));
 
 
 /***/ },
@@ -26199,6 +26207,65 @@
 	    }
 	}
 	exports.fromJsonToKoukikourei = fromJsonToKoukikourei;
+
+
+/***/ },
+/* 200 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	const V = __webpack_require__(195);
+	class Roujin {
+	    constructor(roujinId, patientId, shichouson, jukyuusha, futanWari, validFrom, validUpto) {
+	        this.roujinId = roujinId;
+	        this.patientId = patientId;
+	        this.shichouson = shichouson;
+	        this.jukyuusha = jukyuusha;
+	        this.futanWari = futanWari;
+	        this.validFrom = validFrom;
+	        this.validUpto = validUpto;
+	    }
+	}
+	exports.Roujin = Roujin;
+	function validateRoujin(roujin, checkRoujinId = true) {
+	    let errs = [];
+	    if (checkRoujinId) {
+	        V.validate("roujinId", roujin.roujinId, errs, [
+	            V.isDefined, V.isInteger, V.isPositive
+	        ]);
+	    }
+	    V.validate("患者番号", roujin.patientId, errs, [
+	        V.isDefined, V.isInteger, V.isPositive
+	    ]);
+	    V.validate("市町村番号", roujin.shichouson, errs, [
+	        V.isDefined, V.isInteger, V.isPositive
+	    ]);
+	    V.validate("受給者番号", roujin.jukyuusha, errs, [
+	        V.isDefined, V.isInteger, V.isPositive
+	    ]);
+	    V.validate("負担割", roujin.futanWari, errs, [
+	        V.isDefined, V.isInteger, V.isZeroOrPositive
+	    ]);
+	    V.validate("有効期限（開始）", roujin.validFrom, errs, [
+	        V.isDefined, V.isSqlDate
+	    ]);
+	    V.validate("有効期限（終了）", roujin.validFrom, errs, [
+	        V.isDefined, V.isSqlDateOrZero
+	    ]);
+	    return errs;
+	}
+	exports.validateRoujin = validateRoujin;
+	function fromJsonToRoujin(src) {
+	    let roujin = new Roujin(src.roujin_id, src.patient_id, src.shichouson, src.jukyuusha, src.futan_wari, src.valid_from, src.valid_upto);
+	    let errs = validateRoujin(roujin, true);
+	    if (errs.length > 0) {
+	        return [undefined, new V.ValidationError(errs)];
+	    }
+	    else {
+	        return [roujin, null];
+	    }
+	}
+	exports.fromJsonToRoujin = fromJsonToRoujin;
 
 
 /***/ }

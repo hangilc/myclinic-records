@@ -3,3 +3,4 @@ export * from "./model/visit";
 export * from "./model/text";
 export * from "./model/shahokokuho";
 export * from "./model/koukikourei";
+export * from "./model/roujin";

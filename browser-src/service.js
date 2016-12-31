@@ -90,3 +90,10 @@ function getKoukikourei(koukikoureiId) {
     return request("get_koukikourei", { koukikourei_id: koukikoureiId }, "GET", model.fromJsonToKoukikourei);
 }
 exports.getKoukikourei = getKoukikourei;
+function getRoujin(roujinId) {
+    if (!(Number.isInteger(roujinId) && roujinId > 0)) {
+        return Promise.reject("invalid roujinId");
+    }
+    return request("get_roujin", { roujin_id: roujinId }, "GET", model.fromJsonToRoujin);
+}
+exports.getRoujin = getRoujin;
