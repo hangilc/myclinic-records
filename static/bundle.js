@@ -115,6 +115,11 @@
 	body.appendChild(typed_dom_1.h.h1({}, ["診察日ごとの診療録リスト"]));
 	body.appendChild(dateInput.create());
 	dateInput.setToday();
+	const service = __webpack_require__(192);
+	service.getConductDrug(2)
+	    .then(function (result) {
+	    console.log(result);
+	});
 
 
 /***/ },
@@ -25844,6 +25849,13 @@
 	    return request("get_gazou_label", { conduct_id: conductId }, "GET", model.fromJsonToGazouLabel);
 	}
 	exports.getGazouLabel = getGazouLabel;
+	function getConductDrug(conductDrugId) {
+	    if (!(Number.isInteger(conductDrugId) && conductDrugId > 0)) {
+	        return Promise.reject("invalid conductDrugId");
+	    }
+	    return request("get_conduct_drug", { conduct_drug_id: conductDrugId }, "GET", model.fromJsonToConductDrug);
+	}
+	exports.getConductDrug = getConductDrug;
 
 
 /***/ },
@@ -25865,6 +25877,7 @@
 	__export(__webpack_require__(203));
 	__export(__webpack_require__(204));
 	__export(__webpack_require__(205));
+	__export(__webpack_require__(207));
 
 
 /***/ },
@@ -25940,6 +25953,15 @@
 	    }
 	}
 	exports.isDefined = isDefined;
+	function isNumber(name, value) {
+	    if (typeof value === "number") {
+	        return null;
+	    }
+	    else {
+	        return `${name}の値が数値でありません。`;
+	    }
+	}
+	exports.isNumber = isNumber;
 	function isInteger(name, value) {
 	    if (Number.isInteger(value)) {
 	        return null;
@@ -26682,6 +26704,53 @@
 	    e.addEventListener("submit", handler);
 	}
 	exports.submit = submit;
+
+
+/***/ },
+/* 207 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	const V = __webpack_require__(195);
+	class ConductDrug {
+	    constructor(conductDrugId, conductId, iyakuhincode, amount) {
+	        this.conductDrugId = conductDrugId;
+	        this.conductId = conductId;
+	        this.iyakuhincode = iyakuhincode;
+	        this.amount = amount;
+	    }
+	}
+	exports.ConductDrug = ConductDrug;
+	function validateConductDrug(conductDrug, checkConductDrugId = true) {
+	    let errs = [];
+	    if (checkConductDrugId) {
+	        V.validate("conductDrugId", conductDrug.conductDrugId, errs, [
+	            V.isDefined, V.isInteger, V.isPositive
+	        ]);
+	    }
+	    V.validate("conductId", conductDrug.conductId, errs, [
+	        V.isDefined, V.isInteger, V.isPositive
+	    ]);
+	    V.validate("医薬品コード", conductDrug.iyakuhincode, errs, [
+	        V.isDefined, V.isInteger, V.isPositive
+	    ]);
+	    V.validate("用量", conductDrug.amount, errs, [
+	        V.isDefined, V.isNumber, V.isZeroOrPositive
+	    ]);
+	    return errs;
+	}
+	exports.validateConductDrug = validateConductDrug;
+	function fromJsonToConductDrug(src) {
+	    let conductDrug = new ConductDrug(src.id, src.visit_conduct_id, src.iyakuhincode, src.amount);
+	    let errs = validateConductDrug(conductDrug, true);
+	    if (errs.length > 0) {
+	        return [undefined, new V.ValidationError(errs)];
+	    }
+	    else {
+	        return [conductDrug, null];
+	    }
+	}
+	exports.fromJsonToConductDrug = fromJsonToConductDrug;
 
 
 /***/ }

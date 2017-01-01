@@ -15,6 +15,15 @@ function isDefined(name, value) {
     }
 }
 exports.isDefined = isDefined;
+function isNumber(name, value) {
+    if (typeof value === "number") {
+        return null;
+    }
+    else {
+        return `${name}の値が数値でありません。`;
+    }
+}
+exports.isNumber = isNumber;
 function isInteger(name, value) {
     if (Number.isInteger(value)) {
         return null;

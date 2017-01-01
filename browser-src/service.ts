@@ -13,6 +13,7 @@ import Drug = model.Drug;
 import Shinryou = model.Shinryou;
 import Conduct = model.Conduct;
 import GazouLabel = model.GazouLabel;
+import ConductDrug = model.ConductDrug;
 
 export class HttpError {
 	constructor(
@@ -158,6 +159,14 @@ export function getGazouLabel(conductId: number): Promise<GazouLabel> {
 	}
 	return request<GazouLabel>("get_gazou_label", { conduct_id: conductId }, 
 		"GET", model.fromJsonToGazouLabel);
+}
+
+export function getConductDrug(conductDrugId: number): Promise<ConductDrug> {
+	if( !(Number.isInteger(conductDrugId) && conductDrugId > 0) ){
+		return Promise.reject("invalid conductDrugId");
+	}
+	return request<ConductDrug>("get_conduct_drug", { conduct_drug_id: conductDrugId }, 
+		"GET", model.fromJsonToConductDrug);
 }
 
 

@@ -13,3 +13,4 @@ __export(require("./model/drug"));
 __export(require("./model/shinryou"));
 __export(require("./model/conduct"));
 __export(require("./model/gazou-label"));
+__export(require("./model/conduct-drug"));

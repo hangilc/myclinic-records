@@ -69,3 +69,8 @@ let dateInput = new DateInput();
 body.appendChild(typed_dom_1.h.h1({}, ["診察日ごとの診療録リスト"]));
 body.appendChild(dateInput.create());
 dateInput.setToday();
+const service = require("./service");
+service.getConductDrug(2)
+    .then(function (result) {
+    console.log(result);
+});

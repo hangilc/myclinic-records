@@ -79,3 +79,9 @@ body.appendChild(h.h1({}, ["診察日ごとの診療録リスト"]));
 body.appendChild(dateInput.create());
 
 dateInput.setToday();
+
+import * as service from "./service";
+service.getConductDrug(2)
+.then(function(result){
+	console.log(result);
+})

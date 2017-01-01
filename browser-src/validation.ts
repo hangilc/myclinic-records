@@ -16,6 +16,14 @@ export function isDefined(name: string, value: any): string {
 	}
 }
 
+export function isNumber(name: string, value: any): string {
+	if( typeof value === "number" ){
+		return null;
+	} else {
+		return `${ name }の値が数値でありません。`;
+	}
+}
+
 export function isInteger(name: string, value: any): string {
 	if( Number.isInteger(value) ){
 		return null;
