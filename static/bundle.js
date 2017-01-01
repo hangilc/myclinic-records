@@ -116,7 +116,7 @@
 	body.appendChild(dateInput.create());
 	dateInput.setToday();
 	const service = __webpack_require__(192);
-	service.getFullVisit(39268)
+	service.getFullVisit(30723)
 	    .then(function (result) {
 	    console.log(result);
 	})
@@ -27423,12 +27423,14 @@
 	const conduct_1 = __webpack_require__(204);
 	const full_conduct_shinryou_1 = __webpack_require__(218);
 	const full_conduct_drug_1 = __webpack_require__(219);
+	const full_conduct_kizai_1 = __webpack_require__(220);
 	class FullConduct extends conduct_1.Conduct {
-	    constructor(conductId, visitId, kind, gazouLabel, drugs, shinryouList) {
+	    constructor(conductId, visitId, kind, gazouLabel, drugs, shinryouList, kizaiList) {
 	        super(conductId, visitId, kind);
 	        this.gazouLabel = gazouLabel;
 	        this.drugs = drugs;
 	        this.shinryouList = shinryouList;
+	        this.kizaiList = kizaiList;
 	    }
 	}
 	exports.FullConduct = FullConduct;
@@ -27442,6 +27444,9 @@
 	    });
 	    conduct.shinryouList.forEach(s => {
 	        errs = errs.concat(full_conduct_shinryou_1.validateFullConductShinryou(s));
+	    });
+	    conduct.kizaiList.forEach(s => {
+	        errs = errs.concat(full_conduct_kizai_1.validateFullConductKizai(s));
 	    });
 	    return errs;
 	}
@@ -27461,7 +27466,14 @@
 	        }
 	        return result;
 	    });
-	    let conduct = new FullConduct(src.id, src.visit_id, src.kind, src.gazou_label, drugs, shinryouList);
+	    let kizaiList = src.kizai_list.map(s => {
+	        let [result, err] = full_conduct_kizai_1.fromJsonToFullConductKizai(s);
+	        if (err) {
+	            return [undefined, err];
+	        }
+	        return result;
+	    });
+	    let conduct = new FullConduct(src.id, src.visit_id, src.kind, src.gazou_label, drugs, shinryouList, kizaiList);
 	    let errs = validateFullConduct(conduct);
 	    if (errs.length > 0) {
 	        return [undefined, new V.ValidationError(errs)];
@@ -27565,6 +27577,48 @@
 	    }
 	}
 	exports.fromJsonToFullConductDrug = fromJsonToFullConductDrug;
+
+
+/***/ },
+/* 220 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	const V = __webpack_require__(195);
+	const conduct_kizai_1 = __webpack_require__(209);
+	const kizai_master_1 = __webpack_require__(216);
+	class FullConductKizai extends conduct_kizai_1.ConductKizai {
+	    constructor(conductKizaiId, conductId, kizaicode, amount, name, yomi, unit, kingaku, validFrom, validUpto) {
+	        super(conductKizaiId, conductId, kizaicode, amount);
+	        this.name = name;
+	        this.yomi = yomi;
+	        this.unit = unit;
+	        this.kingaku = kingaku;
+	        this.validFrom = validFrom;
+	        this.validUpto = validUpto;
+	    }
+	}
+	exports.FullConductKizai = FullConductKizai;
+	function validateFullConductKizai(kizai) {
+	    let errs = conduct_kizai_1.validateConductKizai(kizai);
+	    if (errs.length > 0) {
+	        return errs;
+	    }
+	    errs = errs.concat(kizai_master_1.validateKizaiMaster(kizai));
+	    return errs;
+	}
+	exports.validateFullConductKizai = validateFullConductKizai;
+	function fromJsonToFullConductKizai(src) {
+	    let kizai = new FullConductKizai(src.id, src.visit_conduct_id, src.kizaicode, src.amount, src.name, src.yomi, src.unit, +src.kingaku, src.valid_from, src.valid_upto);
+	    let errs = validateFullConductKizai(kizai);
+	    if (errs.length > 0) {
+	        return [undefined, new V.ValidationError(errs)];
+	    }
+	    else {
+	        return [kizai, null];
+	    }
+	}
+	exports.fromJsonToFullConductKizai = fromJsonToFullConductKizai;
 
 
 /***/ }

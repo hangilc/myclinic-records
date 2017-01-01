@@ -3,12 +3,14 @@ const V = require("../validation");
 const conduct_1 = require("./conduct");
 const full_conduct_shinryou_1 = require("./full-conduct-shinryou");
 const full_conduct_drug_1 = require("./full-conduct-drug");
+const full_conduct_kizai_1 = require("./full-conduct-kizai");
 class FullConduct extends conduct_1.Conduct {
-    constructor(conductId, visitId, kind, gazouLabel, drugs, shinryouList) {
+    constructor(conductId, visitId, kind, gazouLabel, drugs, shinryouList, kizaiList) {
         super(conductId, visitId, kind);
         this.gazouLabel = gazouLabel;
         this.drugs = drugs;
         this.shinryouList = shinryouList;
+        this.kizaiList = kizaiList;
     }
 }
 exports.FullConduct = FullConduct;
@@ -22,6 +24,9 @@ function validateFullConduct(conduct) {
     });
     conduct.shinryouList.forEach(s => {
         errs = errs.concat(full_conduct_shinryou_1.validateFullConductShinryou(s));
+    });
+    conduct.kizaiList.forEach(s => {
+        errs = errs.concat(full_conduct_kizai_1.validateFullConductKizai(s));
     });
     return errs;
 }
@@ -41,7 +46,14 @@ function fromJsonToFullConduct(src) {
         }
         return result;
     });
-    let conduct = new FullConduct(src.id, src.visit_id, src.kind, src.gazou_label, drugs, shinryouList);
+    let kizaiList = src.kizai_list.map(s => {
+        let [result, err] = full_conduct_kizai_1.fromJsonToFullConductKizai(s);
+        if (err) {
+            return [undefined, err];
+        }
+        return result;
+    });
+    let conduct = new FullConduct(src.id, src.visit_id, src.kind, src.gazou_label, drugs, shinryouList, kizaiList);
     let errs = validateFullConduct(conduct);
     if (errs.length > 0) {
         return [undefined, new V.ValidationError(errs)];

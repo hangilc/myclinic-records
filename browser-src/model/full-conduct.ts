@@ -4,6 +4,8 @@ import { FullConductShinryou, validateFullConductShinryou,
 	fromJsonToFullConductShinryou } from "./full-conduct-shinryou";
 import { FullConductDrug, validateFullConductDrug,
 	fromJsonToFullConductDrug } from "./full-conduct-drug";
+import { FullConductKizai, validateFullConductKizai,
+	fromJsonToFullConductKizai } from "./full-conduct-kizai";
 
 export class FullConduct extends Conduct {
 	constructor(
@@ -13,6 +15,7 @@ export class FullConduct extends Conduct {
 		readonly gazouLabel: string,
 		readonly drugs: FullConductDrug[],
 		readonly shinryouList: FullConductShinryou[],
+		readonly kizaiList: FullConductKizai[],
 	){
 		super(conductId, visitId, kind)
 	}
@@ -28,6 +31,9 @@ export function validateFullConduct(conduct: FullConduct): string[] {
 	})
 	conduct.shinryouList.forEach(s => {
 		errs = errs.concat(validateFullConductShinryou(s));
+	})
+	conduct.kizaiList.forEach(s => {
+		errs = errs.concat(validateFullConductKizai(s));
 	})
 	return errs;
 }
@@ -47,8 +53,15 @@ export function fromJsonToFullConduct(src: any): [FullConduct, V.ValidationError
 		}
 		return result;
 	})
+	let kizaiList = src.kizai_list.map(s => {
+		let [result, err] = fromJsonToFullConductKizai(s);
+		if( err ){
+			return [undefined, err];
+		}
+		return result;
+	})
 	let conduct = new FullConduct(src.id, src.visit_id, src.kind, src.gazou_label,
-		drugs, shinryouList);
+		drugs, shinryouList, kizaiList);
 	let errs = validateFullConduct(conduct);
 	if( errs.length > 0 ){
 		return [undefined, new V.ValidationError(errs)];
