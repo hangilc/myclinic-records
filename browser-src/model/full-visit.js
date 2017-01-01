@@ -5,7 +5,7 @@ const shahokokuho_1 = require("./shahokokuho");
 const koukikourei_1 = require("./koukikourei");
 const roujin_1 = require("./roujin");
 const kouhi_1 = require("./kouhi");
-const drug_1 = require("./drug");
+const full_drug_1 = require("./full-drug");
 const shinryou_1 = require("./shinryou");
 const conduct_1 = require("./conduct");
 const charge_1 = require("./charge");
@@ -46,7 +46,7 @@ function validateFullVisit(visit) {
         });
     }
     visit.drugs.forEach(t => {
-        errs = errs.concat(drug_1.validateDrug(t));
+        errs = errs.concat(full_drug_1.validateFullDrug(t));
     });
     visit.shinryouList.forEach(s => {
         errs = errs.concat(shinryou_1.validateShinryou(s));
@@ -103,7 +103,7 @@ function fromJsonToFullVisit(src) {
         });
     }
     let drugs = src.drugs.map(s => {
-        let [result, err] = drug_1.fromJsonToDrug(s);
+        let [result, err] = full_drug_1.fromJsonToFullDrug(s);
         if (err) {
             return [undefined, err];
         }

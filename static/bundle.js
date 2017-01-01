@@ -116,7 +116,7 @@
 	body.appendChild(dateInput.create());
 	dateInput.setToday();
 	const service = __webpack_require__(192);
-	service.getFullVisit(6731)
+	service.getFullVisit(1000)
 	    .then(function (result) {
 	    console.log(result);
 	})
@@ -25880,6 +25880,16 @@
 	    return request("get_charge", { visit_id: visitId }, "GET", model.fromJsonToCharge);
 	}
 	exports.getCharge = getCharge;
+	function getIyakuhinMaster(iyakuhincode, at) {
+	    if (!(Number.isInteger(iyakuhincode) && iyakuhincode > 0)) {
+	        return Promise.reject("invalid iyakuhincode");
+	    }
+	    if (!(/^\d{4}-\d{2}-\d{2}( \d{2}:\d{2}:\d{2})?$/.test(at))) {
+	        return Promise.reject("invalid at");
+	    }
+	    return request("get_iyakuhin_master", { iyakuhincode: iyakuhincode, at: at }, "GET", model.fromJsonToIyakuhinMaster);
+	}
+	exports.getIyakuhinMaster = getIyakuhinMaster;
 	function getFullVisit(visitId) {
 	    if (!(Number.isInteger(visitId) && visitId > 0)) {
 	        return Promise.reject("invalid visitId");
@@ -25913,6 +25923,7 @@
 	__export(__webpack_require__(209));
 	__export(__webpack_require__(210));
 	__export(__webpack_require__(211));
+	__export(__webpack_require__(212));
 
 
 /***/ },
@@ -26926,7 +26937,7 @@
 	const koukikourei_1 = __webpack_require__(199);
 	const roujin_1 = __webpack_require__(200);
 	const kouhi_1 = __webpack_require__(201);
-	const drug_1 = __webpack_require__(202);
+	const full_drug_1 = __webpack_require__(213);
 	const shinryou_1 = __webpack_require__(203);
 	const conduct_1 = __webpack_require__(204);
 	const charge_1 = __webpack_require__(210);
@@ -26967,7 +26978,7 @@
 	        });
 	    }
 	    visit.drugs.forEach(t => {
-	        errs = errs.concat(drug_1.validateDrug(t));
+	        errs = errs.concat(full_drug_1.validateFullDrug(t));
 	    });
 	    visit.shinryouList.forEach(s => {
 	        errs = errs.concat(shinryou_1.validateShinryou(s));
@@ -27024,7 +27035,7 @@
 	        });
 	    }
 	    let drugs = src.drugs.map(s => {
-	        let [result, err] = drug_1.fromJsonToDrug(s);
+	        let [result, err] = full_drug_1.fromJsonToFullDrug(s);
 	        if (err) {
 	            return [undefined, err];
 	        }
@@ -27063,6 +27074,120 @@
 	    }
 	}
 	exports.fromJsonToFullVisit = fromJsonToFullVisit;
+
+
+/***/ },
+/* 212 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	const V = __webpack_require__(195);
+	class IyakuhinMaster {
+	    constructor(iyakuhincode, name, yomi, unit, yakka, madoku, kouhatsu, zaikei, validFrom, validUpto) {
+	        this.iyakuhincode = iyakuhincode;
+	        this.name = name;
+	        this.yomi = yomi;
+	        this.unit = unit;
+	        this.yakka = yakka;
+	        this.madoku = madoku;
+	        this.kouhatsu = kouhatsu;
+	        this.zaikei = zaikei;
+	        this.validFrom = validFrom;
+	        this.validUpto = validUpto;
+	    }
+	}
+	exports.IyakuhinMaster = IyakuhinMaster;
+	function validateIyakuhinMaster(iyakuhinMaster) {
+	    let errs = [];
+	    V.validate("医薬品コード", iyakuhinMaster.iyakuhincode, errs, [
+	        V.isDefined, V.isInteger, V.isPositive
+	    ]);
+	    V.validate("名前", iyakuhinMaster.name, errs, [
+	        V.isDefined, V.isString, V.isNotEmpty
+	    ]);
+	    V.validate("よみ", iyakuhinMaster.yomi, errs, [
+	        V.isDefined, V.isString, V.isNotEmpty
+	    ]);
+	    V.validate("単位", iyakuhinMaster.unit, errs, [
+	        V.isDefined, V.isString, V.isNotEmpty
+	    ]);
+	    V.validate("薬価", iyakuhinMaster.yakka, errs, [
+	        V.isDefined, V.isNumber, V.isZeroOrPositive
+	    ]);
+	    V.validate("麻毒", iyakuhinMaster.madoku, errs, [
+	        V.isDefined, V.isInteger, V.isZeroOrPositive
+	    ]);
+	    V.validate("後発", iyakuhinMaster.kouhatsu, errs, [
+	        V.isDefined, V.isBoolean
+	    ]);
+	    V.validate("剤型", iyakuhinMaster.zaikei, errs, [
+	        V.isDefined, V.isInteger, V.isZeroOrPositive
+	    ]);
+	    V.validate("有効期限（開始）", iyakuhinMaster.validFrom, errs, [
+	        V.isDefined, V.isSqlDate
+	    ]);
+	    V.validate("有効期限（終了）", iyakuhinMaster.validFrom, errs, [
+	        V.isDefined, V.isSqlDateOrZero
+	    ]);
+	    return errs;
+	}
+	exports.validateIyakuhinMaster = validateIyakuhinMaster;
+	function fromJsonToIyakuhinMaster(src) {
+	    let master = new IyakuhinMaster(src.iyakuhincode, src.name, src.yomi, src.unit, +src.yakka, +src.madoku, src.kouhatsu === 0 ? false : true, +src.zaikei, src.valid_from, src.valid_upto);
+	    let errs = validateIyakuhinMaster(master);
+	    if (errs.length > 0) {
+	        return [undefined, new V.ValidationError(errs)];
+	    }
+	    else {
+	        return [master, null];
+	    }
+	}
+	exports.fromJsonToIyakuhinMaster = fromJsonToIyakuhinMaster;
+
+
+/***/ },
+/* 213 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	const V = __webpack_require__(195);
+	const drug_1 = __webpack_require__(202);
+	const iyakuhin_master_1 = __webpack_require__(212);
+	class FullDrug extends drug_1.Drug {
+	    constructor(drugId, visitId, iyakuhincode, amount, usage, days, category, prescribed, name, yomi, unit, yakka, madoku, kouhatsu, zaikei, validFrom, validUpto) {
+	        super(drugId, visitId, iyakuhincode, amount, usage, days, category, prescribed);
+	        this.name = name;
+	        this.yomi = yomi;
+	        this.unit = unit;
+	        this.yakka = yakka;
+	        this.madoku = madoku;
+	        this.kouhatsu = kouhatsu;
+	        this.zaikei = zaikei;
+	        this.validFrom = validFrom;
+	        this.validUpto = validUpto;
+	    }
+	}
+	exports.FullDrug = FullDrug;
+	function validateFullDrug(drug) {
+	    let errs = drug_1.validateDrug(drug);
+	    if (errs.length > 0) {
+	        return errs;
+	    }
+	    errs = errs.concat(iyakuhin_master_1.validateIyakuhinMaster(drug));
+	    return errs;
+	}
+	exports.validateFullDrug = validateFullDrug;
+	function fromJsonToFullDrug(src) {
+	    let drug = new FullDrug(src.drug_id, src.visit_id, src.d_iyakuhincode, src.d_amount, src.d_usage, src.d_days, src.d_category, src.d_prescribed === 0 ? false : true, src.name, src.yomi, src.unit, +src.yakka, +src.madoku, src.kouhatsu === 0 ? false : true, +src.zaikei, src.valid_from, src.valid_upto);
+	    let errs = validateFullDrug(drug);
+	    if (errs.length > 0) {
+	        return [undefined, new V.ValidationError(errs)];
+	    }
+	    else {
+	        return [drug, null];
+	    }
+	}
+	exports.fromJsonToFullDrug = fromJsonToFullDrug;
 
 
 /***/ }

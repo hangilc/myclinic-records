@@ -160,6 +160,16 @@ function getCharge(visitId) {
     return request("get_charge", { visit_id: visitId }, "GET", model.fromJsonToCharge);
 }
 exports.getCharge = getCharge;
+function getIyakuhinMaster(iyakuhincode, at) {
+    if (!(Number.isInteger(iyakuhincode) && iyakuhincode > 0)) {
+        return Promise.reject("invalid iyakuhincode");
+    }
+    if (!(/^\d{4}-\d{2}-\d{2}( \d{2}:\d{2}:\d{2})?$/.test(at))) {
+        return Promise.reject("invalid at");
+    }
+    return request("get_iyakuhin_master", { iyakuhincode: iyakuhincode, at: at }, "GET", model.fromJsonToIyakuhinMaster);
+}
+exports.getIyakuhinMaster = getIyakuhinMaster;
 function getFullVisit(visitId) {
     if (!(Number.isInteger(visitId) && visitId > 0)) {
         return Promise.reject("invalid visitId");

@@ -4,7 +4,7 @@ import { Shahokokuho, validateShahokokuho, fromJsonToShahokokuho } from "./shaho
 import { Koukikourei, validateKoukikourei, fromJsonToKoukikourei } from "./koukikourei";
 import { Roujin, validateRoujin, fromJsonToRoujin } from "./roujin";
 import { Kouhi, validateKouhi, fromJsonToKouhi } from "./kouhi";
-import { Drug, validateDrug, fromJsonToDrug } from "./drug";
+import { FullDrug, validateFullDrug, fromJsonToFullDrug } from "./full-drug";
 import { Shinryou, validateShinryou, fromJsonToShinryou } from "./shinryou";
 import { Conduct, validateConduct, fromJsonToConduct } from "./conduct";
 import { Charge, validateCharge, fromJsonToCharge } from "./charge";
@@ -26,7 +26,7 @@ export class FullVisit extends Visit {
 		readonly koukikourei: Koukikourei,
 		readonly roujin: Roujin,
 		readonly kouhiList: Kouhi[],
-		readonly drugs: Drug[],
+		readonly drugs: FullDrug[],
 		readonly shinryouList: Shinryou[],
 		readonly conducts: Conduct[],
 		readonly charge: Charge
@@ -57,7 +57,7 @@ export function validateFullVisit(visit: FullVisit): string[] {
 		})
 	}
 	visit.drugs.forEach(t => {
-		errs = errs.concat(validateDrug(t));
+		errs = errs.concat(validateFullDrug(t));
 	})
 	visit.shinryouList.forEach(s => {
 		errs = errs.concat(validateShinryou(s));
@@ -113,8 +113,8 @@ export function fromJsonToFullVisit(src: any): [FullVisit, V.ValidationError] {
 			return kouhi;
 		});
 	}
-	let drugs: Drug[] = src.drugs.map(s => {
-		let [result, err] = fromJsonToDrug(s);
+	let drugs: FullDrug[] = src.drugs.map(s => {
+		let [result, err] = fromJsonToFullDrug(s);
 		if( err ){
 			return [undefined, err];
 		}

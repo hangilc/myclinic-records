@@ -18,6 +18,7 @@ import ConductShinryou = model.ConductShinryou;
 import ConductKizai = model.ConductKizai;
 import Charge = model.Charge;
 import FullVisit = model.FullVisit;
+import IyakuhinMaster = model.IyakuhinMaster;
 
 export class HttpError {
 	constructor(
@@ -195,6 +196,17 @@ export function getCharge(visitId: number): Promise<Charge> {
 	}
 	return request<Charge>("get_charge", { visit_id: visitId }, 
 		"GET", model.fromJsonToCharge);
+}
+
+export function getIyakuhinMaster(iyakuhincode: number, at: string): Promise<IyakuhinMaster> {
+	if( !(Number.isInteger(iyakuhincode) && iyakuhincode > 0) ){
+		return Promise.reject("invalid iyakuhincode");
+	}
+	if( !(/^\d{4}-\d{2}-\d{2}( \d{2}:\d{2}:\d{2})?$/.test(at)) ){
+		return Promise.reject("invalid at");
+	}
+	return request<IyakuhinMaster>("get_iyakuhin_master", 
+		{ iyakuhincode: iyakuhincode, at: at }, "GET", model.fromJsonToIyakuhinMaster);
 }
 
 export function getFullVisit(visitId: number): Promise<FullVisit> {

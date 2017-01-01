@@ -81,7 +81,7 @@ body.appendChild(dateInput.create());
 dateInput.setToday();
 
 import * as service from "./service";
-service.getFullVisit(6731)
+service.getFullVisit(1000)
 .then(function(result){
 	console.log(result);
 })
