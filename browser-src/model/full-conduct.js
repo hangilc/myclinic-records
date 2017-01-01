@@ -2,10 +2,12 @@
 const V = require("../validation");
 const conduct_1 = require("./conduct");
 const full_conduct_shinryou_1 = require("./full-conduct-shinryou");
+const full_conduct_drug_1 = require("./full-conduct-drug");
 class FullConduct extends conduct_1.Conduct {
-    constructor(conductId, visitId, kind, gazouLabel, shinryouList) {
+    constructor(conductId, visitId, kind, gazouLabel, drugs, shinryouList) {
         super(conductId, visitId, kind);
         this.gazouLabel = gazouLabel;
+        this.drugs = drugs;
         this.shinryouList = shinryouList;
     }
 }
@@ -15,6 +17,9 @@ function validateFullConduct(conduct) {
     V.validate("画像ラベル", conduct.gazouLabel, errs, [
         V.isDefined, V.isOptionalString
     ]);
+    conduct.drugs.forEach(s => {
+        errs = errs.concat(full_conduct_drug_1.validateFullConductDrug(s));
+    });
     conduct.shinryouList.forEach(s => {
         errs = errs.concat(full_conduct_shinryou_1.validateFullConductShinryou(s));
     });
@@ -22,6 +27,13 @@ function validateFullConduct(conduct) {
 }
 exports.validateFullConduct = validateFullConduct;
 function fromJsonToFullConduct(src) {
+    let drugs = src.drugs.map(s => {
+        let [result, err] = full_conduct_drug_1.fromJsonToFullConductDrug(s);
+        if (err) {
+            return [undefined, err];
+        }
+        return result;
+    });
     let shinryouList = src.shinryou_list.map(s => {
         let [result, err] = full_conduct_shinryou_1.fromJsonToFullConductShinryou(s);
         if (err) {
@@ -29,7 +41,7 @@ function fromJsonToFullConduct(src) {
         }
         return result;
     });
-    let conduct = new FullConduct(src.id, src.visit_id, src.kind, src.gazou_label, shinryouList);
+    let conduct = new FullConduct(src.id, src.visit_id, src.kind, src.gazou_label, drugs, shinryouList);
     let errs = validateFullConduct(conduct);
     if (errs.length > 0) {
         return [undefined, new V.ValidationError(errs)];

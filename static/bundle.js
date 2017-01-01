@@ -116,7 +116,7 @@
 	body.appendChild(dateInput.create());
 	dateInput.setToday();
 	const service = __webpack_require__(192);
-	service.getFullVisit(32902)
+	service.getFullVisit(39268)
 	    .then(function (result) {
 	    console.log(result);
 	})
@@ -27422,10 +27422,12 @@
 	const V = __webpack_require__(195);
 	const conduct_1 = __webpack_require__(204);
 	const full_conduct_shinryou_1 = __webpack_require__(218);
+	const full_conduct_drug_1 = __webpack_require__(219);
 	class FullConduct extends conduct_1.Conduct {
-	    constructor(conductId, visitId, kind, gazouLabel, shinryouList) {
+	    constructor(conductId, visitId, kind, gazouLabel, drugs, shinryouList) {
 	        super(conductId, visitId, kind);
 	        this.gazouLabel = gazouLabel;
+	        this.drugs = drugs;
 	        this.shinryouList = shinryouList;
 	    }
 	}
@@ -27435,6 +27437,9 @@
 	    V.validate("画像ラベル", conduct.gazouLabel, errs, [
 	        V.isDefined, V.isOptionalString
 	    ]);
+	    conduct.drugs.forEach(s => {
+	        errs = errs.concat(full_conduct_drug_1.validateFullConductDrug(s));
+	    });
 	    conduct.shinryouList.forEach(s => {
 	        errs = errs.concat(full_conduct_shinryou_1.validateFullConductShinryou(s));
 	    });
@@ -27442,6 +27447,13 @@
 	}
 	exports.validateFullConduct = validateFullConduct;
 	function fromJsonToFullConduct(src) {
+	    let drugs = src.drugs.map(s => {
+	        let [result, err] = full_conduct_drug_1.fromJsonToFullConductDrug(s);
+	        if (err) {
+	            return [undefined, err];
+	        }
+	        return result;
+	    });
 	    let shinryouList = src.shinryou_list.map(s => {
 	        let [result, err] = full_conduct_shinryou_1.fromJsonToFullConductShinryou(s);
 	        if (err) {
@@ -27449,7 +27461,7 @@
 	        }
 	        return result;
 	    });
-	    let conduct = new FullConduct(src.id, src.visit_id, src.kind, src.gazou_label, shinryouList);
+	    let conduct = new FullConduct(src.id, src.visit_id, src.kind, src.gazou_label, drugs, shinryouList);
 	    let errs = validateFullConduct(conduct);
 	    if (errs.length > 0) {
 	        return [undefined, new V.ValidationError(errs)];
@@ -27508,6 +27520,51 @@
 	    }
 	}
 	exports.fromJsonToFullConductShinryou = fromJsonToFullConductShinryou;
+
+
+/***/ },
+/* 219 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	const V = __webpack_require__(195);
+	const conduct_drug_1 = __webpack_require__(207);
+	const iyakuhin_master_1 = __webpack_require__(212);
+	class FullConductDrug extends conduct_drug_1.ConductDrug {
+	    constructor(conductDrugId, conductId, iyakuhincode, amount, name, yomi, unit, yakka, madoku, kouhatsu, zaikei, validFrom, validUpto) {
+	        super(conductDrugId, conductId, iyakuhincode, amount);
+	        this.name = name;
+	        this.yomi = yomi;
+	        this.unit = unit;
+	        this.yakka = yakka;
+	        this.madoku = madoku;
+	        this.kouhatsu = kouhatsu;
+	        this.zaikei = zaikei;
+	        this.validFrom = validFrom;
+	        this.validUpto = validUpto;
+	    }
+	}
+	exports.FullConductDrug = FullConductDrug;
+	function validateFullConductDrug(drug) {
+	    let errs = conduct_drug_1.validateConductDrug(drug);
+	    if (errs.length > 0) {
+	        return errs;
+	    }
+	    errs = errs.concat(iyakuhin_master_1.validateIyakuhinMaster(drug));
+	    return errs;
+	}
+	exports.validateFullConductDrug = validateFullConductDrug;
+	function fromJsonToFullConductDrug(src) {
+	    let drug = new FullConductDrug(src.id, src.visit_conduct_id, src.iyakuhincode, src.amount, src.name, src.yomi, src.unit, +src.yakka, +src.madoku, src.kouhatsu === 0 ? false : true, +src.zaikei, src.valid_from, src.valid_upto);
+	    let errs = validateFullConductDrug(drug);
+	    if (errs.length > 0) {
+	        return [undefined, new V.ValidationError(errs)];
+	    }
+	    else {
+	        return [drug, null];
+	    }
+	}
+	exports.fromJsonToFullConductDrug = fromJsonToFullConductDrug;
 
 
 /***/ }
