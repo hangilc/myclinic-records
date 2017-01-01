@@ -19,3 +19,4 @@ __export(require("./model/conduct-kizai"));
 __export(require("./model/charge"));
 __export(require("./model/full-visit"));
 __export(require("./model/iyakuhin-master"));
+__export(require("./model/shinryou-master"));

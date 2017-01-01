@@ -15,3 +15,4 @@ export * from "./model/conduct-kizai";
 export * from "./model/charge";
 export * from "./model/full-visit";
 export * from "./model/iyakuhin-master";
+export * from "./model/shinryou-master";

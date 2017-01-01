@@ -39,22 +39,23 @@ export function validateShinryouMaster(shinryouMaster: ShinryouMaster): string[]
 	V.validate("往診区分", shinryouMaster.oushinKubun, errs, [
 		V.isDefined, V.isInteger, V.isZeroOrPositive
 	]);
-
-
-	V.validate("よみ", shinryouMaster.yomi, errs, [
+	V.validate("検査グループ", shinryouMaster.kensaGroup, errs, [
 		V.isDefined, V.isString, V.isNotEmpty
 	]);
-	V.validate("単位", shinryouMaster.unit, errs, [
+	V.validate("老人適用", shinryouMaster.roujinTekiyou, errs, [
+		V.isDefined, V.isInteger, V.isZeroOrPositive
+	]);
+	V.validate("コード章", shinryouMaster.codeShou, errs, [
+		V.isDefined, V.isInteger, V.isZeroOrPositive
+	]);
+	V.validate("コード部", shinryouMaster.codeBu, errs, [
 		V.isDefined, V.isString, V.isNotEmpty
 	]);
-	V.validate("麻毒", shinryouMaster.madoku, errs, [
-		V.isDefined, V.isInteger, V.isZeroOrPositive
+	V.validate("コードアルファ", shinryouMaster.codeAlpha, errs, [
+		V.isDefined, V.isString, V.isNotEmpty
 	]);
-	V.validate("後発", shinryouMaster.kouhatsu, errs, [
-		V.isDefined, V.isBoolean
-	]);
-	V.validate("剤型", shinryouMaster.zaikei, errs, [
-		V.isDefined, V.isInteger, V.isZeroOrPositive
+	V.validate("コード区分", shinryouMaster.codeKubun, errs, [
+		V.isDefined, V.isString, V.isNotEmpty
 	]);
 	V.validate("有効期限（開始）", shinryouMaster.validFrom, errs, [
 		V.isDefined, V.isSqlDate
@@ -66,9 +67,10 @@ export function validateShinryouMaster(shinryouMaster: ShinryouMaster): string[]
 }
 
 export function fromJsonToShinryouMaster(src: any): [ShinryouMaster, V.ValidationError] {
-	let master = new ShinryouMaster(src.shinryoucode, src.name, src.yomi, src.unit,
-		+src.yakka, +src.madoku, src.kouhatsu === 0 ? false : true,
-		+src.zaikei, src.valid_from, src.valid_upto);
+	let master = new ShinryouMaster(src.shinryoucode, src.name, +src.tensuu,
+		+src.tensuu_shikibetsu, src.houkatsukensa, +src.oushinkubun, 
+		src.kensagroup, +src.roujintekiyou, +src.code_shou, 
+		src.code_bu, src.code_alpha, src.code_kubun, src.valid_from, src.valid_upto);
 	let errs = validateShinryouMaster(master);
 	if( errs.length > 0 ){
 		return [undefined, new V.ValidationError(errs)];

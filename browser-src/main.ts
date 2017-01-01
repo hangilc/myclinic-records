@@ -81,7 +81,7 @@ body.appendChild(dateInput.create());
 dateInput.setToday();
 
 import * as service from "./service";
-service.getFullVisit(1000)
+service.getShinryouMaster(160208510, "2016-12-30")
 .then(function(result){
 	console.log(result);
 })

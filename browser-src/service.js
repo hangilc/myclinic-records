@@ -170,6 +170,16 @@ function getIyakuhinMaster(iyakuhincode, at) {
     return request("get_iyakuhin_master", { iyakuhincode: iyakuhincode, at: at }, "GET", model.fromJsonToIyakuhinMaster);
 }
 exports.getIyakuhinMaster = getIyakuhinMaster;
+function getShinryouMaster(shinryoucode, at) {
+    if (!(Number.isInteger(shinryoucode) && shinryoucode > 0)) {
+        return Promise.reject("invalid shinryoucode");
+    }
+    if (!(/^\d{4}-\d{2}-\d{2}( \d{2}:\d{2}:\d{2})?$/.test(at))) {
+        return Promise.reject("invalid at");
+    }
+    return request("get_shinryou_master", { shinryoucode: shinryoucode, at: at }, "GET", model.fromJsonToShinryouMaster);
+}
+exports.getShinryouMaster = getShinryouMaster;
 function getFullVisit(visitId) {
     if (!(Number.isInteger(visitId) && visitId > 0)) {
         return Promise.reject("invalid visitId");

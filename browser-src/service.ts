@@ -19,6 +19,7 @@ import ConductKizai = model.ConductKizai;
 import Charge = model.Charge;
 import FullVisit = model.FullVisit;
 import IyakuhinMaster = model.IyakuhinMaster;
+import ShinryouMaster = model.ShinryouMaster;
 
 export class HttpError {
 	constructor(
@@ -207,6 +208,17 @@ export function getIyakuhinMaster(iyakuhincode: number, at: string): Promise<Iya
 	}
 	return request<IyakuhinMaster>("get_iyakuhin_master", 
 		{ iyakuhincode: iyakuhincode, at: at }, "GET", model.fromJsonToIyakuhinMaster);
+}
+
+export function getShinryouMaster(shinryoucode: number, at: string): Promise<ShinryouMaster> {
+	if( !(Number.isInteger(shinryoucode) && shinryoucode > 0) ){
+		return Promise.reject("invalid shinryoucode");
+	}
+	if( !(/^\d{4}-\d{2}-\d{2}( \d{2}:\d{2}:\d{2})?$/.test(at)) ){
+		return Promise.reject("invalid at");
+	}
+	return request<ShinryouMaster>("get_shinryou_master", 
+		{ shinryoucode: shinryoucode, at: at }, "GET", model.fromJsonToShinryouMaster);
 }
 
 export function getFullVisit(visitId: number): Promise<FullVisit> {
