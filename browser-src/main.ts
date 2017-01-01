@@ -81,7 +81,7 @@ body.appendChild(dateInput.create());
 dateInput.setToday();
 
 import * as service from "./service";
-service.getConductDrug(2)
+service.getCharge(200)
 .then(function(result){
 	console.log(result);
 })

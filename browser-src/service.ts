@@ -14,6 +14,9 @@ import Shinryou = model.Shinryou;
 import Conduct = model.Conduct;
 import GazouLabel = model.GazouLabel;
 import ConductDrug = model.ConductDrug;
+import ConductShinryou = model.ConductShinryou;
+import ConductKizai = model.ConductKizai;
+import Charge = model.Charge;
 
 export class HttpError {
 	constructor(
@@ -167,6 +170,30 @@ export function getConductDrug(conductDrugId: number): Promise<ConductDrug> {
 	}
 	return request<ConductDrug>("get_conduct_drug", { conduct_drug_id: conductDrugId }, 
 		"GET", model.fromJsonToConductDrug);
+}
+
+export function getConductShinryou(conductShinryouId: number): Promise<ConductShinryou> {
+	if( !(Number.isInteger(conductShinryouId) && conductShinryouId > 0) ){
+		return Promise.reject("invalid conductShinryouId");
+	}
+	return request<ConductShinryou>("get_conduct_shinryou", { conduct_shinryou_id: conductShinryouId }, 
+		"GET", model.fromJsonToConductShinryou);
+}
+
+export function getConductKizai(conductKizaiId: number): Promise<ConductKizai> {
+	if( !(Number.isInteger(conductKizaiId) && conductKizaiId > 0) ){
+		return Promise.reject("invalid conductKizaiId");
+	}
+	return request<ConductKizai>("get_conduct_kizai", { conduct_kizai_id: conductKizaiId }, 
+		"GET", model.fromJsonToConductKizai);
+}
+
+export function getCharge(visitId: number): Promise<Charge> {
+	if( !(Number.isInteger(visitId) && visitId > 0) ){
+		return Promise.reject("invalid visitId");
+	}
+	return request<Charge>("get_charge", { visit_id: visitId }, 
+		"GET", model.fromJsonToCharge);
 }
 
 

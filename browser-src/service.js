@@ -139,3 +139,24 @@ function getConductDrug(conductDrugId) {
     return request("get_conduct_drug", { conduct_drug_id: conductDrugId }, "GET", model.fromJsonToConductDrug);
 }
 exports.getConductDrug = getConductDrug;
+function getConductShinryou(conductShinryouId) {
+    if (!(Number.isInteger(conductShinryouId) && conductShinryouId > 0)) {
+        return Promise.reject("invalid conductShinryouId");
+    }
+    return request("get_conduct_shinryou", { conduct_shinryou_id: conductShinryouId }, "GET", model.fromJsonToConductShinryou);
+}
+exports.getConductShinryou = getConductShinryou;
+function getConductKizai(conductKizaiId) {
+    if (!(Number.isInteger(conductKizaiId) && conductKizaiId > 0)) {
+        return Promise.reject("invalid conductKizaiId");
+    }
+    return request("get_conduct_kizai", { conduct_kizai_id: conductKizaiId }, "GET", model.fromJsonToConductKizai);
+}
+exports.getConductKizai = getConductKizai;
+function getCharge(visitId) {
+    if (!(Number.isInteger(visitId) && visitId > 0)) {
+        return Promise.reject("invalid visitId");
+    }
+    return request("get_charge", { visit_id: visitId }, "GET", model.fromJsonToCharge);
+}
+exports.getCharge = getCharge;

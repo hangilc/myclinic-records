@@ -116,7 +116,7 @@
 	body.appendChild(dateInput.create());
 	dateInput.setToday();
 	const service = __webpack_require__(192);
-	service.getConductDrug(2)
+	service.getCharge(200)
 	    .then(function (result) {
 	    console.log(result);
 	});
@@ -25856,6 +25856,27 @@
 	    return request("get_conduct_drug", { conduct_drug_id: conductDrugId }, "GET", model.fromJsonToConductDrug);
 	}
 	exports.getConductDrug = getConductDrug;
+	function getConductShinryou(conductShinryouId) {
+	    if (!(Number.isInteger(conductShinryouId) && conductShinryouId > 0)) {
+	        return Promise.reject("invalid conductShinryouId");
+	    }
+	    return request("get_conduct_shinryou", { conduct_shinryou_id: conductShinryouId }, "GET", model.fromJsonToConductShinryou);
+	}
+	exports.getConductShinryou = getConductShinryou;
+	function getConductKizai(conductKizaiId) {
+	    if (!(Number.isInteger(conductKizaiId) && conductKizaiId > 0)) {
+	        return Promise.reject("invalid conductKizaiId");
+	    }
+	    return request("get_conduct_kizai", { conduct_kizai_id: conductKizaiId }, "GET", model.fromJsonToConductKizai);
+	}
+	exports.getConductKizai = getConductKizai;
+	function getCharge(visitId) {
+	    if (!(Number.isInteger(visitId) && visitId > 0)) {
+	        return Promise.reject("invalid visitId");
+	    }
+	    return request("get_charge", { visit_id: visitId }, "GET", model.fromJsonToCharge);
+	}
+	exports.getCharge = getCharge;
 
 
 /***/ },
@@ -25878,6 +25899,9 @@
 	__export(__webpack_require__(204));
 	__export(__webpack_require__(205));
 	__export(__webpack_require__(207));
+	__export(__webpack_require__(208));
+	__export(__webpack_require__(209));
+	__export(__webpack_require__(210));
 
 
 /***/ },
@@ -26751,6 +26775,133 @@
 	    }
 	}
 	exports.fromJsonToConductDrug = fromJsonToConductDrug;
+
+
+/***/ },
+/* 208 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	const V = __webpack_require__(195);
+	class ConductShinryou {
+	    constructor(conductShinryouId, conductId, shinryoucode) {
+	        this.conductShinryouId = conductShinryouId;
+	        this.conductId = conductId;
+	        this.shinryoucode = shinryoucode;
+	    }
+	}
+	exports.ConductShinryou = ConductShinryou;
+	function validateConductShinryou(conductShinryou, checkConductShinryouId = true) {
+	    let errs = [];
+	    if (checkConductShinryouId) {
+	        V.validate("conductShinryouId", conductShinryou.conductShinryouId, errs, [
+	            V.isDefined, V.isInteger, V.isPositive
+	        ]);
+	    }
+	    V.validate("conductId", conductShinryou.conductId, errs, [
+	        V.isDefined, V.isInteger, V.isPositive
+	    ]);
+	    V.validate("診療コード", conductShinryou.shinryoucode, errs, [
+	        V.isDefined, V.isInteger, V.isPositive
+	    ]);
+	    return errs;
+	}
+	exports.validateConductShinryou = validateConductShinryou;
+	function fromJsonToConductShinryou(src) {
+	    let conductShinryou = new ConductShinryou(src.id, src.visit_conduct_id, src.shinryoucode);
+	    let errs = validateConductShinryou(conductShinryou, true);
+	    if (errs.length > 0) {
+	        return [undefined, new V.ValidationError(errs)];
+	    }
+	    else {
+	        return [conductShinryou, null];
+	    }
+	}
+	exports.fromJsonToConductShinryou = fromJsonToConductShinryou;
+
+
+/***/ },
+/* 209 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	const V = __webpack_require__(195);
+	class ConductKizai {
+	    constructor(conductKizaiId, conductId, kizaicode, amount) {
+	        this.conductKizaiId = conductKizaiId;
+	        this.conductId = conductId;
+	        this.kizaicode = kizaicode;
+	        this.amount = amount;
+	    }
+	}
+	exports.ConductKizai = ConductKizai;
+	function validateConductKizai(conductKizai, checkConductKizaiId = true) {
+	    let errs = [];
+	    if (checkConductKizaiId) {
+	        V.validate("conductKizaiId", conductKizai.conductKizaiId, errs, [
+	            V.isDefined, V.isInteger, V.isPositive
+	        ]);
+	    }
+	    V.validate("conductId", conductKizai.conductId, errs, [
+	        V.isDefined, V.isInteger, V.isPositive
+	    ]);
+	    V.validate("器材コード", conductKizai.kizaicode, errs, [
+	        V.isDefined, V.isInteger, V.isPositive
+	    ]);
+	    V.validate("用量", conductKizai.amount, errs, [
+	        V.isDefined, V.isNumber, V.isZeroOrPositive
+	    ]);
+	    return errs;
+	}
+	exports.validateConductKizai = validateConductKizai;
+	function fromJsonToConductKizai(src) {
+	    let conductKizai = new ConductKizai(src.id, src.visit_conduct_id, src.kizaicode, src.amount);
+	    let errs = validateConductKizai(conductKizai, true);
+	    if (errs.length > 0) {
+	        return [undefined, new V.ValidationError(errs)];
+	    }
+	    else {
+	        return [conductKizai, null];
+	    }
+	}
+	exports.fromJsonToConductKizai = fromJsonToConductKizai;
+
+
+/***/ },
+/* 210 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	const V = __webpack_require__(195);
+	class Charge {
+	    constructor(visitId, charge) {
+	        this.visitId = visitId;
+	        this.charge = charge;
+	    }
+	}
+	exports.Charge = Charge;
+	function validateCharge(charge) {
+	    let errs = [];
+	    V.validate("visitId", charge.visitId, errs, [
+	        V.isDefined, V.isInteger, V.isPositive
+	    ]);
+	    V.validate("金額", charge.charge, errs, [
+	        V.isDefined, V.isInteger, V.isZeroOrPositive
+	    ]);
+	    return errs;
+	}
+	exports.validateCharge = validateCharge;
+	function fromJsonToCharge(src) {
+	    let charge = new Charge(src.visit_id, src.charge);
+	    let errs = validateCharge(charge);
+	    if (errs.length > 0) {
+	        return [undefined, new V.ValidationError(errs)];
+	    }
+	    else {
+	        return [charge, null];
+	    }
+	}
+	exports.fromJsonToCharge = fromJsonToCharge;
 
 
 /***/ }
