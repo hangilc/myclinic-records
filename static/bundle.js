@@ -45,95 +45,76 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	const $ = __webpack_require__(113);
 	const moment = __webpack_require__(1);
 	const kanjidate = __webpack_require__(112);
-	let dateInputForm = $("#date-input-form");
-	function setDate(m) {
-	    let month = m.month() + 1;
-	    let day = m.date();
-	    let g = kanjidate.toGengou(m.year(), month, day);
-	    let form = dateInputForm;
-	    $("input[name=nen]", form).val(g.nen);
-	    $("input[name=month]", form).val(month);
-	    $("input[name=day]", form).val(day);
-	}
-	function getDate() {
-	    let gengou = "平成";
-	    let form = dateInputForm;
-	    let nen = +$("input[name=nen]", form).val();
-	    let month = +$("input[name=month]", form).val();
-	    let day = +$("input[name=day]", form).val();
-	    let year = kanjidate.fromGengou(gengou, nen);
-	    let m = moment({ year: year, month: month - 1, date: day });
-	    if (m.isValid()) {
-	        return m;
-	    }
-	    else {
-	        return undefined;
-	    }
-	}
-	setDate(moment());
-	$("form#date-input-form .goto-today").click(function (event) {
-	    event.preventDefault();
-	    setDate(moment());
-	});
-	$("form#date-input-form").submit(function (event) {
-	    let m = getDate();
-	    if (!m) {
-	        alert("日付の入力が不適切です。");
-	        return;
-	    }
-	    console.log(m.format("YYYY-MM-DD"));
-	});
+	const typed_dom_1 = __webpack_require__(206);
 	const service_1 = __webpack_require__(192);
-	service_1.getGazouLabel(101).then(function (result) {
-	    console.log(JSON.stringify(result, null, 2));
-	})
-	    .catch(function (err) {
-	    console.log(err);
-	});
-	class SimpleDomCreator {
-	    constructor(tag, attrs, children) {
-	        this.tag = tag;
-	        this.attrs = attrs;
-	        this.children = children;
-	    }
+	class DateInput {
 	    create() {
-	        let e = document.createElement(this.tag);
-	        for (let key in this.attrs) {
-	            let val = this.attrs[key];
-	            if (key === "style") {
-	                if (typeof val === "string") {
-	                    e.style.cssText = val;
-	                }
-	                else {
-	                    for (let cssKey in val) {
-	                        console.log(cssKey, val);
-	                        e.style[cssKey] = val[cssKey];
-	                    }
-	                }
+	        return typed_dom_1.h.div({}, [
+	            typed_dom_1.f.form(e => this.bindSubmit(e), {}, [
+	                "平成",
+	                typed_dom_1.f.input(e => this.nenInput = e, { size: "4", class: "num-input" }),
+	                "年 ",
+	                typed_dom_1.f.input(e => this.monthInput = e, { size: "4", class: "num-input" }),
+	                "月 ",
+	                typed_dom_1.f.input(e => this.dayInput = e, { size: "4", class: "num-input" }),
+	                "日 ",
+	                typed_dom_1.h.input({ type: "submit", value: "選択" }),
+	                " ",
+	                typed_dom_1.f.a(e => typed_dom_1.click(e, _ => this.setToday()), {}, ["[本日]"])
+	            ])
+	        ]);
+	    }
+	    bindSubmit(form) {
+	        form.addEventListener("submit", (event) => {
+	            let m = this.get();
+	            if (!m) {
+	                alert("日付の入力が不適切です。");
+	                return;
 	            }
-	            else {
-	                e.setAttribute(key, val);
-	            }
-	        }
-	        this.children.forEach(function (child) {
-	            e.appendChild(child.create());
+	            let sqlDate = m.format("YYYY-MM-DD");
+	            service_1.listVisitsByDate(sqlDate)
+	                .then(function (result) {
+	                console.log(result);
+	            })
+	                .catch(function (ex) {
+	                alert(ex);
+	                return;
+	            });
 	        });
-	        return e;
+	    }
+	    set(m) {
+	        let month = m.month() + 1;
+	        let day = m.date();
+	        let g = kanjidate.toGengou(m.year(), month, day);
+	        this.nenInput.value = g.nen.toString();
+	        this.monthInput.value = month.toString();
+	        this.dayInput.value = day.toString();
+	    }
+	    setToday() {
+	        this.set(moment());
+	    }
+	    get() {
+	        let gengou = "平成";
+	        let nen = +this.nenInput.value;
+	        let month = +this.monthInput.value;
+	        let day = +this.dayInput.value;
+	        let year = kanjidate.fromGengou(gengou, nen);
+	        let m = moment({ year: year, month: month - 1, date: day });
+	        if (m.isValid()) {
+	            return m;
+	        }
+	        else {
+	            return undefined;
+	        }
 	    }
 	}
-	class TextCreator {
-	    constructor(text) {
-	        this.text = text;
-	    }
-	    create() {
-	        return document.createTextNode(this.text);
-	    }
-	}
-	let creator = new SimpleDomCreator("div", { style: { border: "1px solid black", width: "100px", height: "200px" } }, [new TextCreator("Hello, world")]);
-	document.body.appendChild(creator.create());
+	let body = document.body;
+	let dateInput = new DateInput();
+	body.appendChild(typed_dom_1.h.h1({}, ["診察日ごとの診療録リスト"]));
+	body.appendChild(dateInput.create());
+	dateInput.setToday();
 
 
 /***/ },
@@ -26597,6 +26578,110 @@
 	    }
 	}
 	exports.fromJsonToGazouLabel = fromJsonToGazouLabel;
+
+
+/***/ },
+/* 206 */
+/***/ function(module, exports) {
+
+	"use strict";
+	function createElement(tag, attrs, children) {
+	    let e = document.createElement(tag);
+	    for (let key in attrs) {
+	        let val = attrs[key];
+	        if (key === "style") {
+	            if (typeof val === "string") {
+	                e.style.cssText = val;
+	            }
+	            else {
+	                for (let cssKey in val) {
+	                    e.style[cssKey] = val[cssKey];
+	                }
+	            }
+	        }
+	        else {
+	            e.setAttribute(key, val);
+	        }
+	    }
+	    if (children) {
+	        children.forEach(function (n) {
+	            if (typeof n === "string") {
+	                e.appendChild(document.createTextNode(n));
+	            }
+	            else {
+	                e.appendChild(n);
+	            }
+	        });
+	    }
+	    return e;
+	}
+	exports.createElement = createElement;
+	function createElementFn(fn, tag, attrs, children) {
+	    let e = createElement(tag, attrs, children);
+	    fn(e);
+	    return e;
+	}
+	exports.createElementFn = createElementFn;
+	var h;
+	(function (h) {
+	    function makeCreator(tag) {
+	        return function (attrs, children) {
+	            return createElement(tag, attrs, children);
+	        };
+	    }
+	    h.div = makeCreator("div");
+	    h.h1 = makeCreator("h1");
+	    h.input = makeCreator("input");
+	    h.button = makeCreator("button");
+	    function form(attrs, children) {
+	        if (!("onSubmit" in attrs)) {
+	            attrs.onSubmit = "return false";
+	        }
+	        return createElement("form", attrs, children);
+	    }
+	    h.form = form;
+	    function a(attrs, children) {
+	        if (!("href" in attrs)) {
+	            attrs.href = "javascript:void(0)";
+	        }
+	        return createElement("a", attrs, children);
+	    }
+	    h.a = a;
+	})(h = exports.h || (exports.h = {}));
+	var f;
+	(function (f) {
+	    function makeCreator(tag) {
+	        return function (fn, attrs, children) {
+	            return createElementFn(fn, tag, attrs, children);
+	        };
+	    }
+	    f.div = makeCreator("div");
+	    f.h1 = makeCreator("h1");
+	    f.input = makeCreator("input");
+	    f.button = makeCreator("button");
+	    function form(fn, attrs, children) {
+	        if (!("onSubmit" in attrs)) {
+	            attrs.onSubmit = "return false";
+	        }
+	        return createElementFn(fn, "form", attrs, children);
+	    }
+	    f.form = form;
+	    function a(fn, attrs, children) {
+	        if (!("href" in attrs)) {
+	            attrs.href = "javascript:void(0)";
+	        }
+	        return createElementFn(fn, "a", attrs, children);
+	    }
+	    f.a = a;
+	})(f = exports.f || (exports.f = {}));
+	function click(e, handler) {
+	    e.addEventListener("click", handler);
+	}
+	exports.click = click;
+	function submit(e, handler) {
+	    e.addEventListener("submit", handler);
+	}
+	exports.submit = submit;
 
 
 /***/ }
