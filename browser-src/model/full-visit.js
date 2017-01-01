@@ -6,7 +6,7 @@ const koukikourei_1 = require("./koukikourei");
 const roujin_1 = require("./roujin");
 const kouhi_1 = require("./kouhi");
 const full_drug_1 = require("./full-drug");
-const shinryou_1 = require("./shinryou");
+const full_shinryou_1 = require("./full-shinryou");
 const conduct_1 = require("./conduct");
 const charge_1 = require("./charge");
 const V = require("../validation");
@@ -49,7 +49,7 @@ function validateFullVisit(visit) {
         errs = errs.concat(full_drug_1.validateFullDrug(t));
     });
     visit.shinryouList.forEach(s => {
-        errs = errs.concat(shinryou_1.validateShinryou(s));
+        errs = errs.concat(full_shinryou_1.validateFullShinryou(s));
     });
     visit.conducts.forEach(t => {
         errs = errs.concat(conduct_1.validateConduct(t));
@@ -110,7 +110,7 @@ function fromJsonToFullVisit(src) {
         return result;
     });
     let shinryouList = src.shinryou_list.map(s => {
-        let [result, err] = shinryou_1.fromJsonToShinryou(s);
+        let [result, err] = full_shinryou_1.fromJsonToFullShinryou(s);
         if (err) {
             return [undefined, err];
         }

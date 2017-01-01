@@ -116,7 +116,7 @@
 	body.appendChild(dateInput.create());
 	dateInput.setToday();
 	const service = __webpack_require__(192);
-	service.getShinryouMaster(160208510, "2016-12-30")
+	service.getFullVisit(12000)
 	    .then(function (result) {
 	    console.log(result);
 	})
@@ -25935,6 +25935,8 @@
 	__export(__webpack_require__(211));
 	__export(__webpack_require__(212));
 	__export(__webpack_require__(214));
+	__export(__webpack_require__(213));
+	__export(__webpack_require__(215));
 
 
 /***/ },
@@ -26949,7 +26951,7 @@
 	const roujin_1 = __webpack_require__(200);
 	const kouhi_1 = __webpack_require__(201);
 	const full_drug_1 = __webpack_require__(213);
-	const shinryou_1 = __webpack_require__(203);
+	const full_shinryou_1 = __webpack_require__(215);
 	const conduct_1 = __webpack_require__(204);
 	const charge_1 = __webpack_require__(210);
 	const V = __webpack_require__(195);
@@ -26992,7 +26994,7 @@
 	        errs = errs.concat(full_drug_1.validateFullDrug(t));
 	    });
 	    visit.shinryouList.forEach(s => {
-	        errs = errs.concat(shinryou_1.validateShinryou(s));
+	        errs = errs.concat(full_shinryou_1.validateFullShinryou(s));
 	    });
 	    visit.conducts.forEach(t => {
 	        errs = errs.concat(conduct_1.validateConduct(t));
@@ -27053,7 +27055,7 @@
 	        return result;
 	    });
 	    let shinryouList = src.shinryou_list.map(s => {
-	        let [result, err] = shinryou_1.fromJsonToShinryou(s);
+	        let [result, err] = full_shinryou_1.fromJsonToFullShinryou(s);
 	        if (err) {
 	            return [undefined, err];
 	        }
@@ -27284,6 +27286,55 @@
 	    }
 	}
 	exports.fromJsonToShinryouMaster = fromJsonToShinryouMaster;
+
+
+/***/ },
+/* 215 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	const V = __webpack_require__(195);
+	const shinryou_1 = __webpack_require__(203);
+	const shinryou_master_1 = __webpack_require__(214);
+	class FullShinryou extends shinryou_1.Shinryou {
+	    constructor(shinryouId, visitId, shinryoucode, name, tensuu, tensuuShikibetsu, houketsuKensa, oushinKubun, kensaGroup, roujinTekiyou, codeShou, codeBu, codeAlpha, codeKubun, validFrom, validUpto) {
+	        super(shinryouId, visitId, shinryoucode);
+	        this.name = name;
+	        this.tensuu = tensuu;
+	        this.tensuuShikibetsu = tensuuShikibetsu;
+	        this.houketsuKensa = houketsuKensa;
+	        this.oushinKubun = oushinKubun;
+	        this.kensaGroup = kensaGroup;
+	        this.roujinTekiyou = roujinTekiyou;
+	        this.codeShou = codeShou;
+	        this.codeBu = codeBu;
+	        this.codeAlpha = codeAlpha;
+	        this.codeKubun = codeKubun;
+	        this.validFrom = validFrom;
+	        this.validUpto = validUpto;
+	    }
+	}
+	exports.FullShinryou = FullShinryou;
+	function validateFullShinryou(shinryou) {
+	    let errs = shinryou_1.validateShinryou(shinryou);
+	    if (errs.length > 0) {
+	        return errs;
+	    }
+	    errs = errs.concat(shinryou_master_1.validateShinryouMaster(shinryou));
+	    return errs;
+	}
+	exports.validateFullShinryou = validateFullShinryou;
+	function fromJsonToFullShinryou(src) {
+	    let shinryou = new FullShinryou(src.shinryou_id, src.visit_id, src.shinryoucode, src.name, +src.tensuu, +src.tensuu_shikibetsu, src.houkatsukensa, +src.oushinkubun, src.kensagroup, +src.roujintekiyou, +src.code_shou, src.code_bu, src.code_alpha, src.code_kubun, src.valid_from, src.valid_upto);
+	    let errs = validateFullShinryou(shinryou);
+	    if (errs.length > 0) {
+	        return [undefined, new V.ValidationError(errs)];
+	    }
+	    else {
+	        return [shinryou, null];
+	    }
+	}
+	exports.fromJsonToFullShinryou = fromJsonToFullShinryou;
 
 
 /***/ }
