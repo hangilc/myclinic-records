@@ -131,6 +131,15 @@ function isFloatCompatibleString(name, value) {
     }
 }
 exports.isFloatCompatibleString = isFloatCompatibleString;
+function isOptionalString(name, value) {
+    if (value == null || typeof value === "string") {
+        return null;
+    }
+    else {
+        return `${name}の値が不適切です。`;
+    }
+}
+exports.isOptionalString = isOptionalString;
 function validate(name, value, errs, validators) {
     for (let i = 0; i < validators.length; i++) {
         let validator = validators[i];

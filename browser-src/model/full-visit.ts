@@ -6,7 +6,7 @@ import { Roujin, validateRoujin, fromJsonToRoujin } from "./roujin";
 import { Kouhi, validateKouhi, fromJsonToKouhi } from "./kouhi";
 import { FullDrug, validateFullDrug, fromJsonToFullDrug } from "./full-drug";
 import { FullShinryou, validateFullShinryou, fromJsonToFullShinryou } from "./full-shinryou";
-import { Conduct, validateConduct, fromJsonToConduct } from "./conduct";
+import { FullConduct, validateFullConduct, fromJsonToFullConduct } from "./full-conduct";
 import { Charge, validateCharge, fromJsonToCharge } from "./charge";
 import * as V from "../validation";
 
@@ -28,7 +28,7 @@ export class FullVisit extends Visit {
 		readonly kouhiList: Kouhi[],
 		readonly drugs: FullDrug[],
 		readonly shinryouList: FullShinryou[],
-		readonly conducts: Conduct[],
+		readonly conducts: FullConduct[],
 		readonly charge: Charge
 	){
 		super(visitId, patientId, visitedAt, shahokokuhoId,
@@ -63,7 +63,7 @@ export function validateFullVisit(visit: FullVisit): string[] {
 		errs = errs.concat(validateFullShinryou(s));
 	})
 	visit.conducts.forEach(t => {
-		errs = errs.concat(validateConduct(t));
+		errs = errs.concat(validateFullConduct(t));
 	})
 	if( visit.charge ){
 		errs = errs.concat(validateCharge(visit.charge));
@@ -127,8 +127,8 @@ export function fromJsonToFullVisit(src: any): [FullVisit, V.ValidationError] {
 		}
 		return result;
 	});
-	let conducts: Conduct[] = src.conducts.map(s => {
-		let [result, err] = fromJsonToConduct(s);
+	let conducts: FullConduct[] = src.conducts.map(s => {
+		let [result, err] = fromJsonToFullConduct(s);
 		if( err ){
 			return [undefined, err];
 		}

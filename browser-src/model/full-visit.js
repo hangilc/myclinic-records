@@ -7,7 +7,7 @@ const roujin_1 = require("./roujin");
 const kouhi_1 = require("./kouhi");
 const full_drug_1 = require("./full-drug");
 const full_shinryou_1 = require("./full-shinryou");
-const conduct_1 = require("./conduct");
+const full_conduct_1 = require("./full-conduct");
 const charge_1 = require("./charge");
 const V = require("../validation");
 class FullVisit extends visit_1.Visit {
@@ -52,7 +52,7 @@ function validateFullVisit(visit) {
         errs = errs.concat(full_shinryou_1.validateFullShinryou(s));
     });
     visit.conducts.forEach(t => {
-        errs = errs.concat(conduct_1.validateConduct(t));
+        errs = errs.concat(full_conduct_1.validateFullConduct(t));
     });
     if (visit.charge) {
         errs = errs.concat(charge_1.validateCharge(visit.charge));
@@ -117,7 +117,7 @@ function fromJsonToFullVisit(src) {
         return result;
     });
     let conducts = src.conducts.map(s => {
-        let [result, err] = conduct_1.fromJsonToConduct(s);
+        let [result, err] = full_conduct_1.fromJsonToFullConduct(s);
         if (err) {
             return [undefined, err];
         }

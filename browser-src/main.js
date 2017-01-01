@@ -70,7 +70,7 @@ body.appendChild(typed_dom_1.h.h1({}, ["診察日ごとの診療録リスト"]))
 body.appendChild(dateInput.create());
 dateInput.setToday();
 const service = require("./service");
-service.getKizaiMaster(700030000, "2014-06-02")
+service.getFullVisit(32902)
     .then(function (result) {
     console.log(result);
 })

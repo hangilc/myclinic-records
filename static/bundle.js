@@ -116,7 +116,7 @@
 	body.appendChild(dateInput.create());
 	dateInput.setToday();
 	const service = __webpack_require__(192);
-	service.getKizaiMaster(700030000, "2014-06-02")
+	service.getFullVisit(32902)
 	    .then(function (result) {
 	    console.log(result);
 	})
@@ -26139,6 +26139,15 @@
 	    }
 	}
 	exports.isFloatCompatibleString = isFloatCompatibleString;
+	function isOptionalString(name, value) {
+	    if (value == null || typeof value === "string") {
+	        return null;
+	    }
+	    else {
+	        return `${name}の値が不適切です。`;
+	    }
+	}
+	exports.isOptionalString = isOptionalString;
 	function validate(name, value, errs, validators) {
 	    for (let i = 0; i < validators.length; i++) {
 	        let validator = validators[i];
@@ -26963,7 +26972,7 @@
 	const kouhi_1 = __webpack_require__(201);
 	const full_drug_1 = __webpack_require__(213);
 	const full_shinryou_1 = __webpack_require__(215);
-	const conduct_1 = __webpack_require__(204);
+	const full_conduct_1 = __webpack_require__(217);
 	const charge_1 = __webpack_require__(210);
 	const V = __webpack_require__(195);
 	class FullVisit extends visit_1.Visit {
@@ -27008,7 +27017,7 @@
 	        errs = errs.concat(full_shinryou_1.validateFullShinryou(s));
 	    });
 	    visit.conducts.forEach(t => {
-	        errs = errs.concat(conduct_1.validateConduct(t));
+	        errs = errs.concat(full_conduct_1.validateFullConduct(t));
 	    });
 	    if (visit.charge) {
 	        errs = errs.concat(charge_1.validateCharge(visit.charge));
@@ -27073,7 +27082,7 @@
 	        return result;
 	    });
 	    let conducts = src.conducts.map(s => {
-	        let [result, err] = conduct_1.fromJsonToConduct(s);
+	        let [result, err] = full_conduct_1.fromJsonToFullConduct(s);
 	        if (err) {
 	            return [undefined, err];
 	        }
@@ -27403,6 +27412,102 @@
 	    }
 	}
 	exports.fromJsonToKizaiMaster = fromJsonToKizaiMaster;
+
+
+/***/ },
+/* 217 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	const V = __webpack_require__(195);
+	const conduct_1 = __webpack_require__(204);
+	const full_conduct_shinryou_1 = __webpack_require__(218);
+	class FullConduct extends conduct_1.Conduct {
+	    constructor(conductId, visitId, kind, gazouLabel, shinryouList) {
+	        super(conductId, visitId, kind);
+	        this.gazouLabel = gazouLabel;
+	        this.shinryouList = shinryouList;
+	    }
+	}
+	exports.FullConduct = FullConduct;
+	function validateFullConduct(conduct) {
+	    let errs = conduct_1.validateConduct(conduct);
+	    V.validate("画像ラベル", conduct.gazouLabel, errs, [
+	        V.isDefined, V.isOptionalString
+	    ]);
+	    conduct.shinryouList.forEach(s => {
+	        errs = errs.concat(full_conduct_shinryou_1.validateFullConductShinryou(s));
+	    });
+	    return errs;
+	}
+	exports.validateFullConduct = validateFullConduct;
+	function fromJsonToFullConduct(src) {
+	    let shinryouList = src.shinryou_list.map(s => {
+	        let [result, err] = full_conduct_shinryou_1.fromJsonToFullConductShinryou(s);
+	        if (err) {
+	            return [undefined, err];
+	        }
+	        return result;
+	    });
+	    let conduct = new FullConduct(src.id, src.visit_id, src.kind, src.gazou_label, shinryouList);
+	    let errs = validateFullConduct(conduct);
+	    if (errs.length > 0) {
+	        return [undefined, new V.ValidationError(errs)];
+	    }
+	    else {
+	        return [conduct, null];
+	    }
+	}
+	exports.fromJsonToFullConduct = fromJsonToFullConduct;
+
+
+/***/ },
+/* 218 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	const V = __webpack_require__(195);
+	const conduct_shinryou_1 = __webpack_require__(208);
+	const shinryou_master_1 = __webpack_require__(214);
+	class FullConductShinryou extends conduct_shinryou_1.ConductShinryou {
+	    constructor(conductShinryouId, conductId, shinryoucode, name, tensuu, tensuuShikibetsu, houketsuKensa, oushinKubun, kensaGroup, roujinTekiyou, codeShou, codeBu, codeAlpha, codeKubun, validFrom, validUpto) {
+	        super(conductShinryouId, conductId, shinryoucode);
+	        this.name = name;
+	        this.tensuu = tensuu;
+	        this.tensuuShikibetsu = tensuuShikibetsu;
+	        this.houketsuKensa = houketsuKensa;
+	        this.oushinKubun = oushinKubun;
+	        this.kensaGroup = kensaGroup;
+	        this.roujinTekiyou = roujinTekiyou;
+	        this.codeShou = codeShou;
+	        this.codeBu = codeBu;
+	        this.codeAlpha = codeAlpha;
+	        this.codeKubun = codeKubun;
+	        this.validFrom = validFrom;
+	        this.validUpto = validUpto;
+	    }
+	}
+	exports.FullConductShinryou = FullConductShinryou;
+	function validateFullConductShinryou(shinryou) {
+	    let errs = conduct_shinryou_1.validateConductShinryou(shinryou);
+	    if (errs.length > 0) {
+	        return errs;
+	    }
+	    errs = errs.concat(shinryou_master_1.validateShinryouMaster(shinryou));
+	    return errs;
+	}
+	exports.validateFullConductShinryou = validateFullConductShinryou;
+	function fromJsonToFullConductShinryou(src) {
+	    let shinryou = new FullConductShinryou(src.id, src.visit_conduct_id, src.shinryoucode, src.name, +src.tensuu, +src.tensuu_shikibetsu, src.houkatsukensa, +src.oushinkubun, src.kensagroup, +src.roujintekiyou, +src.code_shou, src.code_bu, src.code_alpha, src.code_kubun, src.valid_from, src.valid_upto);
+	    let errs = validateFullConductShinryou(shinryou);
+	    if (errs.length > 0) {
+	        return [undefined, new V.ValidationError(errs)];
+	    }
+	    else {
+	        return [shinryou, null];
+	    }
+	}
+	exports.fromJsonToFullConductShinryou = fromJsonToFullConductShinryou;
 
 
 /***/ }

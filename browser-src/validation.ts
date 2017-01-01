@@ -124,6 +124,14 @@ export function isFloatCompatibleString(name: string, value: any): string {
 	}
 }
 
+export function isOptionalString(name: string, value: any): string {
+	if( value == null || typeof value === "string" ){
+		return null;
+	} else {
+		return `${ name }の値が不適切です。`;
+	}
+}
+
 export function validate(name: string, value: any, errs: string[], 
 	validators: Validator[]): void {
 	for(let i=0;i<validators.length;i++){
