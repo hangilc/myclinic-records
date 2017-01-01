@@ -180,6 +180,16 @@ function getShinryouMaster(shinryoucode, at) {
     return request("get_shinryou_master", { shinryoucode: shinryoucode, at: at }, "GET", model.fromJsonToShinryouMaster);
 }
 exports.getShinryouMaster = getShinryouMaster;
+function getKizaiMaster(kizaicode, at) {
+    if (!(Number.isInteger(kizaicode) && kizaicode > 0)) {
+        return Promise.reject("invalid kizaicode");
+    }
+    if (!(/^\d{4}-\d{2}-\d{2}( \d{2}:\d{2}:\d{2})?$/.test(at))) {
+        return Promise.reject("invalid at");
+    }
+    return request("get_kizai_master", { kizaicode: kizaicode, at: at }, "GET", model.fromJsonToKizaiMaster);
+}
+exports.getKizaiMaster = getKizaiMaster;
 function getFullVisit(visitId) {
     if (!(Number.isInteger(visitId) && visitId > 0)) {
         return Promise.reject("invalid visitId");

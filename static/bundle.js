@@ -116,7 +116,7 @@
 	body.appendChild(dateInput.create());
 	dateInput.setToday();
 	const service = __webpack_require__(192);
-	service.getFullVisit(12000)
+	service.getKizaiMaster(700030000, "2014-06-02")
 	    .then(function (result) {
 	    console.log(result);
 	})
@@ -25900,6 +25900,16 @@
 	    return request("get_shinryou_master", { shinryoucode: shinryoucode, at: at }, "GET", model.fromJsonToShinryouMaster);
 	}
 	exports.getShinryouMaster = getShinryouMaster;
+	function getKizaiMaster(kizaicode, at) {
+	    if (!(Number.isInteger(kizaicode) && kizaicode > 0)) {
+	        return Promise.reject("invalid kizaicode");
+	    }
+	    if (!(/^\d{4}-\d{2}-\d{2}( \d{2}:\d{2}:\d{2})?$/.test(at))) {
+	        return Promise.reject("invalid at");
+	    }
+	    return request("get_kizai_master", { kizaicode: kizaicode, at: at }, "GET", model.fromJsonToKizaiMaster);
+	}
+	exports.getKizaiMaster = getKizaiMaster;
 	function getFullVisit(visitId) {
 	    if (!(Number.isInteger(visitId) && visitId > 0)) {
 	        return Promise.reject("invalid visitId");
@@ -25935,6 +25945,7 @@
 	__export(__webpack_require__(211));
 	__export(__webpack_require__(212));
 	__export(__webpack_require__(214));
+	__export(__webpack_require__(216));
 	__export(__webpack_require__(213));
 	__export(__webpack_require__(215));
 
@@ -27335,6 +27346,63 @@
 	    }
 	}
 	exports.fromJsonToFullShinryou = fromJsonToFullShinryou;
+
+
+/***/ },
+/* 216 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	const V = __webpack_require__(195);
+	class KizaiMaster {
+	    constructor(kizaicode, name, yomi, unit, kingaku, validFrom, validUpto) {
+	        this.kizaicode = kizaicode;
+	        this.name = name;
+	        this.yomi = yomi;
+	        this.unit = unit;
+	        this.kingaku = kingaku;
+	        this.validFrom = validFrom;
+	        this.validUpto = validUpto;
+	    }
+	}
+	exports.KizaiMaster = KizaiMaster;
+	function validateKizaiMaster(kizaiMaster) {
+	    let errs = [];
+	    V.validate("器材コード", kizaiMaster.kizaicode, errs, [
+	        V.isDefined, V.isInteger, V.isPositive
+	    ]);
+	    V.validate("名前", kizaiMaster.name, errs, [
+	        V.isDefined, V.isString, V.isNotEmpty
+	    ]);
+	    V.validate("よみ", kizaiMaster.yomi, errs, [
+	        V.isDefined, V.isString, V.isNotEmpty
+	    ]);
+	    V.validate("単位", kizaiMaster.unit, errs, [
+	        V.isDefined, V.isString, V.isNotEmpty
+	    ]);
+	    V.validate("金額", kizaiMaster.kingaku, errs, [
+	        V.isDefined, V.isNumber, V.isZeroOrPositive
+	    ]);
+	    V.validate("有効期限（開始）", kizaiMaster.validFrom, errs, [
+	        V.isDefined, V.isSqlDate
+	    ]);
+	    V.validate("有効期限（終了）", kizaiMaster.validFrom, errs, [
+	        V.isDefined, V.isSqlDateOrZero
+	    ]);
+	    return errs;
+	}
+	exports.validateKizaiMaster = validateKizaiMaster;
+	function fromJsonToKizaiMaster(src) {
+	    let master = new KizaiMaster(src.kizaicode, src.name, src.yomi, src.unit, +src.kingaku, src.valid_from, src.valid_upto);
+	    let errs = validateKizaiMaster(master);
+	    if (errs.length > 0) {
+	        return [undefined, new V.ValidationError(errs)];
+	    }
+	    else {
+	        return [master, null];
+	    }
+	}
+	exports.fromJsonToKizaiMaster = fromJsonToKizaiMaster;
 
 
 /***/ }

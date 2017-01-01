@@ -16,5 +16,6 @@ export * from "./model/charge";
 export * from "./model/full-visit";
 export * from "./model/iyakuhin-master";
 export * from "./model/shinryou-master";
+export * from "./model/kizai-master";
 export * from "./model/full-drug";
 export * from "./model/full-shinryou";

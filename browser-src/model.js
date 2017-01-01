@@ -20,5 +20,6 @@ __export(require("./model/charge"));
 __export(require("./model/full-visit"));
 __export(require("./model/iyakuhin-master"));
 __export(require("./model/shinryou-master"));
+__export(require("./model/kizai-master"));
 __export(require("./model/full-drug"));
 __export(require("./model/full-shinryou"));

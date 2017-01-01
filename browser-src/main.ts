@@ -81,7 +81,7 @@ body.appendChild(dateInput.create());
 dateInput.setToday();
 
 import * as service from "./service";
-service.getFullVisit(12000)
+service.getKizaiMaster(700030000, "2014-06-02")
 .then(function(result){
 	console.log(result);
 })
