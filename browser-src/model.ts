@@ -13,3 +13,4 @@ export * from "./model/conduct-drug";
 export * from "./model/conduct-shinryou";
 export * from "./model/conduct-kizai";
 export * from "./model/charge";
+export * from "./model/full-visit";

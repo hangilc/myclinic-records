@@ -17,6 +17,7 @@ import ConductDrug = model.ConductDrug;
 import ConductShinryou = model.ConductShinryou;
 import ConductKizai = model.ConductKizai;
 import Charge = model.Charge;
+import FullVisit = model.FullVisit;
 
 export class HttpError {
 	constructor(
@@ -194,6 +195,14 @@ export function getCharge(visitId: number): Promise<Charge> {
 	}
 	return request<Charge>("get_charge", { visit_id: visitId }, 
 		"GET", model.fromJsonToCharge);
+}
+
+export function getFullVisit(visitId: number): Promise<FullVisit> {
+	if( !(Number.isInteger(visitId) && visitId > 0) ){
+		return Promise.reject("invalid visitId");
+	}
+	return request<FullVisit>("get_full_visit", { visit_id: visitId }, 
+		"GET", model.fromJsonToFullVisit);
 }
 
 

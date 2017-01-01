@@ -17,3 +17,4 @@ __export(require("./model/conduct-drug"));
 __export(require("./model/conduct-shinryou"));
 __export(require("./model/conduct-kizai"));
 __export(require("./model/charge"));
+__export(require("./model/full-visit"));

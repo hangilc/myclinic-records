@@ -116,9 +116,12 @@
 	body.appendChild(dateInput.create());
 	dateInput.setToday();
 	const service = __webpack_require__(192);
-	service.getCharge(200)
+	service.getFullVisit(6731)
 	    .then(function (result) {
 	    console.log(result);
+	})
+	    .catch(function (ex) {
+	    console.log("ERROR", ex);
 	});
 
 
@@ -25877,6 +25880,13 @@
 	    return request("get_charge", { visit_id: visitId }, "GET", model.fromJsonToCharge);
 	}
 	exports.getCharge = getCharge;
+	function getFullVisit(visitId) {
+	    if (!(Number.isInteger(visitId) && visitId > 0)) {
+	        return Promise.reject("invalid visitId");
+	    }
+	    return request("get_full_visit", { visit_id: visitId }, "GET", model.fromJsonToFullVisit);
+	}
+	exports.getFullVisit = getFullVisit;
 
 
 /***/ },
@@ -25902,6 +25912,7 @@
 	__export(__webpack_require__(208));
 	__export(__webpack_require__(209));
 	__export(__webpack_require__(210));
+	__export(__webpack_require__(211));
 
 
 /***/ },
@@ -26902,6 +26913,156 @@
 	    }
 	}
 	exports.fromJsonToCharge = fromJsonToCharge;
+
+
+/***/ },
+/* 211 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	const visit_1 = __webpack_require__(196);
+	const text_1 = __webpack_require__(197);
+	const shahokokuho_1 = __webpack_require__(198);
+	const koukikourei_1 = __webpack_require__(199);
+	const roujin_1 = __webpack_require__(200);
+	const kouhi_1 = __webpack_require__(201);
+	const drug_1 = __webpack_require__(202);
+	const shinryou_1 = __webpack_require__(203);
+	const conduct_1 = __webpack_require__(204);
+	const charge_1 = __webpack_require__(210);
+	const V = __webpack_require__(195);
+	class FullVisit extends visit_1.Visit {
+	    constructor(visitId, patientId, visitedAt, shahokokuhoId, koukikoureiId, roujinId, kouhi1Id, kouhi2Id, kouhi3Id, texts, shahokokuho, koukikourei, roujin, kouhiList, drugs, shinryouList, conducts, charge) {
+	        super(visitId, patientId, visitedAt, shahokokuhoId, koukikoureiId, roujinId, kouhi1Id, kouhi2Id, kouhi3Id);
+	        this.texts = texts;
+	        this.shahokokuho = shahokokuho;
+	        this.koukikourei = koukikourei;
+	        this.roujin = roujin;
+	        this.kouhiList = kouhiList;
+	        this.drugs = drugs;
+	        this.shinryouList = shinryouList;
+	        this.conducts = conducts;
+	        this.charge = charge;
+	    }
+	}
+	exports.FullVisit = FullVisit;
+	function validateFullVisit(visit) {
+	    let errs;
+	    errs = visit_1.validateVisit(visit);
+	    visit.texts.forEach(t => {
+	        errs = errs.concat(text_1.validateText(t));
+	    });
+	    if (visit.shahokokuho) {
+	        errs = errs.concat(shahokokuho_1.validateShahokokuho(visit.shahokokuho));
+	    }
+	    if (visit.koukikourei) {
+	        errs = errs.concat(koukikourei_1.validateKoukikourei(visit.koukikourei));
+	    }
+	    if (visit.roujin) {
+	        errs = errs.concat(roujin_1.validateRoujin(visit.roujin));
+	    }
+	    if (visit.kouhiList) {
+	        visit.kouhiList.forEach(function (kouhi) {
+	            errs = errs.concat(kouhi_1.validateKouhi(kouhi));
+	        });
+	    }
+	    visit.drugs.forEach(t => {
+	        errs = errs.concat(drug_1.validateDrug(t));
+	    });
+	    visit.shinryouList.forEach(s => {
+	        errs = errs.concat(shinryou_1.validateShinryou(s));
+	    });
+	    visit.conducts.forEach(t => {
+	        errs = errs.concat(conduct_1.validateConduct(t));
+	    });
+	    if (visit.charge) {
+	        errs = errs.concat(charge_1.validateCharge(visit.charge));
+	    }
+	    return errs;
+	}
+	exports.validateFullVisit = validateFullVisit;
+	function fromJsonToFullVisit(src) {
+	    let texts = src.texts.map(s => {
+	        let [result, err] = text_1.fromJsonToText(s);
+	        if (err) {
+	            return [undefined, err];
+	        }
+	        return result;
+	    });
+	    let shahokokuho = null;
+	    if (src.shahokokuho) {
+	        let [result, err] = shahokokuho_1.fromJsonToShahokokuho(src.shahokokuho);
+	        if (err) {
+	            return [undefined, err];
+	        }
+	        shahokokuho = result;
+	    }
+	    let koukikourei = null;
+	    if (src.koukikourei) {
+	        let [result, err] = koukikourei_1.fromJsonToKoukikourei(src.koukikourei);
+	        if (err) {
+	            return [undefined, err];
+	        }
+	        koukikourei = result;
+	    }
+	    let roujin = null;
+	    if (src.roujin) {
+	        let [result, err] = roujin_1.fromJsonToRoujin(src.roujin);
+	        if (err) {
+	            return [undefined, err];
+	        }
+	        roujin = result;
+	    }
+	    let kouhiList = [];
+	    if (src.kouhi_list) {
+	        kouhiList = src.kouhi_list.map(function (srcKouhi) {
+	            let [kouhi, err] = kouhi_1.fromJsonToKouhi(srcKouhi);
+	            if (err) {
+	                return [undefined, err];
+	            }
+	            return kouhi;
+	        });
+	    }
+	    let drugs = src.drugs.map(s => {
+	        let [result, err] = drug_1.fromJsonToDrug(s);
+	        if (err) {
+	            return [undefined, err];
+	        }
+	        return result;
+	    });
+	    let shinryouList = src.shinryou_list.map(s => {
+	        let [result, err] = shinryou_1.fromJsonToShinryou(s);
+	        if (err) {
+	            return [undefined, err];
+	        }
+	        return result;
+	    });
+	    let conducts = src.conducts.map(s => {
+	        let [result, err] = conduct_1.fromJsonToConduct(s);
+	        if (err) {
+	            return [undefined, err];
+	        }
+	        return result;
+	    });
+	    let charge = null;
+	    if (src.charge) {
+	        let [result, err] = charge_1.fromJsonToCharge(src.charge);
+	        if (err) {
+	            return [undefined, err];
+	        }
+	        charge = result;
+	    }
+	    let visit = new FullVisit(src.visit_id, src.patient_id, src.v_datetime, src.shahokokuho_id, src.koukikourei_id, src.roujin_id, src.kouhi_1_id, src.kouhi_2_id, src.kouhi_3_id, texts, shahokokuho, koukikourei, roujin, kouhiList, drugs, shinryouList, conducts, charge);
+	    let errs = validateFullVisit(visit);
+	    console.log(src);
+	    if (errs.length > 0) {
+	        return [undefined, new V.ValidationError(errs)];
+	    }
+	    else {
+	        return [visit, null];
+	    }
+	}
+	exports.fromJsonToFullVisit = fromJsonToFullVisit;
 
 
 /***/ }

@@ -70,7 +70,10 @@ body.appendChild(typed_dom_1.h.h1({}, ["診察日ごとの診療録リスト"]))
 body.appendChild(dateInput.create());
 dateInput.setToday();
 const service = require("./service");
-service.getCharge(200)
+service.getFullVisit(6731)
     .then(function (result) {
     console.log(result);
+})
+    .catch(function (ex) {
+    console.log("ERROR", ex);
 });

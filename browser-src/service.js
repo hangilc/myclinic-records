@@ -160,3 +160,10 @@ function getCharge(visitId) {
     return request("get_charge", { visit_id: visitId }, "GET", model.fromJsonToCharge);
 }
 exports.getCharge = getCharge;
+function getFullVisit(visitId) {
+    if (!(Number.isInteger(visitId) && visitId > 0)) {
+        return Promise.reject("invalid visitId");
+    }
+    return request("get_full_visit", { visit_id: visitId }, "GET", model.fromJsonToFullVisit);
+}
+exports.getFullVisit = getFullVisit;
