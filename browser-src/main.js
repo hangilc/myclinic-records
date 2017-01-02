@@ -1,44 +1,56 @@
 "use strict";
-const moment = require("moment");
-const kanjidate = require("kanjidate");
 const typed_dom_1 = require("./typed-dom");
-const service_1 = require("./service");
+const records_by_date_1 = require("./records-by-date");
+let main = typed_dom_1.h.div({}, []);
+document.body.appendChild(main);
+{
+    let app = new records_by_date_1.RecordsByDate();
+    main.appendChild(app.createDom());
+    app.setToday();
+}
+/*
 class DateInput {
-    create() {
-        return typed_dom_1.h.div({}, [
-            typed_dom_1.f.form(e => this.bindSubmit(e), {}, [
+    private nenInput: HTMLInputElement;
+    private monthInput: HTMLInputElement;
+    private dayInput: HTMLInputElement;
+
+    create(): HTMLElement {
+        return h.div({}, [
+            f.form(e => this.bindSubmit(e), {}, [
                 "平成",
-                typed_dom_1.f.input(e => this.nenInput = e, { size: "4", class: "num-input" }),
+                f.input(e => this.nenInput = e, {size:"4", class:"num-input"}),
                 "年 ",
-                typed_dom_1.f.input(e => this.monthInput = e, { size: "4", class: "num-input" }),
+                f.input(e => this.monthInput = e, {size:"4", class:"num-input"}),
                 "月 ",
-                typed_dom_1.f.input(e => this.dayInput = e, { size: "4", class: "num-input" }),
+                f.input(e => this.dayInput = e, {size:"4", class:"num-input"}),
                 "日 ",
-                typed_dom_1.h.input({ type: "submit", value: "選択" }),
+                h.input({type:"submit", value:"選択"}),
                 " ",
-                typed_dom_1.f.a(e => typed_dom_1.click(e, _ => this.setToday()), {}, ["[本日]"])
+                f.a(e => click(e, _ => this.setToday()), {}, ["[本日]"])
             ])
         ]);
     }
-    bindSubmit(form) {
-        form.addEventListener("submit", (event) => {
+
+    bindSubmit(form: HTMLFormElement) {
+        form.addEventListener("submit", (event: Event) => {
             let m = this.get();
-            if (!m) {
+            if( ! m ){
                 alert("日付の入力が不適切です。");
                 return;
             }
             let sqlDate = m.format("YYYY-MM-DD");
-            service_1.listVisitsByDate(sqlDate)
-                .then(function (result) {
+            listVisitsByDate(sqlDate)
+            .then(function(result){
                 console.log(result);
             })
-                .catch(function (ex) {
+            .catch(function(ex){
                 alert(ex);
                 return;
-            });
-        });
+            })
+        })
     }
-    set(m) {
+
+    set(m: moment.Moment): void {
         let month = m.month() + 1;
         let day = m.date();
         let g = kanjidate.toGengou(m.year(), month, day);
@@ -46,34 +58,38 @@ class DateInput {
         this.monthInput.value = month.toString();
         this.dayInput.value = day.toString();
     }
-    setToday() {
+
+    setToday(): void {
         this.set(moment());
     }
-    get() {
+
+    get(): moment.Moment | undefined {
         let gengou = "平成";
-        let nen = +this.nenInput.value;
-        let month = +this.monthInput.value;
-        let day = +this.dayInput.value;
-        let year = kanjidate.fromGengou(gengou, nen);
-        let m = moment({ year: year, month: month - 1, date: day });
-        if (m.isValid()) {
+        let nen: number = +this.nenInput.value;
+        let month: number = +this.monthInput.value;
+        let day:number = +this.dayInput.value;
+        let year:number = kanjidate.fromGengou(gengou, nen);
+        let m = moment({year: year, month: month - 1, date: day});
+        if( m.isValid() ){
             return m;
-        }
-        else {
+        } else {
             return undefined;
         }
     }
 }
+
 let body = document.body;
 let dateInput = new DateInput();
-body.appendChild(typed_dom_1.h.h1({}, ["診察日ごとの診療録リスト"]));
+body.appendChild(h.h1({}, ["診察日ごとの診療録リスト"]));
 body.appendChild(dateInput.create());
+
 dateInput.setToday();
-const service = require("./service");
-service.getFullVisit(77970)
-    .then(function (result) {
-    console.log(result);
-})
-    .catch(function (ex) {
-    console.log("ERROR", ex);
-});
+*/
+// import * as service from "./service";
+// service.getFullVisit(77970)
+// .then(function(result){
+// 	console.log(result);
+// })
+// .catch(function(ex){
+// 	console.log("ERROR", ex);
+// })

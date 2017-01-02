@@ -137,7 +137,6 @@ function fromJsonToFullVisit(src) {
     }
     let visit = new FullVisit(src.visit_id, src.patient_id, src.v_datetime, src.shahokokuho_id, src.koukikourei_id, src.roujin_id, src.kouhi_1_id, src.kouhi_2_id, src.kouhi_3_id, texts, shahokokuho, koukikourei, roujin, kouhiList, drugs, shinryouList, conducts, charge);
     let errs = validateFullVisit(visit);
-    console.log(src);
     if (errs.length > 0) {
         return new V.ValidationError(errs);
     }

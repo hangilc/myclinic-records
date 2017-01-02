@@ -151,7 +151,6 @@ export function fromJsonToFullVisit(src: any): FullVisit | V.ValidationError {
 		texts, shahokokuho, koukikourei, roujin, kouhiList,
 		drugs, shinryouList, conducts, charge);
 	let errs = validateFullVisit(visit);
-	console.log(src);
 	if( errs.length > 0 ){
 		return new V.ValidationError(errs);
 	} else {

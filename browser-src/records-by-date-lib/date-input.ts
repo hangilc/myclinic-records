@@ -1,24 +1,13 @@
-import * as $ from "jquery";
-import { h } from "./typed-dom";
-import { RecordsByDate } from "./records-by-date";
+import { h, f } from "../typed-dom";
+import * as moment from "moment";
+import * as kanjidate from "kanjidate";
 
-let main: HTMLElement = h.div({}, []);
-document.body.appendChild(main);
-{
-	let app = new RecordsByDate();
-	main.appendChild(app.createDom());
-	app.setToday();
-}
-
-
-
-/*
-class DateInput {
+export class DateInput {
 	private nenInput: HTMLInputElement;
 	private monthInput: HTMLInputElement;
 	private dayInput: HTMLInputElement;
 
-	create(): HTMLElement {
+	createDom(): HTMLElement {
 		return h.div({}, [
 			f.form(e => this.bindSubmit(e), {}, [
 				"平成",
@@ -30,7 +19,7 @@ class DateInput {
 				"日 ",
 				h.input({type:"submit", value:"選択"}),
 				" ",
-				f.a(e => click(e, _ => this.setToday()), {}, ["[本日]"])
+				f.a(e => this.bindToday(e), {}, ["[本日]"])
 			])
 		]);
 	}
@@ -43,15 +32,21 @@ class DateInput {
 				return;
 			}
 			let sqlDate = m.format("YYYY-MM-DD");
-			listVisitsByDate(sqlDate)
-			.then(function(result){
-				console.log(result);
-			})
-			.catch(function(ex){
-				alert(ex);
-				return;
-			})
+			// listVisitsByDate(sqlDate)
+			// .then(function(result){
+			// 	console.log(result);
+			// })
+			// .catch(function(ex){
+			// 	alert(ex);
+			// 	return;
+			// })
 		})
+	}
+
+	bindToday(e: HTMLElement){
+		e.addEventListener("click", _ => {
+			this.setToday();
+		});
 	}
 
 	set(m: moment.Moment): void {
@@ -81,21 +76,3 @@ class DateInput {
 		}
 	}
 }
-
-let body = document.body;
-let dateInput = new DateInput();
-body.appendChild(h.h1({}, ["診察日ごとの診療録リスト"]));
-body.appendChild(dateInput.create());
-
-dateInput.setToday();
-*/
-
-// import * as service from "./service";
-// service.getFullVisit(77970)
-// .then(function(result){
-// 	console.log(result);
-// })
-// .catch(function(ex){
-// 	console.log("ERROR", ex);
-// })
-
