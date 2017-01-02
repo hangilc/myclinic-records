@@ -55,91 +55,6 @@
 	    app.setToday();
 	}
 	appRecordsByDate(main);
-	/*
-	class DateInput {
-	    private nenInput: HTMLInputElement;
-	    private monthInput: HTMLInputElement;
-	    private dayInput: HTMLInputElement;
-
-	    create(): HTMLElement {
-	        return h.div({}, [
-	            f.form(e => this.bindSubmit(e), {}, [
-	                "平成",
-	                f.input(e => this.nenInput = e, {size:"4", class:"num-input"}),
-	                "年 ",
-	                f.input(e => this.monthInput = e, {size:"4", class:"num-input"}),
-	                "月 ",
-	                f.input(e => this.dayInput = e, {size:"4", class:"num-input"}),
-	                "日 ",
-	                h.input({type:"submit", value:"選択"}),
-	                " ",
-	                f.a(e => click(e, _ => this.setToday()), {}, ["[本日]"])
-	            ])
-	        ]);
-	    }
-
-	    bindSubmit(form: HTMLFormElement) {
-	        form.addEventListener("submit", (event: Event) => {
-	            let m = this.get();
-	            if( ! m ){
-	                alert("日付の入力が不適切です。");
-	                return;
-	            }
-	            let sqlDate = m.format("YYYY-MM-DD");
-	            listVisitsByDate(sqlDate)
-	            .then(function(result){
-	                console.log(result);
-	            })
-	            .catch(function(ex){
-	                alert(ex);
-	                return;
-	            })
-	        })
-	    }
-
-	    set(m: moment.Moment): void {
-	        let month = m.month() + 1;
-	        let day = m.date();
-	        let g = kanjidate.toGengou(m.year(), month, day);
-	        this.nenInput.value = g.nen.toString();
-	        this.monthInput.value = month.toString();
-	        this.dayInput.value = day.toString();
-	    }
-
-	    setToday(): void {
-	        this.set(moment());
-	    }
-
-	    get(): moment.Moment | undefined {
-	        let gengou = "平成";
-	        let nen: number = +this.nenInput.value;
-	        let month: number = +this.monthInput.value;
-	        let day:number = +this.dayInput.value;
-	        let year:number = kanjidate.fromGengou(gengou, nen);
-	        let m = moment({year: year, month: month - 1, date: day});
-	        if( m.isValid() ){
-	            return m;
-	        } else {
-	            return undefined;
-	        }
-	    }
-	}
-
-	let body = document.body;
-	let dateInput = new DateInput();
-	body.appendChild(h.h1({}, ["診察日ごとの診療録リスト"]));
-	body.appendChild(dateInput.create());
-
-	dateInput.setToday();
-	*/
-	// import * as service from "./service";
-	// service.getFullVisit(77970)
-	// .then(function(result){
-	// 	console.log(result);
-	// })
-	// .catch(function(ex){
-	// 	console.log("ERROR", ex);
-	// })
 
 
 /***/ },
@@ -193,6 +108,7 @@
 	    }
 	    h.div = makeCreator("div");
 	    h.h1 = makeCreator("h1");
+	    h.h2 = makeCreator("h2");
 	    h.input = makeCreator("input");
 	    h.button = makeCreator("button");
 	    function form(attrs, children) {
@@ -219,6 +135,7 @@
 	    }
 	    f.div = makeCreator("div");
 	    f.h1 = makeCreator("h1");
+	    f.h2 = makeCreator("h2");
 	    f.input = makeCreator("input");
 	    f.button = makeCreator("button");
 	    function form(fn, attrs, children) {
@@ -262,12 +179,14 @@
 	const typed_dom_1 = __webpack_require__(1);
 	const date_input_1 = __webpack_require__(3);
 	const service_1 = __webpack_require__(116);
+	const kanjidate = __webpack_require__(115);
 	class RecordsByDate {
 	    constructor() {
 	        this.dateInput = new date_input_1.DateInput();
 	        this.dom = typed_dom_1.h.div({}, [
 	            typed_dom_1.h.h1({}, ["診察日ごとの診療録リスト"]),
-	            this.dateInput.dom
+	            this.dateInput.dom,
+	            typed_dom_1.f.div(e => this.domDispWrapper = e, {}, [])
 	        ]);
 	        this.dateInput.setOnSubmit((m) => {
 	            this.onDateInputSubmit(m);
@@ -280,11 +199,22 @@
 	        return __awaiter(this, void 0, void 0, function* () {
 	            let at = m.format("YYYY-MM-DD");
 	            let visits = yield service_1.listVisitsByDate(at);
-	            console.log(visits);
+	            let fullVisits = yield Promise.all(visits.map(v => {
+	                return service_1.getFullVisit(v.visitId);
+	            }));
+	            this.renderDisp(m, fullVisits);
 	        });
+	    }
+	    renderDisp(m, fullVisits) {
+	        var wrapper = this.domDispWrapper;
+	        wrapper.innerHTML = "";
+	        wrapper.appendChild(createHeader(m));
 	    }
 	}
 	exports.RecordsByDate = RecordsByDate;
+	function createHeader(m) {
+	    return typed_dom_1.h.h2({}, [kanjidate.format(kanjidate.f1, m.format("YYYY-MM-DD"))]);
+	}
 
 
 /***/ },

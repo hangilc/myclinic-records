@@ -1,4 +1,4 @@
-import { h, f } from "../typed-dom";
+import { h, f } from "./typed-dom";
 import * as moment from "moment";
 import * as kanjidate from "kanjidate";
 

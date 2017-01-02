@@ -1,5 +1,5 @@
 "use strict";
-const typed_dom_1 = require("../typed-dom");
+const typed_dom_1 = require("./typed-dom");
 const moment = require("moment");
 const kanjidate = require("kanjidate");
 class DateInput {
