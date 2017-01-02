@@ -2,12 +2,51 @@ import { h, f } from "../typed-dom";
 import * as moment from "moment";
 import * as kanjidate from "kanjidate";
 
+import Moment = moment.Moment;
+
 export class DateInput {
+	dom: HTMLElement;
 	private nenInput: HTMLInputElement;
 	private monthInput: HTMLInputElement;
 	private dayInput: HTMLInputElement;
+	onSubmit: (m: Moment) => any | undefined;
 
-	createDom(): HTMLElement {
+	constructor(){
+		this.dom = this.createDom();
+	}
+
+	setOnSubmit(fn: (m: Moment) => any): void {
+		this.onSubmit = fn;
+	}
+
+	set(m: Moment): void {
+		let month = m.month() + 1;
+		let day = m.date();
+		let g = kanjidate.toGengou(m.year(), month, day);
+		this.nenInput.value = g.nen.toString();
+		this.monthInput.value = month.toString();
+		this.dayInput.value = day.toString();
+	}
+
+	setToday(): void {
+		this.set(moment());
+	}
+
+	get(): Moment | undefined {
+		let gengou = "平成";
+		let nen: number = +this.nenInput.value;
+		let month: number = +this.monthInput.value;
+		let day:number = +this.dayInput.value;
+		let year:number = kanjidate.fromGengou(gengou, nen);
+		let m = moment({year: year, month: month - 1, date: day});
+		if( m.isValid() ){
+			return m;
+		} else {
+			return undefined;
+		}
+	}
+
+	private createDom(): HTMLElement {
 		return h.div({}, [
 			f.form(e => this.bindSubmit(e), {}, [
 				"平成",
@@ -24,55 +63,24 @@ export class DateInput {
 		]);
 	}
 
-	bindSubmit(form: HTMLFormElement) {
+	private bindSubmit(form: HTMLFormElement) {
 		form.addEventListener("submit", (event: Event) => {
-			let m = this.get();
-			if( ! m ){
-				alert("日付の入力が不適切です。");
-				return;
+			if( this.onSubmit ){
+				let m = this.get();
+				if( ! m ){
+					alert("日付の入力が不適切です。");
+					return;
+				}
+				this.onSubmit(m);
 			}
-			let sqlDate = m.format("YYYY-MM-DD");
-			// listVisitsByDate(sqlDate)
-			// .then(function(result){
-			// 	console.log(result);
-			// })
-			// .catch(function(ex){
-			// 	alert(ex);
-			// 	return;
-			// })
 		})
 	}
 
-	bindToday(e: HTMLElement){
+	private bindToday(e: HTMLElement){
 		e.addEventListener("click", _ => {
 			this.setToday();
 		});
 	}
 
-	set(m: moment.Moment): void {
-		let month = m.month() + 1;
-		let day = m.date();
-		let g = kanjidate.toGengou(m.year(), month, day);
-		this.nenInput.value = g.nen.toString();
-		this.monthInput.value = month.toString();
-		this.dayInput.value = day.toString();
-	}
-
-	setToday(): void {
-		this.set(moment());
-	}
-
-	get(): moment.Moment | undefined {
-		let gengou = "平成";
-		let nen: number = +this.nenInput.value;
-		let month: number = +this.monthInput.value;
-		let day:number = +this.dayInput.value;
-		let year:number = kanjidate.fromGengou(gengou, nen);
-		let m = moment({year: year, month: month - 1, date: day});
-		if( m.isValid() ){
-			return m;
-		} else {
-			return undefined;
-		}
-	}
 }
+

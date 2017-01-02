@@ -1,23 +1,30 @@
 import { h, f } from "./typed-dom";
 import { DateInput } from "./records-by-date-lib/date-input";
+import * as moment from "moment";
+import { listVisitsByDate } from "./service";
 
 export class RecordsByDate {
-	dom: HTMLElement | undefined;
-	dateInput: DateInput | undefined;
+	dom: HTMLElement;
+	dateInput: DateInput;
 
-	createDom(): HTMLElement {
+	constructor(){
 		this.dateInput = new DateInput();
 		this.dom = h.div({}, [
 			h.h1({}, ["診察日ごとの診療録リスト"]),
-			this.dateInput.createDom()
+			this.dateInput.dom
 		]);
-		return this.dom;
+		this.dateInput.setOnSubmit((m: moment.Moment) => {
+			this.onDateInputSubmit(m);
+		});
 	}
 
 	setToday(): void {
-		let d = this.dateInput;
-		if( d ){
-			d.setToday();
-		}
+		this.dateInput.setToday();
+	}
+
+	private async onDateInputSubmit(m: moment.Moment) {
+		let at = m.format("YYYY-MM-DD");
+		let visits = await listVisitsByDate(at);
+		console.log(visits);
 	}
 }

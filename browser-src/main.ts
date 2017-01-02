@@ -1,16 +1,17 @@
 import * as $ from "jquery";
-import { h } from "./typed-dom";
+import { h, f } from "./typed-dom";
 import { RecordsByDate } from "./records-by-date";
 
 let main: HTMLElement = h.div({}, []);
 document.body.appendChild(main);
-{
+
+function appRecordsByDate(wrapper: HTMLElement): void{
 	let app = new RecordsByDate();
-	main.appendChild(app.createDom());
+	wrapper.appendChild(app.dom);
 	app.setToday();
 }
 
-
+appRecordsByDate(main);
 
 /*
 class DateInput {

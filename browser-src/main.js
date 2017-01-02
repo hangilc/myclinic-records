@@ -3,11 +3,12 @@ const typed_dom_1 = require("./typed-dom");
 const records_by_date_1 = require("./records-by-date");
 let main = typed_dom_1.h.div({}, []);
 document.body.appendChild(main);
-{
+function appRecordsByDate(wrapper) {
     let app = new records_by_date_1.RecordsByDate();
-    main.appendChild(app.createDom());
+    wrapper.appendChild(app.dom);
     app.setToday();
 }
+appRecordsByDate(main);
 /*
 class DateInput {
     private nenInput: HTMLInputElement;
