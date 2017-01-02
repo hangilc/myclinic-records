@@ -28,10 +28,10 @@ function fromJsonToShinryou(src) {
     let shinryou = new Shinryou(src.shinryou_id, src.visit_id, src.shinryoucode);
     let errs = validateShinryou(shinryou, true);
     if (errs.length > 0) {
-        return [undefined, new V.ValidationError(errs)];
+        return new V.ValidationError(errs);
     }
     else {
-        return [shinryou, null];
+        return shinryou;
     }
 }
 exports.fromJsonToShinryou = fromJsonToShinryou;

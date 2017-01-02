@@ -31,25 +31,26 @@ export class HttpError {
 }
 
 interface fromJson<T> {
-	(json: any) : [T, ValidationError]
+	(json: any) : T | ValidationError 
 }
 
 function fromJsonArray<T>(cvtor: fromJson<T>): fromJson<T[]> {
-	return function(json: any) : [T[], ValidationError] {
+	return function(json: any) : T[] | ValidationError {
 		if( Array.isArray(json) ){
 			let list: any[] = <any[]>json;
 			let ret: T[] = [];
 			for(let i=0;i<list.length;i++){
 				let item = list[i];
-				let [v, e] : [T, ValidationError] = cvtor(item);
-				if( e ){
-					return [undefined, e];
+				let obj = cvtor(item);
+				if( obj instanceof ValidationError ){
+					return obj;
+				} else {
+					ret.push(obj);
 				}
-				ret.push(v);
 			}
-			return [ret, undefined];
+			return ret;
 		} else {
-			return [undefined, new ValidationError(["array expected"])];
+			return new ValidationError(["array expected"]);
 		}
 	}
 }
@@ -66,11 +67,11 @@ function request<T>(service: string, data: Object,
 			dataType: "json",
 			timeout: 15000,
 			success: function(result){
-				let [ret, err]: [T, ValidationError] = cvtor(result);
-				if( err ){
-					reject(err);
+				let obj = cvtor(result);
+				if( obj instanceof ValidationError ){
+					reject(obj);
 				} else {
-					resolve(ret);
+					resolve(obj);
 				}
 			},
 			error: function(xhr, status, ex){

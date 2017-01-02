@@ -44,10 +44,10 @@ function fromJsonToKoukikourei(src) {
     let koukikourei = new Koukikourei(src.koukikourei_id, src.patient_id, src.hokensha_bangou, src.hihokensha_bangou, src.futan_wari, src.valid_from, src.valid_upto);
     let errs = validateKoukikourei(koukikourei, true);
     if (errs.length > 0) {
-        return [undefined, new V.ValidationError(errs)];
+        return new V.ValidationError(errs);
     }
     else {
-        return [koukikourei, null];
+        return koukikourei;
     }
 }
 exports.fromJsonToKoukikourei = fromJsonToKoukikourei;

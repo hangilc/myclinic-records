@@ -38,14 +38,14 @@ export function validateKizaiMaster(kizaiMaster: KizaiMaster): string[] {
 	return errs;
 }
 
-export function fromJsonToKizaiMaster(src: any): [KizaiMaster, V.ValidationError] {
+export function fromJsonToKizaiMaster(src: any): KizaiMaster | V.ValidationError {
 	let master = new KizaiMaster(src.kizaicode, src.name, src.yomi, src.unit,
 		+src.kingaku, src.valid_from, src.valid_upto);
 	let errs = validateKizaiMaster(master);
 	if( errs.length > 0 ){
-		return [undefined, new V.ValidationError(errs)];
+		return new V.ValidationError(errs);
 	} else {
-		return [master, null];
+		return master;
 	}
 }
 

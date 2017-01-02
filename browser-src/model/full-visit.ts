@@ -22,14 +22,14 @@ export class FullVisit extends Visit {
 		kouhi2Id: number,
 		kouhi3Id: number,
 		readonly texts: Text[], 
-		readonly shahokokuho: Shahokokuho,
-		readonly koukikourei: Koukikourei,
-		readonly roujin: Roujin,
+		readonly shahokokuho: Shahokokuho | null,
+		readonly koukikourei: Koukikourei | null,
+		readonly roujin: Roujin | null,
 		readonly kouhiList: Kouhi[],
 		readonly drugs: FullDrug[],
 		readonly shinryouList: FullShinryou[],
 		readonly conducts: FullConduct[],
-		readonly charge: Charge
+		readonly charge: Charge | null
 	){
 		super(visitId, patientId, visitedAt, shahokokuhoId,
 			koukikoureiId, roujinId, kouhi1Id, kouhi2Id, kouhi3Id)
@@ -71,76 +71,79 @@ export function validateFullVisit(visit: FullVisit): string[] {
 	return errs;
 }
 
-export function fromJsonToFullVisit(src: any): [FullVisit, V.ValidationError] {
-	let texts: Text[] = src.texts.map(s => {
-		let [result, err] = fromJsonToText(s);
-		if( err ){
-			return [undefined, err];
+export function fromJsonToFullVisit(src: any): FullVisit | V.ValidationError {
+	let texts: Text[];
+	{
+		let result = V.mapConvert(src.texts, fromJsonToText);
+		if( result instanceof V.ValidationError ){
+			return result;
 		}
-		return result;
-	});
-	let shahokokuho: Shahokokuho = null;
+		texts = result;		
+	}
+	let shahokokuho: Shahokokuho | null = null;
 	if( src.shahokokuho ){
-		let [result, err] = fromJsonToShahokokuho(src.shahokokuho);
-		if ( err ){
-			return [undefined, err];
+		let result = fromJsonToShahokokuho(src.shahokokuho);
+		if( result instanceof V.ValidationError ){
+			return result;
 		}
 		shahokokuho = result;
 	}
-	let koukikourei: Koukikourei = null;
+	let koukikourei: Koukikourei | null = null;
 	if( src.koukikourei ){
-		let [result, err] = fromJsonToKoukikourei(src.koukikourei);
-		if ( err ){
-			return [undefined, err];
+		let result = fromJsonToKoukikourei(src.koukikourei);
+		if( result instanceof V.ValidationError ){
+			return result;
 		}
 		koukikourei = result;
 	}
-	let roujin: Roujin = null;
+	let roujin: Roujin | null = null;
 	if( src.roujin ){
-		let [result, err] = fromJsonToRoujin(src.roujin);
-		if ( err ){
-			return [undefined, err];
+		let result = fromJsonToRoujin(src.roujin);
+		if ( result instanceof V.ValidationError ){
+			return result;
 		}
 		roujin = result;
 	}
-	let kouhiList: Kouhi[] = [];
-	if( src.kouhi_list ){
-		kouhiList = src.kouhi_list.map(function(srcKouhi){
-			let [kouhi, err] = fromJsonToKouhi(srcKouhi)
-			if( err ){
-				return [undefined, err];
-			}
-			return kouhi;
-		});
+	let kouhiList: Kouhi[];
+	{
+		let result = V.mapConvert(src.kouhi_list, fromJsonToKouhi);
+		if( result instanceof V.ValidationError ){
+			return result;
+		}
+		kouhiList = result;
 	}
-	let drugs: FullDrug[] = src.drugs.map(s => {
-		let [result, err] = fromJsonToFullDrug(s);
-		if( err ){
-			return [undefined, err];
+	let drugs: FullDrug[];
+	{
+		let result = V.mapConvert(src.drugs, fromJsonToFullDrug);
+		if( result instanceof V.ValidationError ){
+			return result;
 		}
-		return result;
-	});
-	let shinryouList: FullShinryou[] = src.shinryou_list.map(s => {
-		let [result, err] = fromJsonToFullShinryou(s);
-		if( err ){
-			return [undefined, err];
+		drugs = result;
+	}
+	let shinryouList: FullShinryou[];
+	{
+		let result = V.mapConvert(src.shinryou_list, fromJsonToFullShinryou);
+		if( result instanceof V.ValidationError ){
+			return result;
 		}
-		return result;
-	});
-	let conducts: FullConduct[] = src.conducts.map(s => {
-		let [result, err] = fromJsonToFullConduct(s);
-		if( err ){
-			return [undefined, err];
+		shinryouList = result;
+	}
+	let conducts: FullConduct[];
+	{
+		let result = V.mapConvert(src.conducts, fromJsonToFullConduct);
+		if( result instanceof V.ValidationError ){
+			return result;
 		}
-		return result;
-	});
-	let charge: Charge = null;
+		conducts = result;
+	}
+	let charge: Charge | null = null;
 	if( src.charge ){
-		let [result, err] = fromJsonToCharge(src.charge);
-		if( err ){
-			return [undefined, err];
+		let result = fromJsonToCharge(src.charge);
+		if( result instanceof V.ValidationError ){
+			return result;
+		} else {
+			charge = result;
 		}
-		charge = result;
 	}
 	let visit = new FullVisit(src.visit_id, src.patient_id, src.v_datetime,
 		src.shahokokuho_id, src.koukikourei_id, src.roujin_id,
@@ -150,9 +153,9 @@ export function fromJsonToFullVisit(src: any): [FullVisit, V.ValidationError] {
 	let errs = validateFullVisit(visit);
 	console.log(src);
 	if( errs.length > 0 ){
-		return [undefined, new V.ValidationError(errs)];
+		return new V.ValidationError(errs);
 	} else {
-		return [visit, null];
+		return visit;
 	}
 }
 

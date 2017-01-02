@@ -22,10 +22,10 @@ function fromJsonToCharge(src) {
     let charge = new Charge(src.visit_id, src.charge);
     let errs = validateCharge(charge);
     if (errs.length > 0) {
-        return [undefined, new V.ValidationError(errs)];
+        return new V.ValidationError(errs);
     }
     else {
-        return [charge, null];
+        return charge;
     }
 }
 exports.fromJsonToCharge = fromJsonToCharge;

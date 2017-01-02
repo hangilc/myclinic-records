@@ -38,10 +38,10 @@ function fromJsonToVisit(src) {
     let visit = new Visit(src.visit_id, src.patient_id, src.v_datetime, src.shahokokuho_id, src.koukikourei_id, src.roujin_id, src.kouhi_1_id, src.kouhi_2_id, src.kouhi_3_id);
     let errs = validateVisit(visit, true);
     if (errs.length > 0) {
-        return [undefined, new V.ValidationError(errs)];
+        return new V.ValidationError(errs);
     }
     else {
-        return [visit, null];
+        return visit;
     }
 }
 exports.fromJsonToVisit = fromJsonToVisit;

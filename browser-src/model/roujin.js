@@ -44,10 +44,10 @@ function fromJsonToRoujin(src) {
     let roujin = new Roujin(src.roujin_id, src.patient_id, src.shichouson, src.jukyuusha, src.futan_wari, src.valid_from, src.valid_upto);
     let errs = validateRoujin(roujin, true);
     if (errs.length > 0) {
-        return [undefined, new V.ValidationError(errs)];
+        return new V.ValidationError(errs);
     }
     else {
-        return [roujin, null];
+        return roujin;
     }
 }
 exports.fromJsonToRoujin = fromJsonToRoujin;

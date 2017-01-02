@@ -2,7 +2,8 @@
 	"compilerOptions": {
 		"module": "commonjs",
 		"target": "ES5",
-		"outDir": ".."
+		"outDir": "..",
+		"strictNullChecks": true
 	},
 	"files": [
 		"index.ts"

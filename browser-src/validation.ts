@@ -5,10 +5,23 @@ export class ValidationError {
 }
 
 export interface Validator {
-	(name: string, o: any) : string
+	(name: string, o: any) : string | null
 }
 
-export function isDefined(name: string, value: any): string {
+export function mapConvert<S,T>(arr: S[], cvt: (src:S) => T|ValidationError): T[] | ValidationError {
+	let res: T[] = [];
+	for(let i=0;i<arr.length;i++){
+		let c = cvt(arr[i]);
+		if( c instanceof ValidationError ){
+			return c;
+		} else {
+			res.push(c);
+		}
+	}
+	return res;
+}
+
+export function isDefined(name: string, value: any): string | null {
 	if( value === undefined ){
 		return `${ name }の値が指摘されていません。`;
 	} else {
@@ -16,7 +29,7 @@ export function isDefined(name: string, value: any): string {
 	}
 }
 
-export function isNumber(name: string, value: any): string {
+export function isNumber(name: string, value: any): string | null {
 	if( typeof value === "number" ){
 		return null;
 	} else {
@@ -24,7 +37,7 @@ export function isNumber(name: string, value: any): string {
 	}
 }
 
-export function isInteger(name: string, value: any): string {
+export function isInteger(name: string, value: any): string | null {
 	if( Number.isInteger(value) ){
 		return null;
 	} else {
@@ -32,7 +45,7 @@ export function isInteger(name: string, value: any): string {
 	}
 }
 
-export function isString(name: string, value: any): string {
+export function isString(name: string, value: any): string | null {
 	if( typeof value === "string" ){
 		return null;
 	} else {
@@ -40,7 +53,7 @@ export function isString(name: string, value: any): string {
 	}
 }
 
-export function isBoolean(name: string, value: any): string {
+export function isBoolean(name: string, value: any): string | null {
 	if( typeof value === "boolean" ){
 		return null;
 	} else {
@@ -48,7 +61,7 @@ export function isBoolean(name: string, value: any): string {
 	}
 }
 
-export function isPositive(name: string, value: any): string {
+export function isPositive(name: string, value: any): string | null {
 	if( value > 0 ){
 		return null;
 	} else {
@@ -56,7 +69,7 @@ export function isPositive(name: string, value: any): string {
 	}
 }
 
-export function isZeroOrPositive(name: string, value: any): string {
+export function isZeroOrPositive(name: string, value: any): string | null {
 	if( value >= 0 ){
 		return null;
 	} else {
@@ -64,7 +77,7 @@ export function isZeroOrPositive(name: string, value: any): string {
 	}
 }
 
-export function isNotEmpty(name: string, value: any): string {
+export function isNotEmpty(name: string, value: any): string | null {
 	if( value === "" || value == null ){
 		return `${ name}の値が空白です。`;
 	} else {
@@ -72,7 +85,7 @@ export function isNotEmpty(name: string, value: any): string {
 	}
 }
 
-export function isSqlDate(name: string, value: any): string {
+export function isSqlDate(name: string, value: any): string | null {
 	if( /^\d{4}-\d{2}-\d{2}$/.test(value) ){
 		let m = moment(value);
 		if( m.isValid() ){
@@ -82,7 +95,7 @@ export function isSqlDate(name: string, value: any): string {
 	return `${ name }の値が不適切です。`;
 }
 
-export function isSqlDateOrZero(name: string, value: any): string {
+export function isSqlDateOrZero(name: string, value: any): string | null {
 	if( value === "0000-00-00" ){
 		return null;
 	}
@@ -95,7 +108,7 @@ export function isSqlDateOrZero(name: string, value: any): string {
 	return `${ name }の値が不適切です。`;
 }
 
-export function isSqlDateTime(name: string, value: any): string {
+export function isSqlDateTime(name: string, value: any): string | null {
 	if( /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(value) ){
 		let m = moment(value);
 		if( m.isValid() ){
@@ -106,7 +119,7 @@ export function isSqlDateTime(name: string, value: any): string {
 }
 
 export function isOneOf(...list: any[]): Validator {
-	return function(name: string, value: any): string {
+	return function(name: string, value: any): string | null {
 		for(let i=0;i<list.length;i++){
 			if( value === list[i] ){
 				return null;
@@ -116,7 +129,7 @@ export function isOneOf(...list: any[]): Validator {
 	}
 }
 
-export function isFloatCompatibleString(name: string, value: any): string {
+export function isFloatCompatibleString(name: string, value: any): string | null {
 	if( /^\d+(\.\d+)?$/.test(value) ){
 		return null;
 	} else {
@@ -124,7 +137,7 @@ export function isFloatCompatibleString(name: string, value: any): string {
 	}
 }
 
-export function isOptionalString(name: string, value: any): string {
+export function isOptionalString(name: string, value: any): string | null {
 	if( value == null || typeof value === "string" ){
 		return null;
 	} else {

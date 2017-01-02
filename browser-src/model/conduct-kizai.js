@@ -32,10 +32,10 @@ function fromJsonToConductKizai(src) {
     let conductKizai = new ConductKizai(src.id, src.visit_conduct_id, src.kizaicode, src.amount);
     let errs = validateConductKizai(conductKizai, true);
     if (errs.length > 0) {
-        return [undefined, new V.ValidationError(errs)];
+        return new V.ValidationError(errs);
     }
     else {
-        return [conductKizai, null];
+        return conductKizai;
     }
 }
 exports.fromJsonToConductKizai = fromJsonToConductKizai;

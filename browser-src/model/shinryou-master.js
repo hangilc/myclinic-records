@@ -70,10 +70,10 @@ function fromJsonToShinryouMaster(src) {
     let master = new ShinryouMaster(src.shinryoucode, src.name, +src.tensuu, +src.tensuu_shikibetsu, src.houkatsukensa, +src.oushinkubun, src.kensagroup, +src.roujintekiyou, +src.code_shou, src.code_bu, src.code_alpha, src.code_kubun, src.valid_from, src.valid_upto);
     let errs = validateShinryouMaster(master);
     if (errs.length > 0) {
-        return [undefined, new V.ValidationError(errs)];
+        return new V.ValidationError(errs);
     }
     else {
-        return [master, null];
+        return master;
     }
 }
 exports.fromJsonToShinryouMaster = fromJsonToShinryouMaster;

@@ -40,10 +40,10 @@ function fromJsonToKouhi(src) {
     let kouhi = new Kouhi(src.kouhi_id, src.patient_id, src.futansha, src.jukyuusha, src.valid_from, src.valid_upto);
     let errs = validateKouhi(kouhi, true);
     if (errs.length > 0) {
-        return [undefined, new V.ValidationError(errs)];
+        return new V.ValidationError(errs);
     }
     else {
-        return [kouhi, null];
+        return kouhi;
     }
 }
 exports.fromJsonToKouhi = fromJsonToKouhi;

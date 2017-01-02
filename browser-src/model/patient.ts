@@ -33,15 +33,15 @@ export function validatePatient(patient: Patient,
 	return errs;
 }
 
-export function fromJsonToPatient(src: any) : [Patient, V.ValidationError] {
+export function fromJsonToPatient(src: any) : Patient | V.ValidationError {
  	let patient = new Patient(src.patient_id, src.last_name,
  		src.first_name, src.last_name_yomi, src.first_name_yomi,
  		src.birth_day, src.sex, src.address, src.phone);
  	let errs = validatePatient(patient, true);
  	if( errs.length > 0 ){
- 		return [undefined, new V.ValidationError(errs)];
+ 		return new V.ValidationError(errs);
  	} else {
- 		return [patient, null];
+ 		return patient;
  	}
 }
 

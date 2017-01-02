@@ -25,12 +25,12 @@ export function validateShinryou(shinryou: Shinryou,
 	return errs;
 }
 
-export function fromJsonToShinryou(src: any): [Shinryou, V.ValidationError] {
+export function fromJsonToShinryou(src: any): Shinryou | V.ValidationError {
 	let shinryou = new Shinryou(src.shinryou_id, src.visit_id, src.shinryoucode);
 	let errs = validateShinryou(shinryou, true);
 	if( errs.length > 0 ){
-		return [undefined, new V.ValidationError(errs)];
+		return new V.ValidationError(errs);
 	} else {
-		return [shinryou, null];
+		return shinryou;
 	}
 }

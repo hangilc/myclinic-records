@@ -30,10 +30,10 @@ function fromJsonToFullDrug(src) {
     let drug = new FullDrug(src.drug_id, src.visit_id, src.d_iyakuhincode, src.d_amount, src.d_usage, src.d_days, src.d_category, src.d_prescribed === 0 ? false : true, src.name, src.yomi, src.unit, +src.yakka, +src.madoku, src.kouhatsu === 0 ? false : true, +src.zaikei, src.valid_from, src.valid_upto);
     let errs = validateFullDrug(drug);
     if (errs.length > 0) {
-        return [undefined, new V.ValidationError(errs)];
+        return new V.ValidationError(errs);
     }
     else {
-        return [drug, null];
+        return drug;
     }
 }
 exports.fromJsonToFullDrug = fromJsonToFullDrug;

@@ -58,7 +58,7 @@ class DateInput {
 		this.set(moment());
 	}
 
-	get(): moment.Moment {
+	get(): moment.Moment | undefined {
 		let gengou = "平成";
 		let nen: number = +this.nenInput.value;
 		let month: number = +this.monthInput.value;

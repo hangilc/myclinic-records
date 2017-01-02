@@ -17,16 +17,18 @@ function fromJsonArray(cvtor) {
             let ret = [];
             for (let i = 0; i < list.length; i++) {
                 let item = list[i];
-                let [v, e] = cvtor(item);
-                if (e) {
-                    return [undefined, e];
+                let obj = cvtor(item);
+                if (obj instanceof validation_1.ValidationError) {
+                    return obj;
                 }
-                ret.push(v);
+                else {
+                    ret.push(obj);
+                }
             }
-            return [ret, undefined];
+            return ret;
         }
         else {
-            return [undefined, new validation_1.ValidationError(["array expected"])];
+            return new validation_1.ValidationError(["array expected"]);
         }
     };
 }
@@ -41,12 +43,12 @@ function request(service, data, method, cvtor) {
             dataType: "json",
             timeout: 15000,
             success: function (result) {
-                let [ret, err] = cvtor(result);
-                if (err) {
-                    reject(err);
+                let obj = cvtor(result);
+                if (obj instanceof validation_1.ValidationError) {
+                    reject(obj);
                 }
                 else {
-                    resolve(ret);
+                    resolve(obj);
                 }
             },
             error: function (xhr, status, ex) {

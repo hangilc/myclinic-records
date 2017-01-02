@@ -36,7 +36,7 @@ export function validateFullDrug(drug: FullDrug): string[] {
 	return errs;
 }
 
-export function fromJsonToFullDrug(src: any): [FullDrug, V.ValidationError] {
+export function fromJsonToFullDrug(src: any): FullDrug | V.ValidationError {
 	let drug = new FullDrug(src.drug_id, src.visit_id, src.d_iyakuhincode,
 		src.d_amount, src.d_usage, src.d_days, src.d_category, 
 		src.d_prescribed === 0 ? false : true,
@@ -45,9 +45,9 @@ export function fromJsonToFullDrug(src: any): [FullDrug, V.ValidationError] {
 		+src.zaikei, src.valid_from, src.valid_upto);
 	let errs = validateFullDrug(drug);
 	if( errs.length > 0 ){
-		return [undefined, new V.ValidationError(errs)];
+		return new V.ValidationError(errs);
 	} else {
-		return [drug, null];
+		return drug;
 	}
 }
 

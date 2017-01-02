@@ -32,10 +32,10 @@ function fromJsonToConductDrug(src) {
     let conductDrug = new ConductDrug(src.id, src.visit_conduct_id, src.iyakuhincode, src.amount);
     let errs = validateConductDrug(conductDrug, true);
     if (errs.length > 0) {
-        return [undefined, new V.ValidationError(errs)];
+        return new V.ValidationError(errs);
     }
     else {
-        return [conductDrug, null];
+        return conductDrug;
     }
 }
 exports.fromJsonToConductDrug = fromJsonToConductDrug;

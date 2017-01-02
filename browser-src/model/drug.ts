@@ -45,14 +45,14 @@ export function validateDrug(drug: Drug,
 	return errs;
 }
 
-export function fromJsonToDrug(src: any): [Drug, V.ValidationError] {
+export function fromJsonToDrug(src: any): Drug | V.ValidationError {
 	let drug = new Drug(src.drug_id, src.visit_id, src.d_iyakuhincode,
 		src.d_amount, src.d_usage, src.d_days, src.d_category, 
 		src.d_prescribed === 0 ? false : true);
 	let errs = validateDrug(drug, true);
 	if( errs.length > 0 ){
-		return [undefined, new V.ValidationError(errs)];
+		return new V.ValidationError(errs);
 	} else {
-		return [drug, null];
+		return drug;
 	}
 }

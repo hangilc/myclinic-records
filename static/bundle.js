@@ -25737,16 +25737,18 @@
 	            let ret = [];
 	            for (let i = 0; i < list.length; i++) {
 	                let item = list[i];
-	                let [v, e] = cvtor(item);
-	                if (e) {
-	                    return [undefined, e];
+	                let obj = cvtor(item);
+	                if (obj instanceof validation_1.ValidationError) {
+	                    return obj;
 	                }
-	                ret.push(v);
+	                else {
+	                    ret.push(obj);
+	                }
 	            }
-	            return [ret, undefined];
+	            return ret;
 	        }
 	        else {
-	            return [undefined, new validation_1.ValidationError(["array expected"])];
+	            return new validation_1.ValidationError(["array expected"]);
 	        }
 	    };
 	}
@@ -25761,12 +25763,12 @@
 	            dataType: "json",
 	            timeout: 15000,
 	            success: function (result) {
-	                let [ret, err] = cvtor(result);
-	                if (err) {
-	                    reject(err);
+	                let obj = cvtor(result);
+	                if (obj instanceof validation_1.ValidationError) {
+	                    reject(obj);
 	                }
 	                else {
-	                    resolve(ret);
+	                    resolve(obj);
 	                }
 	            },
 	            error: function (xhr, status, ex) {
@@ -25993,10 +25995,10 @@
 	    let patient = new Patient(src.patient_id, src.last_name, src.first_name, src.last_name_yomi, src.first_name_yomi, src.birth_day, src.sex, src.address, src.phone);
 	    let errs = validatePatient(patient, true);
 	    if (errs.length > 0) {
-	        return [undefined, new V.ValidationError(errs)];
+	        return new V.ValidationError(errs);
 	    }
 	    else {
-	        return [patient, null];
+	        return patient;
 	    }
 	}
 	exports.fromJsonToPatient = fromJsonToPatient;
@@ -26014,6 +26016,20 @@
 	    }
 	}
 	exports.ValidationError = ValidationError;
+	function mapConvert(arr, cvt) {
+	    let res = [];
+	    for (let i = 0; i < arr.length; i++) {
+	        let c = cvt(arr[i]);
+	        if (c instanceof ValidationError) {
+	            return c;
+	        }
+	        else {
+	            res.push(c);
+	        }
+	    }
+	    return res;
+	}
+	exports.mapConvert = mapConvert;
 	function isDefined(name, value) {
 	    if (value === undefined) {
 	        return `${name}の値が指摘されていません。`;
@@ -26205,10 +26221,10 @@
 	    let visit = new Visit(src.visit_id, src.patient_id, src.v_datetime, src.shahokokuho_id, src.koukikourei_id, src.roujin_id, src.kouhi_1_id, src.kouhi_2_id, src.kouhi_3_id);
 	    let errs = validateVisit(visit, true);
 	    if (errs.length > 0) {
-	        return [undefined, new V.ValidationError(errs)];
+	        return new V.ValidationError(errs);
 	    }
 	    else {
-	        return [visit, null];
+	        return visit;
 	    }
 	}
 	exports.fromJsonToVisit = fromJsonToVisit;
@@ -26246,10 +26262,10 @@
 	    let text = new Text(src.text_id, src.visit_id, src.content);
 	    let errs = validateText(text, true);
 	    if (errs.length > 0) {
-	        return [undefined, new V.ValidationError(errs)];
+	        return new V.ValidationError(errs);
 	    }
 	    else {
-	        return [text, null];
+	        return text;
 	    }
 	}
 	exports.fromJsonToText = fromJsonToText;
@@ -26313,10 +26329,10 @@
 	    let shahokokuho = new Shahokokuho(src.shahokokuho_id, src.patient_id, src.hokensha_bangou, src.hihokensha_kigou, src.hihokensha_bangou, src.honnin === 0 ? false : true, src.valid_from, src.valid_upto, src.kourei);
 	    let errs = validateShahokokuho(shahokokuho, true);
 	    if (errs.length > 0) {
-	        return [undefined, new V.ValidationError(errs)];
+	        return new V.ValidationError(errs);
 	    }
 	    else {
-	        return [shahokokuho, null];
+	        return shahokokuho;
 	    }
 	}
 	exports.fromJsonToShahokokuho = fromJsonToShahokokuho;
@@ -26372,10 +26388,10 @@
 	    let koukikourei = new Koukikourei(src.koukikourei_id, src.patient_id, src.hokensha_bangou, src.hihokensha_bangou, src.futan_wari, src.valid_from, src.valid_upto);
 	    let errs = validateKoukikourei(koukikourei, true);
 	    if (errs.length > 0) {
-	        return [undefined, new V.ValidationError(errs)];
+	        return new V.ValidationError(errs);
 	    }
 	    else {
-	        return [koukikourei, null];
+	        return koukikourei;
 	    }
 	}
 	exports.fromJsonToKoukikourei = fromJsonToKoukikourei;
@@ -26431,10 +26447,10 @@
 	    let roujin = new Roujin(src.roujin_id, src.patient_id, src.shichouson, src.jukyuusha, src.futan_wari, src.valid_from, src.valid_upto);
 	    let errs = validateRoujin(roujin, true);
 	    if (errs.length > 0) {
-	        return [undefined, new V.ValidationError(errs)];
+	        return new V.ValidationError(errs);
 	    }
 	    else {
-	        return [roujin, null];
+	        return roujin;
 	    }
 	}
 	exports.fromJsonToRoujin = fromJsonToRoujin;
@@ -26486,10 +26502,10 @@
 	    let kouhi = new Kouhi(src.kouhi_id, src.patient_id, src.futansha, src.jukyuusha, src.valid_from, src.valid_upto);
 	    let errs = validateKouhi(kouhi, true);
 	    if (errs.length > 0) {
-	        return [undefined, new V.ValidationError(errs)];
+	        return new V.ValidationError(errs);
 	    }
 	    else {
-	        return [kouhi, null];
+	        return kouhi;
 	    }
 	}
 	exports.fromJsonToKouhi = fromJsonToKouhi;
@@ -26549,10 +26565,10 @@
 	    let drug = new Drug(src.drug_id, src.visit_id, src.d_iyakuhincode, src.d_amount, src.d_usage, src.d_days, src.d_category, src.d_prescribed === 0 ? false : true);
 	    let errs = validateDrug(drug, true);
 	    if (errs.length > 0) {
-	        return [undefined, new V.ValidationError(errs)];
+	        return new V.ValidationError(errs);
 	    }
 	    else {
-	        return [drug, null];
+	        return drug;
 	    }
 	}
 	exports.fromJsonToDrug = fromJsonToDrug;
@@ -26592,10 +26608,10 @@
 	    let shinryou = new Shinryou(src.shinryou_id, src.visit_id, src.shinryoucode);
 	    let errs = validateShinryou(shinryou, true);
 	    if (errs.length > 0) {
-	        return [undefined, new V.ValidationError(errs)];
+	        return new V.ValidationError(errs);
 	    }
 	    else {
-	        return [shinryou, null];
+	        return shinryou;
 	    }
 	}
 	exports.fromJsonToShinryou = fromJsonToShinryou;
@@ -26635,10 +26651,10 @@
 	    let conduct = new Conduct(src.id, src.visit_id, src.kind);
 	    let errs = validateConduct(conduct, true);
 	    if (errs.length > 0) {
-	        return [undefined, new V.ValidationError(errs)];
+	        return new V.ValidationError(errs);
 	    }
 	    else {
-	        return [conduct, null];
+	        return conduct;
 	    }
 	}
 	exports.fromJsonToConduct = fromJsonToConduct;
@@ -26672,10 +26688,10 @@
 	    let gazouLabel = new GazouLabel(src.visit_conduct_id, src.label);
 	    let errs = validateGazouLabel(gazouLabel);
 	    if (errs.length > 0) {
-	        return [undefined, new V.ValidationError(errs)];
+	        return new V.ValidationError(errs);
 	    }
 	    else {
-	        return [gazouLabel, null];
+	        return gazouLabel;
 	    }
 	}
 	exports.fromJsonToGazouLabel = fromJsonToGazouLabel;
@@ -26823,10 +26839,10 @@
 	    let conductDrug = new ConductDrug(src.id, src.visit_conduct_id, src.iyakuhincode, src.amount);
 	    let errs = validateConductDrug(conductDrug, true);
 	    if (errs.length > 0) {
-	        return [undefined, new V.ValidationError(errs)];
+	        return new V.ValidationError(errs);
 	    }
 	    else {
-	        return [conductDrug, null];
+	        return conductDrug;
 	    }
 	}
 	exports.fromJsonToConductDrug = fromJsonToConductDrug;
@@ -26866,10 +26882,10 @@
 	    let conductShinryou = new ConductShinryou(src.id, src.visit_conduct_id, src.shinryoucode);
 	    let errs = validateConductShinryou(conductShinryou, true);
 	    if (errs.length > 0) {
-	        return [undefined, new V.ValidationError(errs)];
+	        return new V.ValidationError(errs);
 	    }
 	    else {
-	        return [conductShinryou, null];
+	        return conductShinryou;
 	    }
 	}
 	exports.fromJsonToConductShinryou = fromJsonToConductShinryou;
@@ -26913,10 +26929,10 @@
 	    let conductKizai = new ConductKizai(src.id, src.visit_conduct_id, src.kizaicode, src.amount);
 	    let errs = validateConductKizai(conductKizai, true);
 	    if (errs.length > 0) {
-	        return [undefined, new V.ValidationError(errs)];
+	        return new V.ValidationError(errs);
 	    }
 	    else {
-	        return [conductKizai, null];
+	        return conductKizai;
 	    }
 	}
 	exports.fromJsonToConductKizai = fromJsonToConductKizai;
@@ -26950,10 +26966,10 @@
 	    let charge = new Charge(src.visit_id, src.charge);
 	    let errs = validateCharge(charge);
 	    if (errs.length > 0) {
-	        return [undefined, new V.ValidationError(errs)];
+	        return new V.ValidationError(errs);
 	    }
 	    else {
-	        return [charge, null];
+	        return charge;
 	    }
 	}
 	exports.fromJsonToCharge = fromJsonToCharge;
@@ -27026,84 +27042,88 @@
 	}
 	exports.validateFullVisit = validateFullVisit;
 	function fromJsonToFullVisit(src) {
-	    let texts = src.texts.map(s => {
-	        let [result, err] = text_1.fromJsonToText(s);
-	        if (err) {
-	            return [undefined, err];
+	    let texts;
+	    {
+	        let result = V.mapConvert(src.texts, text_1.fromJsonToText);
+	        if (result instanceof V.ValidationError) {
+	            return result;
 	        }
-	        return result;
-	    });
+	        texts = result;
+	    }
 	    let shahokokuho = null;
 	    if (src.shahokokuho) {
-	        let [result, err] = shahokokuho_1.fromJsonToShahokokuho(src.shahokokuho);
-	        if (err) {
-	            return [undefined, err];
+	        let result = shahokokuho_1.fromJsonToShahokokuho(src.shahokokuho);
+	        if (result instanceof V.ValidationError) {
+	            return result;
 	        }
 	        shahokokuho = result;
 	    }
 	    let koukikourei = null;
 	    if (src.koukikourei) {
-	        let [result, err] = koukikourei_1.fromJsonToKoukikourei(src.koukikourei);
-	        if (err) {
-	            return [undefined, err];
+	        let result = koukikourei_1.fromJsonToKoukikourei(src.koukikourei);
+	        if (result instanceof V.ValidationError) {
+	            return result;
 	        }
 	        koukikourei = result;
 	    }
 	    let roujin = null;
 	    if (src.roujin) {
-	        let [result, err] = roujin_1.fromJsonToRoujin(src.roujin);
-	        if (err) {
-	            return [undefined, err];
+	        let result = roujin_1.fromJsonToRoujin(src.roujin);
+	        if (result instanceof V.ValidationError) {
+	            return result;
 	        }
 	        roujin = result;
 	    }
-	    let kouhiList = [];
-	    if (src.kouhi_list) {
-	        kouhiList = src.kouhi_list.map(function (srcKouhi) {
-	            let [kouhi, err] = kouhi_1.fromJsonToKouhi(srcKouhi);
-	            if (err) {
-	                return [undefined, err];
-	            }
-	            return kouhi;
-	        });
+	    let kouhiList;
+	    {
+	        let result = V.mapConvert(src.kouhi_list, kouhi_1.fromJsonToKouhi);
+	        if (result instanceof V.ValidationError) {
+	            return result;
+	        }
+	        kouhiList = result;
 	    }
-	    let drugs = src.drugs.map(s => {
-	        let [result, err] = full_drug_1.fromJsonToFullDrug(s);
-	        if (err) {
-	            return [undefined, err];
+	    let drugs;
+	    {
+	        let result = V.mapConvert(src.drugs, full_drug_1.fromJsonToFullDrug);
+	        if (result instanceof V.ValidationError) {
+	            return result;
 	        }
-	        return result;
-	    });
-	    let shinryouList = src.shinryou_list.map(s => {
-	        let [result, err] = full_shinryou_1.fromJsonToFullShinryou(s);
-	        if (err) {
-	            return [undefined, err];
+	        drugs = result;
+	    }
+	    let shinryouList;
+	    {
+	        let result = V.mapConvert(src.shinryou_list, full_shinryou_1.fromJsonToFullShinryou);
+	        if (result instanceof V.ValidationError) {
+	            return result;
 	        }
-	        return result;
-	    });
-	    let conducts = src.conducts.map(s => {
-	        let [result, err] = full_conduct_1.fromJsonToFullConduct(s);
-	        if (err) {
-	            return [undefined, err];
+	        shinryouList = result;
+	    }
+	    let conducts;
+	    {
+	        let result = V.mapConvert(src.conducts, full_conduct_1.fromJsonToFullConduct);
+	        if (result instanceof V.ValidationError) {
+	            return result;
 	        }
-	        return result;
-	    });
+	        conducts = result;
+	    }
 	    let charge = null;
 	    if (src.charge) {
-	        let [result, err] = charge_1.fromJsonToCharge(src.charge);
-	        if (err) {
-	            return [undefined, err];
+	        let result = charge_1.fromJsonToCharge(src.charge);
+	        if (result instanceof V.ValidationError) {
+	            return result;
 	        }
-	        charge = result;
+	        else {
+	            charge = result;
+	        }
 	    }
 	    let visit = new FullVisit(src.visit_id, src.patient_id, src.v_datetime, src.shahokokuho_id, src.koukikourei_id, src.roujin_id, src.kouhi_1_id, src.kouhi_2_id, src.kouhi_3_id, texts, shahokokuho, koukikourei, roujin, kouhiList, drugs, shinryouList, conducts, charge);
 	    let errs = validateFullVisit(visit);
 	    console.log(src);
 	    if (errs.length > 0) {
-	        return [undefined, new V.ValidationError(errs)];
+	        return new V.ValidationError(errs);
 	    }
 	    else {
-	        return [visit, null];
+	        return visit;
 	    }
 	}
 	exports.fromJsonToFullVisit = fromJsonToFullVisit;
@@ -27169,10 +27189,10 @@
 	    let master = new IyakuhinMaster(src.iyakuhincode, src.name, src.yomi, src.unit, +src.yakka, +src.madoku, src.kouhatsu === 0 ? false : true, +src.zaikei, src.valid_from, src.valid_upto);
 	    let errs = validateIyakuhinMaster(master);
 	    if (errs.length > 0) {
-	        return [undefined, new V.ValidationError(errs)];
+	        return new V.ValidationError(errs);
 	    }
 	    else {
-	        return [master, null];
+	        return master;
 	    }
 	}
 	exports.fromJsonToIyakuhinMaster = fromJsonToIyakuhinMaster;
@@ -27214,10 +27234,10 @@
 	    let drug = new FullDrug(src.drug_id, src.visit_id, src.d_iyakuhincode, src.d_amount, src.d_usage, src.d_days, src.d_category, src.d_prescribed === 0 ? false : true, src.name, src.yomi, src.unit, +src.yakka, +src.madoku, src.kouhatsu === 0 ? false : true, +src.zaikei, src.valid_from, src.valid_upto);
 	    let errs = validateFullDrug(drug);
 	    if (errs.length > 0) {
-	        return [undefined, new V.ValidationError(errs)];
+	        return new V.ValidationError(errs);
 	    }
 	    else {
-	        return [drug, null];
+	        return drug;
 	    }
 	}
 	exports.fromJsonToFullDrug = fromJsonToFullDrug;
@@ -27299,10 +27319,10 @@
 	    let master = new ShinryouMaster(src.shinryoucode, src.name, +src.tensuu, +src.tensuu_shikibetsu, src.houkatsukensa, +src.oushinkubun, src.kensagroup, +src.roujintekiyou, +src.code_shou, src.code_bu, src.code_alpha, src.code_kubun, src.valid_from, src.valid_upto);
 	    let errs = validateShinryouMaster(master);
 	    if (errs.length > 0) {
-	        return [undefined, new V.ValidationError(errs)];
+	        return new V.ValidationError(errs);
 	    }
 	    else {
-	        return [master, null];
+	        return master;
 	    }
 	}
 	exports.fromJsonToShinryouMaster = fromJsonToShinryouMaster;
@@ -27348,10 +27368,10 @@
 	    let shinryou = new FullShinryou(src.shinryou_id, src.visit_id, src.shinryoucode, src.name, +src.tensuu, +src.tensuu_shikibetsu, src.houkatsukensa, +src.oushinkubun, src.kensagroup, +src.roujintekiyou, +src.code_shou, src.code_bu, src.code_alpha, src.code_kubun, src.valid_from, src.valid_upto);
 	    let errs = validateFullShinryou(shinryou);
 	    if (errs.length > 0) {
-	        return [undefined, new V.ValidationError(errs)];
+	        return new V.ValidationError(errs);
 	    }
 	    else {
-	        return [shinryou, null];
+	        return shinryou;
 	    }
 	}
 	exports.fromJsonToFullShinryou = fromJsonToFullShinryou;
@@ -27405,10 +27425,10 @@
 	    let master = new KizaiMaster(src.kizaicode, src.name, src.yomi, src.unit, +src.kingaku, src.valid_from, src.valid_upto);
 	    let errs = validateKizaiMaster(master);
 	    if (errs.length > 0) {
-	        return [undefined, new V.ValidationError(errs)];
+	        return new V.ValidationError(errs);
 	    }
 	    else {
-	        return [master, null];
+	        return master;
 	    }
 	}
 	exports.fromJsonToKizaiMaster = fromJsonToKizaiMaster;
@@ -27424,15 +27444,13 @@
 	const full_conduct_shinryou_1 = __webpack_require__(218);
 	const full_conduct_drug_1 = __webpack_require__(219);
 	const full_conduct_kizai_1 = __webpack_require__(220);
-	const charge_1 = __webpack_require__(210);
 	class FullConduct extends conduct_1.Conduct {
-	    constructor(conductId, visitId, kind, gazouLabel, drugs, shinryouList, kizaiList, charge) {
+	    constructor(conductId, visitId, kind, gazouLabel, drugs, shinryouList, kizaiList) {
 	        super(conductId, visitId, kind);
 	        this.gazouLabel = gazouLabel;
 	        this.drugs = drugs;
 	        this.shinryouList = shinryouList;
 	        this.kizaiList = kizaiList;
-	        this.charge = charge;
 	    }
 	}
 	exports.FullConduct = FullConduct;
@@ -27450,49 +27468,60 @@
 	    conduct.kizaiList.forEach(s => {
 	        errs = errs.concat(full_conduct_kizai_1.validateFullConductKizai(s));
 	    });
-	    if (conduct.charge != null) {
-	        errs = errs.concat(charge_1.validateCharge(conduct.charge));
-	    }
 	    return errs;
 	}
 	exports.validateFullConduct = validateFullConduct;
 	function fromJsonToFullConduct(src) {
-	    let drugs = src.drugs.map(s => {
-	        let [result, err] = full_conduct_drug_1.fromJsonToFullConductDrug(s);
-	        if (err) {
-	            return [undefined, err];
+	    let gazouLabel;
+	    {
+	        let val = src.gazou_label;
+	        if (typeof val === "string") {
+	            gazouLabel = val;
 	        }
-	        return result;
-	    });
-	    let shinryouList = src.shinryou_list.map(s => {
-	        let [result, err] = full_conduct_shinryou_1.fromJsonToFullConductShinryou(s);
-	        if (err) {
-	            return [undefined, err];
+	        else if (val === undefined || val === null) {
+	            gazouLabel = null;
 	        }
-	        return result;
-	    });
-	    let kizaiList = src.kizai_list.map(s => {
-	        let [result, err] = full_conduct_kizai_1.fromJsonToFullConductKizai(s);
-	        if (err) {
-	            return [undefined, err];
+	        else {
+	            return new V.ValidationError(["invalid gazou_label"]);
 	        }
-	        return result;
-	    });
-	    let charge = null;
-	    if (src.charge) {
-	        let [result, err] = charge_1.fromJsonToCharge(src.charge);
-	        if (err) {
-	            return [undefined, err];
-	        }
-	        charge = result;
 	    }
-	    let conduct = new FullConduct(src.id, src.visit_id, src.kind, src.gazou_label, drugs, shinryouList, kizaiList, charge);
+	    let drugs;
+	    {
+	        let result = V.mapConvert(src.drugs, full_conduct_drug_1.fromJsonToFullConductDrug);
+	        if (result instanceof V.ValidationError) {
+	            return result;
+	        }
+	        else {
+	            drugs = result;
+	        }
+	    }
+	    let shinryouList;
+	    {
+	        let result = V.mapConvert(src.shinryou_list, full_conduct_shinryou_1.fromJsonToFullConductShinryou);
+	        if (result instanceof V.ValidationError) {
+	            return result;
+	        }
+	        else {
+	            shinryouList = result;
+	        }
+	    }
+	    let kizaiList;
+	    {
+	        let result = V.mapConvert(src.kizai_list, full_conduct_kizai_1.fromJsonToFullConductKizai);
+	        if (result instanceof V.ValidationError) {
+	            return result;
+	        }
+	        else {
+	            kizaiList = result;
+	        }
+	    }
+	    let conduct = new FullConduct(src.id, src.visit_id, src.kind, gazouLabel, drugs, shinryouList, kizaiList);
 	    let errs = validateFullConduct(conduct);
 	    if (errs.length > 0) {
-	        return [undefined, new V.ValidationError(errs)];
+	        return new V.ValidationError(errs);
 	    }
 	    else {
-	        return [conduct, null];
+	        return conduct;
 	    }
 	}
 	exports.fromJsonToFullConduct = fromJsonToFullConduct;
@@ -27538,10 +27567,10 @@
 	    let shinryou = new FullConductShinryou(src.id, src.visit_conduct_id, src.shinryoucode, src.name, +src.tensuu, +src.tensuu_shikibetsu, src.houkatsukensa, +src.oushinkubun, src.kensagroup, +src.roujintekiyou, +src.code_shou, src.code_bu, src.code_alpha, src.code_kubun, src.valid_from, src.valid_upto);
 	    let errs = validateFullConductShinryou(shinryou);
 	    if (errs.length > 0) {
-	        return [undefined, new V.ValidationError(errs)];
+	        return new V.ValidationError(errs);
 	    }
 	    else {
-	        return [shinryou, null];
+	        return shinryou;
 	    }
 	}
 	exports.fromJsonToFullConductShinryou = fromJsonToFullConductShinryou;
@@ -27583,10 +27612,10 @@
 	    let drug = new FullConductDrug(src.id, src.visit_conduct_id, src.iyakuhincode, src.amount, src.name, src.yomi, src.unit, +src.yakka, +src.madoku, src.kouhatsu === 0 ? false : true, +src.zaikei, src.valid_from, src.valid_upto);
 	    let errs = validateFullConductDrug(drug);
 	    if (errs.length > 0) {
-	        return [undefined, new V.ValidationError(errs)];
+	        return new V.ValidationError(errs);
 	    }
 	    else {
-	        return [drug, null];
+	        return drug;
 	    }
 	}
 	exports.fromJsonToFullConductDrug = fromJsonToFullConductDrug;
@@ -27625,10 +27654,10 @@
 	    let kizai = new FullConductKizai(src.id, src.visit_conduct_id, src.kizaicode, src.amount, src.name, src.yomi, src.unit, +src.kingaku, src.valid_from, src.valid_upto);
 	    let errs = validateFullConductKizai(kizai);
 	    if (errs.length > 0) {
-	        return [undefined, new V.ValidationError(errs)];
+	        return new V.ValidationError(errs);
 	    }
 	    else {
-	        return [kizai, null];
+	        return kizai;
 	    }
 	}
 	exports.fromJsonToFullConductKizai = fromJsonToFullConductKizai;

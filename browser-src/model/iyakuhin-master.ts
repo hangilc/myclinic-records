@@ -50,15 +50,15 @@ export function validateIyakuhinMaster(iyakuhinMaster: IyakuhinMaster): string[]
 	return errs;
 }
 
-export function fromJsonToIyakuhinMaster(src: any): [IyakuhinMaster, V.ValidationError] {
+export function fromJsonToIyakuhinMaster(src: any): IyakuhinMaster | V.ValidationError {
 	let master = new IyakuhinMaster(src.iyakuhincode, src.name, src.yomi, src.unit,
 		+src.yakka, +src.madoku, src.kouhatsu === 0 ? false : true,
 		+src.zaikei, src.valid_from, src.valid_upto);
 	let errs = validateIyakuhinMaster(master);
 	if( errs.length > 0 ){
-		return [undefined, new V.ValidationError(errs)];
+		return new V.ValidationError(errs);
 	} else {
-		return [master, null];
+		return master;
 	}
 }
 

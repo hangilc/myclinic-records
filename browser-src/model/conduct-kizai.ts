@@ -29,13 +29,13 @@ export function validateConductKizai(conductKizai: ConductKizai,
 	return errs;
 }
 
-export function fromJsonToConductKizai(src: any): [ConductKizai, V.ValidationError] {
+export function fromJsonToConductKizai(src: any): ConductKizai | V.ValidationError {
 	let conductKizai = new ConductKizai(src.id, src.visit_conduct_id, 
 			src.kizaicode, src.amount);
 	let errs = validateConductKizai(conductKizai, true);
 	if( errs.length > 0 ){
-		return [undefined, new V.ValidationError(errs)];
+		return new V.ValidationError(errs);
 	} else {
-		return [conductKizai, null];
+		return conductKizai;
 	}
 }

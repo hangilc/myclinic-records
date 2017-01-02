@@ -41,14 +41,14 @@ export function validateRoujin(roujin: Roujin,
 	return errs;
 }
 
-export function fromJsonToRoujin(src: any): [Roujin, V.ValidationError] {
+export function fromJsonToRoujin(src: any): Roujin | V.ValidationError {
 	let roujin = new Roujin(src.roujin_id, src.patient_id, 
 		src.shichouson, src.jukyuusha, 
 		src.futan_wari, src.valid_from, src.valid_upto);
 	let errs = validateRoujin(roujin, true);
 	if( errs.length > 0 ){
-		return [undefined, new V.ValidationError(errs)];
+		return new V.ValidationError(errs);
 	} else {
-		return [roujin, null];
+		return roujin;
 	}
 }

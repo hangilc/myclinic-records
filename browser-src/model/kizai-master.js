@@ -42,10 +42,10 @@ function fromJsonToKizaiMaster(src) {
     let master = new KizaiMaster(src.kizaicode, src.name, src.yomi, src.unit, +src.kingaku, src.valid_from, src.valid_upto);
     let errs = validateKizaiMaster(master);
     if (errs.length > 0) {
-        return [undefined, new V.ValidationError(errs)];
+        return new V.ValidationError(errs);
     }
     else {
-        return [master, null];
+        return master;
     }
 }
 exports.fromJsonToKizaiMaster = fromJsonToKizaiMaster;

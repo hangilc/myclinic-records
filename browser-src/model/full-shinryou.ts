@@ -34,7 +34,7 @@ export function validateFullShinryou(shinryou: FullShinryou): string[] {
 	return errs;
 }
 
-export function fromJsonToFullShinryou(src: any): [FullShinryou, V.ValidationError] {
+export function fromJsonToFullShinryou(src: any): FullShinryou | V.ValidationError {
 	let shinryou = new FullShinryou(src.shinryou_id, src.visit_id, src.shinryoucode,
 		src.name, +src.tensuu,
 		+src.tensuu_shikibetsu, src.houkatsukensa, +src.oushinkubun, 
@@ -42,9 +42,9 @@ export function fromJsonToFullShinryou(src: any): [FullShinryou, V.ValidationErr
 		src.code_bu, src.code_alpha, src.code_kubun, src.valid_from, src.valid_upto);
 	let errs = validateFullShinryou(shinryou);
 	if( errs.length > 0 ){
-		return [undefined, new V.ValidationError(errs)];
+		return new V.ValidationError(errs);
 	} else {
-		return [shinryou, null];
+		return shinryou;
 	}
 }
 

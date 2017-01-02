@@ -61,84 +61,88 @@ function validateFullVisit(visit) {
 }
 exports.validateFullVisit = validateFullVisit;
 function fromJsonToFullVisit(src) {
-    let texts = src.texts.map(s => {
-        let [result, err] = text_1.fromJsonToText(s);
-        if (err) {
-            return [undefined, err];
+    let texts;
+    {
+        let result = V.mapConvert(src.texts, text_1.fromJsonToText);
+        if (result instanceof V.ValidationError) {
+            return result;
         }
-        return result;
-    });
+        texts = result;
+    }
     let shahokokuho = null;
     if (src.shahokokuho) {
-        let [result, err] = shahokokuho_1.fromJsonToShahokokuho(src.shahokokuho);
-        if (err) {
-            return [undefined, err];
+        let result = shahokokuho_1.fromJsonToShahokokuho(src.shahokokuho);
+        if (result instanceof V.ValidationError) {
+            return result;
         }
         shahokokuho = result;
     }
     let koukikourei = null;
     if (src.koukikourei) {
-        let [result, err] = koukikourei_1.fromJsonToKoukikourei(src.koukikourei);
-        if (err) {
-            return [undefined, err];
+        let result = koukikourei_1.fromJsonToKoukikourei(src.koukikourei);
+        if (result instanceof V.ValidationError) {
+            return result;
         }
         koukikourei = result;
     }
     let roujin = null;
     if (src.roujin) {
-        let [result, err] = roujin_1.fromJsonToRoujin(src.roujin);
-        if (err) {
-            return [undefined, err];
+        let result = roujin_1.fromJsonToRoujin(src.roujin);
+        if (result instanceof V.ValidationError) {
+            return result;
         }
         roujin = result;
     }
-    let kouhiList = [];
-    if (src.kouhi_list) {
-        kouhiList = src.kouhi_list.map(function (srcKouhi) {
-            let [kouhi, err] = kouhi_1.fromJsonToKouhi(srcKouhi);
-            if (err) {
-                return [undefined, err];
-            }
-            return kouhi;
-        });
+    let kouhiList;
+    {
+        let result = V.mapConvert(src.kouhi_list, kouhi_1.fromJsonToKouhi);
+        if (result instanceof V.ValidationError) {
+            return result;
+        }
+        kouhiList = result;
     }
-    let drugs = src.drugs.map(s => {
-        let [result, err] = full_drug_1.fromJsonToFullDrug(s);
-        if (err) {
-            return [undefined, err];
+    let drugs;
+    {
+        let result = V.mapConvert(src.drugs, full_drug_1.fromJsonToFullDrug);
+        if (result instanceof V.ValidationError) {
+            return result;
         }
-        return result;
-    });
-    let shinryouList = src.shinryou_list.map(s => {
-        let [result, err] = full_shinryou_1.fromJsonToFullShinryou(s);
-        if (err) {
-            return [undefined, err];
+        drugs = result;
+    }
+    let shinryouList;
+    {
+        let result = V.mapConvert(src.shinryou_list, full_shinryou_1.fromJsonToFullShinryou);
+        if (result instanceof V.ValidationError) {
+            return result;
         }
-        return result;
-    });
-    let conducts = src.conducts.map(s => {
-        let [result, err] = full_conduct_1.fromJsonToFullConduct(s);
-        if (err) {
-            return [undefined, err];
+        shinryouList = result;
+    }
+    let conducts;
+    {
+        let result = V.mapConvert(src.conducts, full_conduct_1.fromJsonToFullConduct);
+        if (result instanceof V.ValidationError) {
+            return result;
         }
-        return result;
-    });
+        conducts = result;
+    }
     let charge = null;
     if (src.charge) {
-        let [result, err] = charge_1.fromJsonToCharge(src.charge);
-        if (err) {
-            return [undefined, err];
+        let result = charge_1.fromJsonToCharge(src.charge);
+        if (result instanceof V.ValidationError) {
+            return result;
         }
-        charge = result;
+        else {
+            charge = result;
+        }
     }
     let visit = new FullVisit(src.visit_id, src.patient_id, src.v_datetime, src.shahokokuho_id, src.koukikourei_id, src.roujin_id, src.kouhi_1_id, src.kouhi_2_id, src.kouhi_3_id, texts, shahokokuho, koukikourei, roujin, kouhiList, drugs, shinryouList, conducts, charge);
     let errs = validateFullVisit(visit);
     console.log(src);
     if (errs.length > 0) {
-        return [undefined, new V.ValidationError(errs)];
+        return new V.ValidationError(errs);
     }
     else {
-        return [visit, null];
+        return visit;
     }
 }
 exports.fromJsonToFullVisit = fromJsonToFullVisit;

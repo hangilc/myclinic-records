@@ -23,12 +23,12 @@ export function validateText(text: Text,
 	return errs;
 }
 
-export function fromJsonToText(src: any): [Text, V.ValidationError] {
+export function fromJsonToText(src: any): Text | V.ValidationError {
 	let text = new Text(src.text_id, src.visit_id, src.content);
 	let errs = validateText(text, true);
 	if( errs.length > 0 ){
-		return [undefined, new V.ValidationError(errs)];
+		return new V.ValidationError(errs);
 	} else {
-		return [text, null];
+		return text;
 	}
 }

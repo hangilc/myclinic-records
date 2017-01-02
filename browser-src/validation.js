@@ -6,6 +6,20 @@ class ValidationError {
     }
 }
 exports.ValidationError = ValidationError;
+function mapConvert(arr, cvt) {
+    let res = [];
+    for (let i = 0; i < arr.length; i++) {
+        let c = cvt(arr[i]);
+        if (c instanceof ValidationError) {
+            return c;
+        }
+        else {
+            res.push(c);
+        }
+    }
+    return res;
+}
+exports.mapConvert = mapConvert;
 function isDefined(name, value) {
     if (value === undefined) {
         return `${name}の値が指摘されていません。`;

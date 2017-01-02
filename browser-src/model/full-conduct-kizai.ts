@@ -28,15 +28,15 @@ export function validateFullConductKizai(kizai: FullConductKizai): string[] {
 	return errs;
 }
 
-export function fromJsonToFullConductKizai(src: any): [FullConductKizai, V.ValidationError] {
+export function fromJsonToFullConductKizai(src: any): FullConductKizai | V.ValidationError {
 	let kizai = new FullConductKizai(src.id, src.visit_conduct_id, 
 			src.kizaicode, src.amount,src.name, src.yomi, src.unit,
 		+src.kingaku, src.valid_from, src.valid_upto);
 	let errs = validateFullConductKizai(kizai);
 	if( errs.length > 0 ){
-		return [undefined, new V.ValidationError(errs)];
+		return new V.ValidationError(errs);
 	} else {
-		return [kizai, null];
+		return kizai;
 	}
 }
 

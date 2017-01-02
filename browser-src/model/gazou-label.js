@@ -22,10 +22,10 @@ function fromJsonToGazouLabel(src) {
     let gazouLabel = new GazouLabel(src.visit_conduct_id, src.label);
     let errs = validateGazouLabel(gazouLabel);
     if (errs.length > 0) {
-        return [undefined, new V.ValidationError(errs)];
+        return new V.ValidationError(errs);
     }
     else {
-        return [gazouLabel, null];
+        return gazouLabel;
     }
 }
 exports.fromJsonToGazouLabel = fromJsonToGazouLabel;

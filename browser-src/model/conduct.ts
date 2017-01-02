@@ -25,12 +25,12 @@ export function validateConduct(conduct: Conduct,
 	return errs;
 }
 
-export function fromJsonToConduct(src: any): [Conduct, V.ValidationError] {
+export function fromJsonToConduct(src: any): Conduct | V.ValidationError {
 	let conduct = new Conduct(src.id, src.visit_id, src.kind);
 	let errs = validateConduct(conduct, true);
 	if( errs.length > 0 ){
-		return [undefined, new V.ValidationError(errs)];
+		return new V.ValidationError(errs);
 	} else {
-		return [conduct, null];
+		return conduct;
 	}
 }

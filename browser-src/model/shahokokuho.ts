@@ -49,15 +49,15 @@ export function validateShahokokuho(shahokokuho: Shahokokuho,
 	return errs;
 }
 
-export function fromJsonToShahokokuho(src: any): [Shahokokuho, V.ValidationError] {
+export function fromJsonToShahokokuho(src: any): Shahokokuho | V.ValidationError {
 	let shahokokuho = new Shahokokuho(src.shahokokuho_id, src.patient_id, 
 		src.hokensha_bangou, src.hihokensha_kigou, src.hihokensha_bangou, 
 		src.honnin === 0 ? false : true, src.valid_from, 
 		src.valid_upto, src.kourei);
 	let errs = validateShahokokuho(shahokokuho, true);
 	if( errs.length > 0 ){
-		return [undefined, new V.ValidationError(errs)];
+		return new V.ValidationError(errs);
 	} else {
-		return [shahokokuho, null];
+		return shahokokuho;
 	}
 }
