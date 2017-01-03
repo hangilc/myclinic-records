@@ -109,6 +109,7 @@ class RecordContent {
 							new RecordTextList(visit.texts).dom
 						]),
 						h.td(right, [
+							new RecordShinryouList(visit.shinryouList).dom,
 							new RecordDrugList(visit.drugs).dom
 						])
 					])
@@ -146,6 +147,28 @@ class RecordText {
 	}
 }
 
+class RecordShinryouList {
+	dom: HTMLElement;
+
+	constructor(shinryouList: FullShinryou[]){
+		this.dom = h.div({class: "shinryou-list"}, shinryouList.map(s => {
+			return new RecordShinryou(s).dom;
+		}))
+	}
+}
+
+class RecordShinryou {
+	dom: HTMLElement;
+
+	constructor(shinryou: FullShinryou){
+		this.dom = h.div({}, [
+			shinryou.name,
+			" ",
+			`[${ shinryou.tensuu }点]`
+		])
+	}
+}
+
 class RecordDrugList {
 	dom: HTMLElement;
 
@@ -165,7 +188,8 @@ class RecordDrug {
 		this.dom = h.div({}, [
 			index.toString(),
 			") ",
-			drugRep(drug)
+			drugRep(drug),
+			` [薬価 ${ drug.yakka }円]`
 		])
 	}
 }
