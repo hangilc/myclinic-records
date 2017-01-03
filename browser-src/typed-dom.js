@@ -46,6 +46,7 @@ var h;
     h.div = makeCreator("div");
     h.h1 = makeCreator("h1");
     h.h2 = makeCreator("h2");
+    h.h3 = makeCreator("h3");
     h.input = makeCreator("input");
     h.button = makeCreator("button");
     function form(attrs, children) {
@@ -73,6 +74,7 @@ var f;
     f.div = makeCreator("div");
     f.h1 = makeCreator("h1");
     f.h2 = makeCreator("h2");
+    f.h3 = makeCreator("h3");
     f.input = makeCreator("input");
     f.button = makeCreator("button");
     function form(fn, attrs, children) {

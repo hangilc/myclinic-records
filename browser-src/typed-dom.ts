@@ -45,6 +45,7 @@ export namespace h {
 	export let div = makeCreator<HTMLElement>("div");
 	export let h1 = makeCreator<HTMLElement>("h1");
 	export let h2 = makeCreator<HTMLElement>("h2");
+	export let h3 = makeCreator<HTMLElement>("h3");
 	export let input = makeCreator<HTMLInputElement>("input");
 	export let button = makeCreator<HTMLElement>("button");
 
@@ -75,6 +76,7 @@ export namespace f {
 	export let div = makeCreator<HTMLElement>("div");
 	export let h1 = makeCreator<HTMLElement>("h1");
 	export let h2 = makeCreator<HTMLElement>("h2");
+	export let h3 = makeCreator<HTMLElement>("h3");
 	export let input = makeCreator<HTMLInputElement>("input");
 	export let button = makeCreator<HTMLElement>("button");
 

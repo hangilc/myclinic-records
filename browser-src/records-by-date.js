@@ -40,9 +40,40 @@ class RecordsByDate {
         var wrapper = this.domDispWrapper;
         wrapper.innerHTML = "";
         wrapper.appendChild(createHeader(m));
+        fullVisits.forEach(v => {
+            this.renderVisit(v, wrapper);
+        });
+    }
+    renderVisit(visit, wrapper) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let patient = yield service_1.getPatient(visit.patientId);
+            let rec = new RecordItem(visit, patient);
+            wrapper.appendChild(rec.dom);
+        });
     }
 }
 exports.RecordsByDate = RecordsByDate;
 function createHeader(m) {
     return typed_dom_1.h.h2({}, [kanjidate.format(kanjidate.f1, m.format("YYYY-MM-DD"))]);
+}
+function formatVisitTime(at) {
+    return kanjidate.format("{h:2}時{m:2}分", at);
+}
+class RecordItem {
+    constructor(visit, patient) {
+        this.dom = typed_dom_1.h.div({}, [
+            typed_dom_1.h.h3({}, [
+                `${patient.lastName} ${patient.firstName}`,
+                " ",
+                `(患者番号 ${patient.patientId})`,
+                "[",
+                typed_dom_1.f.a(e => { }, {}, ["全診療記録"]),
+                "]",
+                " ",
+                formatVisitTime(visit.visitedAt)
+            ])
+        ]);
+    }
+}
+class RecordContent {
 }
