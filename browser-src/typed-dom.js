@@ -49,6 +49,11 @@ var h;
     h.h3 = makeCreator("h3");
     h.input = makeCreator("input");
     h.button = makeCreator("button");
+    h.table = makeCreator("table");
+    h.tbody = makeCreator("tbody");
+    h.tr = makeCreator("tr");
+    h.td = makeCreator("td");
+    h.br = makeCreator("br");
     function form(attrs, children) {
         if (!("onSubmit" in attrs)) {
             attrs.onSubmit = "return false";
@@ -77,6 +82,11 @@ var f;
     f.h3 = makeCreator("h3");
     f.input = makeCreator("input");
     f.button = makeCreator("button");
+    f.table = makeCreator("table");
+    f.tbody = makeCreator("tbody");
+    f.tr = makeCreator("tr");
+    f.td = makeCreator("td");
+    f.br = makeCreator("br");
     function form(fn, attrs, children) {
         if (!("onSubmit" in attrs)) {
             attrs.onSubmit = "return false";

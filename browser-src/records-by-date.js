@@ -26,6 +26,9 @@ class RecordsByDate {
     setToday() {
         this.dateInput.setToday();
     }
+    set(m) {
+        this.dateInput.set(m);
+    }
     onDateInputSubmit(m) {
         return __awaiter(this, void 0, void 0, function* () {
             let at = m.format("YYYY-MM-DD");
@@ -61,6 +64,7 @@ function formatVisitTime(at) {
 }
 class RecordItem {
     constructor(visit, patient) {
+        let content = new RecordContent(visit);
         this.dom = typed_dom_1.h.div({}, [
             typed_dom_1.h.h3({}, [
                 `${patient.lastName} ${patient.firstName}`,
@@ -70,10 +74,55 @@ class RecordItem {
                 typed_dom_1.f.a(e => { }, {}, ["全診療記録"]),
                 "]",
                 " ",
-                formatVisitTime(visit.visitedAt)
-            ])
+                formatVisitTime(visit.visitedAt),
+            ]),
+            content.dom
         ]);
     }
 }
 class RecordContent {
+    constructor(visit) {
+        let left = {
+            style: "background-color: rgb(255, 255, 153)",
+            valign: "top",
+            width: "260",
+            class: "texts-list"
+        };
+        let right = {
+            style: "background-color: rgb(255, 204, 255)",
+            valign: "top",
+            width: "260"
+        };
+        this.dom = typed_dom_1.h.table({ style: "margin-left:10px",
+            border: "0", cellpadding: "0", cellspacing: "0" }, [
+            typed_dom_1.h.tbody({}, [
+                typed_dom_1.h.tr({}, [
+                    typed_dom_1.h.td(left, [
+                        new RecordTextList(visit.texts).dom
+                    ]),
+                    typed_dom_1.h.td(right, [])
+                ])
+            ])
+        ]);
+    }
+}
+class RecordTextList {
+    constructor(texts) {
+        this.dom = typed_dom_1.h.div({}, texts.map(t => {
+            let rt = new RecordText(t);
+            return rt.dom;
+        }));
+    }
+}
+class RecordText {
+    constructor(text) {
+        let content = text.content;
+        let lines = content.split(/\r\n|\r|\n/g);
+        this.dom = typed_dom_1.h.div({}, []);
+        lines.forEach(line => {
+            let t = document.createTextNode(line);
+            this.dom.appendChild(t);
+            this.dom.appendChild(typed_dom_1.h.br({}, []));
+        });
+    }
 }

@@ -3,7 +3,7 @@ import { DateInput } from "./date-input";
 import * as moment from "moment";
 import { listVisitsByDate, getFullVisit, getPatient } from "./service";
 import * as kanjidate from "kanjidate";
-import { FullVisit, Patient } from "./model";
+import { FullVisit, Patient, Text } from "./model";
 
 export class RecordsByDate {
 	dom: HTMLElement;
@@ -24,6 +24,10 @@ export class RecordsByDate {
 
 	setToday(): void {
 		this.dateInput.setToday();
+	}
+
+	set(m: moment.Moment): void {
+		this.dateInput.set(m);
 	}
 
 	private async onDateInputSubmit(m: moment.Moment) {
@@ -63,6 +67,7 @@ class RecordItem {
 	dom: HTMLElement;
 
 	constructor(visit: FullVisit, patient: Patient) {
+		let content = new RecordContent(visit);
 		this.dom = h.div({}, [
 			h.h3({}, [
 				`${ patient.lastName } ${ patient.firstName }`,
@@ -72,12 +77,65 @@ class RecordItem {
 				f.a(e => {}, {}, ["全診療記録"]),
 				"]",
 				" ",
-				formatVisitTime(visit.visitedAt)
-			])
+				formatVisitTime(visit.visitedAt),
+			]),
+			content.dom
 		]);
 	}
 }
 
 class RecordContent {
-	
+	dom: HTMLElement;
+
+	constructor(visit: FullVisit){
+		let left = {
+			style: "background-color: rgb(255, 255, 153)",
+			valign: "top",
+			width: "260",
+			class: "texts-list"
+		};
+		let right = {
+			style: "background-color: rgb(255, 204, 255)",
+			valign: "top",
+			width: "260"
+		}
+		this.dom = h.table({style:"margin-left:10px", 
+			border:"0", cellpadding:"0", cellspacing:"0"}, [
+				h.tbody({}, [
+					h.tr({}, [
+						h.td(left, [
+							new RecordTextList(visit.texts).dom
+						]),
+						h.td(right, [
+						])
+					])
+				])
+		]);
+	}
+}
+
+class RecordTextList {
+	dom: HTMLElement;
+
+	constructor(texts: Text[]){
+		this.dom = h.div({}, texts.map(t => {
+			let rt = new RecordText(t);
+			return rt.dom;
+		}))
+	}
+}
+
+class RecordText {
+	dom: HTMLElement;
+
+	constructor(text: Text){
+		let content = text.content;
+		let lines = content.split(/\r\n|\r|\n/g);
+		this.dom = h.div({}, []);
+		lines.forEach(line => {
+			let t = document.createTextNode(line);
+			this.dom.appendChild(t);
+			this.dom.appendChild(h.br({}, []));
+		})
+	}
 }

@@ -47,12 +47,14 @@
 	"use strict";
 	const typed_dom_1 = __webpack_require__(1);
 	const records_by_date_1 = __webpack_require__(2);
+	const moment = __webpack_require__(4);
 	let main = typed_dom_1.h.div({}, []);
 	document.body.appendChild(main);
 	function appRecordsByDate(wrapper) {
 	    let app = new records_by_date_1.RecordsByDate();
 	    wrapper.appendChild(app.dom);
-	    app.setToday();
+	    //app.setToday();
+	    app.set(moment("2016-06-02"));
 	}
 	appRecordsByDate(main);
 
@@ -112,6 +114,11 @@
 	    h.h3 = makeCreator("h3");
 	    h.input = makeCreator("input");
 	    h.button = makeCreator("button");
+	    h.table = makeCreator("table");
+	    h.tbody = makeCreator("tbody");
+	    h.tr = makeCreator("tr");
+	    h.td = makeCreator("td");
+	    h.br = makeCreator("br");
 	    function form(attrs, children) {
 	        if (!("onSubmit" in attrs)) {
 	            attrs.onSubmit = "return false";
@@ -140,6 +147,11 @@
 	    f.h3 = makeCreator("h3");
 	    f.input = makeCreator("input");
 	    f.button = makeCreator("button");
+	    f.table = makeCreator("table");
+	    f.tbody = makeCreator("tbody");
+	    f.tr = makeCreator("tr");
+	    f.td = makeCreator("td");
+	    f.br = makeCreator("br");
 	    function form(fn, attrs, children) {
 	        if (!("onSubmit" in attrs)) {
 	            attrs.onSubmit = "return false";
@@ -197,6 +209,9 @@
 	    setToday() {
 	        this.dateInput.setToday();
 	    }
+	    set(m) {
+	        this.dateInput.set(m);
+	    }
 	    onDateInputSubmit(m) {
 	        return __awaiter(this, void 0, void 0, function* () {
 	            let at = m.format("YYYY-MM-DD");
@@ -232,6 +247,7 @@
 	}
 	class RecordItem {
 	    constructor(visit, patient) {
+	        let content = new RecordContent(visit);
 	        this.dom = typed_dom_1.h.div({}, [
 	            typed_dom_1.h.h3({}, [
 	                `${patient.lastName} ${patient.firstName}`,
@@ -241,12 +257,57 @@
 	                typed_dom_1.f.a(e => { }, {}, ["全診療記録"]),
 	                "]",
 	                " ",
-	                formatVisitTime(visit.visitedAt)
-	            ])
+	                formatVisitTime(visit.visitedAt),
+	            ]),
+	            content.dom
 	        ]);
 	    }
 	}
 	class RecordContent {
+	    constructor(visit) {
+	        let left = {
+	            style: "background-color: rgb(255, 255, 153)",
+	            valign: "top",
+	            width: "260",
+	            class: "texts-list"
+	        };
+	        let right = {
+	            style: "background-color: rgb(255, 204, 255)",
+	            valign: "top",
+	            width: "260"
+	        };
+	        this.dom = typed_dom_1.h.table({ style: "margin-left:10px",
+	            border: "0", cellpadding: "0", cellspacing: "0" }, [
+	            typed_dom_1.h.tbody({}, [
+	                typed_dom_1.h.tr({}, [
+	                    typed_dom_1.h.td(left, [
+	                        new RecordTextList(visit.texts).dom
+	                    ]),
+	                    typed_dom_1.h.td(right, [])
+	                ])
+	            ])
+	        ]);
+	    }
+	}
+	class RecordTextList {
+	    constructor(texts) {
+	        this.dom = typed_dom_1.h.div({}, texts.map(t => {
+	            let rt = new RecordText(t);
+	            return rt.dom;
+	        }));
+	    }
+	}
+	class RecordText {
+	    constructor(text) {
+	        let content = text.content;
+	        let lines = content.split(/\r\n|\r|\n/g);
+	        this.dom = typed_dom_1.h.div({}, []);
+	        lines.forEach(line => {
+	            let t = document.createTextNode(line);
+	            this.dom.appendChild(t);
+	            this.dom.appendChild(typed_dom_1.h.br({}, []));
+	        });
+	    }
 	}
 
 

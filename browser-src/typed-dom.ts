@@ -48,6 +48,11 @@ export namespace h {
 	export let h3 = makeCreator<HTMLElement>("h3");
 	export let input = makeCreator<HTMLInputElement>("input");
 	export let button = makeCreator<HTMLElement>("button");
+	export let table = makeCreator<HTMLTableElement>("table");
+	export let tbody = makeCreator<HTMLElement>("tbody");
+	export let tr = makeCreator<HTMLElement>("tr");
+	export let td = makeCreator<HTMLElement>("td");
+	export let br = makeCreator<HTMLElement>("br");
 
 	export function form(attrs: any, children?: (HTMLElement|string)[]): HTMLFormElement{
 		if( !("onSubmit" in attrs) ){
@@ -79,6 +84,11 @@ export namespace f {
 	export let h3 = makeCreator<HTMLElement>("h3");
 	export let input = makeCreator<HTMLInputElement>("input");
 	export let button = makeCreator<HTMLElement>("button");
+	export let table = makeCreator<HTMLTableElement>("table");
+	export let tbody = makeCreator<HTMLElement>("tbody");
+	export let tr = makeCreator<HTMLElement>("tr");
+	export let td = makeCreator<HTMLElement>("td");
+	export let br = makeCreator<HTMLElement>("br");
 
 	export function form(fn: (e:HTMLFormElement) => void,
 			attrs: any, children?: (HTMLElement|string)[]): HTMLFormElement{
