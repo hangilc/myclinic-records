@@ -34,11 +34,16 @@ export class RecordsByDate {
 
 	private async onDateInputSubmit(m: moment.Moment) {
 		let at = m.format("YYYY-MM-DD");
-		let visits = await listVisitsByDate(at);
-		let fullVisits = await Promise.all(visits.map(v => {
-			return getFullVisit(v.visitId);
-		}))
-		this.renderDisp(m, fullVisits);
+		try {
+			let visits = await listVisitsByDate(at);
+			let fullVisits = await Promise.all(visits.map(v => {
+				return getFullVisit(v.visitId);
+			}))
+			this.renderDisp(m, fullVisits);
+		} catch(ex){
+			alert(ex);
+			return;
+		}
 	}
 
 	private renderDisp(m: moment.Moment, fullVisits: FullVisit[]){
@@ -79,9 +84,9 @@ class RecordItem {
 				f.a(e => {}, {}, ["全診療記録"]),
 				"]",
 				" ",
-				formatVisitTime(visit.visitedAt),
+				//formatVisitTime(visit.visitedAt),
 			]),
-			content.dom
+			//content.dom
 		]);
 	}
 }
@@ -110,7 +115,8 @@ class RecordContent {
 						]),
 						h.td(right, [
 							new RecordShinryouList(visit.shinryouList).dom,
-							new RecordDrugList(visit.drugs).dom
+							new RecordDrugList(visit.drugs).dom,
+							new RecordConductList(visit.conducts).dom,
 						])
 					])
 				])
@@ -190,6 +196,26 @@ class RecordDrug {
 			") ",
 			drugRep(drug),
 			` [薬価 ${ drug.yakka }円]`
+		])
+	}
+}
+
+class RecordConductList {
+	dom: HTMLElement;
+
+	constructor(conducts: FullConduct[]){
+		this.dom = h.div({class: "conducts-list"}, conducts.map(c => {
+			return new RecordConduct(c).dom;
+		}))
+	}
+}
+
+class RecordConduct {
+	dom:HTMLElement;
+
+	constructor(conduct: FullConduct){
+		this.dom = h.div({}, [
+			"CONDUCT"
 		])
 	}
 }

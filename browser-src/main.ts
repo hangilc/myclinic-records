@@ -10,7 +10,7 @@ function appRecordsByDate(wrapper: HTMLElement): void{
 	let app = new RecordsByDate();
 	wrapper.appendChild(app.dom);
 	//app.setToday();
-	app.set(moment("2016-06-02"))
+	app.set(moment("2016-08-29"))
 }
 
 appRecordsByDate(main);

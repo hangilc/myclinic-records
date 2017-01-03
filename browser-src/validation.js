@@ -4,6 +4,9 @@ class ValidationError {
     constructor(errors) {
         this.errors = errors;
     }
+    toString() {
+        return this.errors.join("");
+    }
 }
 exports.ValidationError = ValidationError;
 function mapConvert(arr, cvt) {

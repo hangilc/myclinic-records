@@ -2,6 +2,10 @@ import * as moment from "moment";
 
 export class ValidationError {
 	constructor(readonly errors: string[]){}
+
+	toString(): string {
+		return this.errors.join("");
+	}
 }
 
 export interface Validator {

@@ -8,6 +8,6 @@ function appRecordsByDate(wrapper) {
     let app = new records_by_date_1.RecordsByDate();
     wrapper.appendChild(app.dom);
     //app.setToday();
-    app.set(moment("2016-06-02"));
+    app.set(moment("2016-08-29"));
 }
 appRecordsByDate(main);

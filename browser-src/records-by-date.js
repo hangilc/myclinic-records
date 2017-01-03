@@ -33,11 +33,17 @@ class RecordsByDate {
     onDateInputSubmit(m) {
         return __awaiter(this, void 0, void 0, function* () {
             let at = m.format("YYYY-MM-DD");
-            let visits = yield service_1.listVisitsByDate(at);
-            let fullVisits = yield Promise.all(visits.map(v => {
-                return service_1.getFullVisit(v.visitId);
-            }));
-            this.renderDisp(m, fullVisits);
+            try {
+                let visits = yield service_1.listVisitsByDate(at);
+                let fullVisits = yield Promise.all(visits.map(v => {
+                    return service_1.getFullVisit(v.visitId);
+                }));
+                this.renderDisp(m, fullVisits);
+            }
+            catch (ex) {
+                alert(ex);
+                return;
+            }
         });
     }
     renderDisp(m, fullVisits) {
@@ -75,9 +81,7 @@ class RecordItem {
                 typed_dom_1.f.a(e => { }, {}, ["全診療記録"]),
                 "]",
                 " ",
-                formatVisitTime(visit.visitedAt),
             ]),
-            content.dom
         ]);
     }
 }
@@ -103,7 +107,8 @@ class RecordContent {
                     ]),
                     typed_dom_1.h.td(right, [
                         new RecordShinryouList(visit.shinryouList).dom,
-                        new RecordDrugList(visit.drugs).dom
+                        new RecordDrugList(visit.drugs).dom,
+                        new RecordConductList(visit.conducts).dom,
                     ])
                 ])
             ])
@@ -165,6 +170,20 @@ class RecordDrug {
             ") ",
             myclinic_util_1.drugRep(drug),
             ` [薬価 ${drug.yakka}円]`
+        ]);
+    }
+}
+class RecordConductList {
+    constructor(conducts) {
+        this.dom = typed_dom_1.h.div({ class: "conducts-list" }, conducts.map(c => {
+            return new RecordConduct(c).dom;
+        }));
+    }
+}
+class RecordConduct {
+    constructor(conduct) {
+        this.dom = typed_dom_1.h.div({}, [
+            "CONDUCT"
         ]);
     }
 }

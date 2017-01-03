@@ -54,7 +54,7 @@
 	    let app = new records_by_date_1.RecordsByDate();
 	    wrapper.appendChild(app.dom);
 	    //app.setToday();
-	    app.set(moment("2016-06-02"));
+	    app.set(moment("2016-08-29"));
 	}
 	appRecordsByDate(main);
 
@@ -218,11 +218,17 @@
 	    onDateInputSubmit(m) {
 	        return __awaiter(this, void 0, void 0, function* () {
 	            let at = m.format("YYYY-MM-DD");
-	            let visits = yield service_1.listVisitsByDate(at);
-	            let fullVisits = yield Promise.all(visits.map(v => {
-	                return service_1.getFullVisit(v.visitId);
-	            }));
-	            this.renderDisp(m, fullVisits);
+	            try {
+	                let visits = yield service_1.listVisitsByDate(at);
+	                let fullVisits = yield Promise.all(visits.map(v => {
+	                    return service_1.getFullVisit(v.visitId);
+	                }));
+	                this.renderDisp(m, fullVisits);
+	            }
+	            catch (ex) {
+	                alert(ex);
+	                return;
+	            }
 	        });
 	    }
 	    renderDisp(m, fullVisits) {
@@ -260,9 +266,7 @@
 	                typed_dom_1.f.a(e => { }, {}, ["全診療記録"]),
 	                "]",
 	                " ",
-	                formatVisitTime(visit.visitedAt),
 	            ]),
-	            content.dom
 	        ]);
 	    }
 	}
@@ -288,7 +292,8 @@
 	                    ]),
 	                    typed_dom_1.h.td(right, [
 	                        new RecordShinryouList(visit.shinryouList).dom,
-	                        new RecordDrugList(visit.drugs).dom
+	                        new RecordDrugList(visit.drugs).dom,
+	                        new RecordConductList(visit.conducts).dom,
 	                    ])
 	                ])
 	            ])
@@ -350,6 +355,20 @@
 	            ") ",
 	            myclinic_util_1.drugRep(drug),
 	            ` [薬価 ${drug.yakka}円]`
+	        ]);
+	    }
+	}
+	class RecordConductList {
+	    constructor(conducts) {
+	        this.dom = typed_dom_1.h.div({ class: "conducts-list" }, conducts.map(c => {
+	            return new RecordConduct(c).dom;
+	        }));
+	    }
+	}
+	class RecordConduct {
+	    constructor(conduct) {
+	        this.dom = typed_dom_1.h.div({}, [
+	            "CONDUCT"
 	        ]);
 	    }
 	}
@@ -15742,6 +15761,7 @@
 	                let item = list[i];
 	                let obj = cvtor(item);
 	                if (obj instanceof validation_1.ValidationError) {
+	                    console.log(item);
 	                    return obj;
 	                }
 	                else {
@@ -15768,6 +15788,7 @@
 	            success: function (result) {
 	                let obj = cvtor(result);
 	                if (obj instanceof validation_1.ValidationError) {
+	                    console.log(result);
 	                    reject(obj);
 	                }
 	                else {
@@ -26159,6 +26180,9 @@
 	class ValidationError {
 	    constructor(errors) {
 	        this.errors = errors;
+	    }
+	    toString() {
+	        return this.errors.join("");
 	    }
 	}
 	exports.ValidationError = ValidationError;

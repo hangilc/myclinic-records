@@ -19,6 +19,7 @@ function fromJsonArray(cvtor) {
                 let item = list[i];
                 let obj = cvtor(item);
                 if (obj instanceof validation_1.ValidationError) {
+                    console.log(item);
                     return obj;
                 }
                 else {
@@ -45,6 +46,7 @@ function request(service, data, method, cvtor) {
             success: function (result) {
                 let obj = cvtor(result);
                 if (obj instanceof validation_1.ValidationError) {
+                    console.log(result);
                     reject(obj);
                 }
                 else {

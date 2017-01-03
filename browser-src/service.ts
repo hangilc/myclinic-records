@@ -43,6 +43,7 @@ function fromJsonArray<T>(cvtor: fromJson<T>): fromJson<T[]> {
 				let item = list[i];
 				let obj = cvtor(item);
 				if( obj instanceof ValidationError ){
+					console.log(item);
 					return obj;
 				} else {
 					ret.push(obj);
@@ -69,6 +70,7 @@ function request<T>(service: string, data: Object,
 			success: function(result){
 				let obj = cvtor(result);
 				if( obj instanceof ValidationError ){
+					console.log(result);
 					reject(obj);
 				} else {
 					resolve(obj);
