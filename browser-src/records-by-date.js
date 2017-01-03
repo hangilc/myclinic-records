@@ -11,6 +11,7 @@ const typed_dom_1 = require("./typed-dom");
 const date_input_1 = require("./date-input");
 const service_1 = require("./service");
 const kanjidate = require("kanjidate");
+const myclinic_util_1 = require("./myclinic-util");
 class RecordsByDate {
     constructor() {
         this.dateInput = new date_input_1.DateInput();
@@ -100,7 +101,9 @@ class RecordContent {
                     typed_dom_1.h.td(left, [
                         new RecordTextList(visit.texts).dom
                     ]),
-                    typed_dom_1.h.td(right, [])
+                    typed_dom_1.h.td(right, [
+                        new RecordDrugList(visit.drugs).dom
+                    ])
                 ])
             ])
         ]);
@@ -118,11 +121,32 @@ class RecordText {
     constructor(text) {
         let content = text.content;
         let lines = content.split(/\r\n|\r|\n/g);
-        this.dom = typed_dom_1.h.div({}, []);
+        let attr = {
+            style: "font-family:sans-serif; font-size:14px; margin:10px;"
+        };
+        this.dom = typed_dom_1.h.p(attr, []);
         lines.forEach(line => {
             let t = document.createTextNode(line);
             this.dom.appendChild(t);
             this.dom.appendChild(typed_dom_1.h.br({}, []));
         });
+    }
+}
+class RecordDrugList {
+    constructor(drugs) {
+        let index = 1;
+        this.dom = typed_dom_1.h.div({ class: "drugs-list" }, drugs.map(d => {
+            let item = new RecordDrug(index++, d);
+            return item.dom;
+        }));
+    }
+}
+class RecordDrug {
+    constructor(index, drug) {
+        this.dom = typed_dom_1.h.div({}, [
+            index.toString(),
+            ") ",
+            myclinic_util_1.drugRep(drug)
+        ]);
     }
 }

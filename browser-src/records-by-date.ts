@@ -3,7 +3,9 @@ import { DateInput } from "./date-input";
 import * as moment from "moment";
 import { listVisitsByDate, getFullVisit, getPatient } from "./service";
 import * as kanjidate from "kanjidate";
-import { FullVisit, Patient, Text } from "./model";
+import { FullVisit, Patient, Text, FullDrug, FullShinryou,
+	FullConduct, Charge } from "./model";
+import { drugRep } from "./myclinic-util";
 
 export class RecordsByDate {
 	dom: HTMLElement;
@@ -107,6 +109,7 @@ class RecordContent {
 							new RecordTextList(visit.texts).dom
 						]),
 						h.td(right, [
+							new RecordDrugList(visit.drugs).dom
 						])
 					])
 				])
@@ -131,11 +134,38 @@ class RecordText {
 	constructor(text: Text){
 		let content = text.content;
 		let lines = content.split(/\r\n|\r|\n/g);
-		this.dom = h.div({}, []);
+		let attr = {
+			style: "font-family:sans-serif; font-size:14px; margin:10px;"
+		};
+		this.dom = h.p(attr, []);
 		lines.forEach(line => {
 			let t = document.createTextNode(line);
 			this.dom.appendChild(t);
 			this.dom.appendChild(h.br({}, []));
 		})
+	}
+}
+
+class RecordDrugList {
+	dom: HTMLElement;
+
+	constructor(drugs: FullDrug[]){
+		let index = 1;
+		this.dom = h.div({class: "drugs-list"}, drugs.map(d => {
+			let item = new RecordDrug(index++, d);
+			return item.dom;
+		}))
+	}
+}
+
+class RecordDrug {
+	dom: HTMLElement;
+
+	constructor(index: number, drug: FullDrug){
+		this.dom = h.div({}, [
+			index.toString(),
+			") ",
+			drugRep(drug)
+		])
 	}
 }

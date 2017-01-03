@@ -53,6 +53,7 @@ export namespace h {
 	export let tr = makeCreator<HTMLElement>("tr");
 	export let td = makeCreator<HTMLElement>("td");
 	export let br = makeCreator<HTMLElement>("br");
+	export let p = makeCreator<HTMLElement>("p");
 
 	export function form(attrs: any, children?: (HTMLElement|string)[]): HTMLFormElement{
 		if( !("onSubmit" in attrs) ){
@@ -89,6 +90,7 @@ export namespace f {
 	export let tr = makeCreator<HTMLElement>("tr");
 	export let td = makeCreator<HTMLElement>("td");
 	export let br = makeCreator<HTMLElement>("br");
+	export let p = makeCreator<HTMLElement>("p");
 
 	export function form(fn: (e:HTMLFormElement) => void,
 			attrs: any, children?: (HTMLElement|string)[]): HTMLFormElement{

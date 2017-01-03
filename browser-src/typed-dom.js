@@ -54,6 +54,7 @@ var h;
     h.tr = makeCreator("tr");
     h.td = makeCreator("td");
     h.br = makeCreator("br");
+    h.p = makeCreator("p");
     function form(attrs, children) {
         if (!("onSubmit" in attrs)) {
             attrs.onSubmit = "return false";
@@ -87,6 +88,7 @@ var f;
     f.tr = makeCreator("tr");
     f.td = makeCreator("td");
     f.br = makeCreator("br");
+    f.p = makeCreator("p");
     function form(fn, attrs, children) {
         if (!("onSubmit" in attrs)) {
             attrs.onSubmit = "return false";

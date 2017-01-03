@@ -23,3 +23,4 @@ __export(require("./model/shinryou-master"));
 __export(require("./model/kizai-master"));
 __export(require("./model/full-drug"));
 __export(require("./model/full-shinryou"));
+__export(require("./model/full-conduct"));
