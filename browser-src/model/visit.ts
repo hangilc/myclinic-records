@@ -1,4 +1,4 @@
-import * as V from "../validation";
+import { Validator, ValidationError } from "../validator";
 
 export class Visit {
 	constructor(
@@ -14,6 +14,76 @@ export class Visit {
 	){}
 }
 
+function convertToVisit(src: any): 
+	Visit | ValidationError {
+	let visitId: number;
+	let patientId: number;
+	let visitedAt: string;
+	let shahokokuhoId: number;
+	let koukikoureiId: number;
+	let roujinId: number;
+	let kouhi1Id: number;
+	let kouhi2Id: number;
+	let kouhi3Id: number;
+	let err = {};
+	{
+		let cvt = new Validator(src.visit_id)
+			.isDefined()
+			.ensureNumber()
+			.isInteger()
+			.isPositive()
+		if( cvt.hasError ){
+			err["visitId"] = cvt.getError();
+			visitId = 0;
+		} else {
+			visitId = cvt.getValue();
+		}
+	}
+	{
+		let cvt = new Validator(src.patient_id)
+			.isDefined()
+			.ensureNumber()
+			.isInteger()
+			.isPositive()
+		if( cvt.hasError ){
+			err["患者番号"] = cvt.getError();
+			patientId = 0;
+		} else {
+			patientId = cvt.getValue();
+		}
+	}
+	{
+		let cvt = new Validator(src.v_datetime)
+			.ensureString()
+			.isSqlDateTime()
+			.isValidDate()
+		if( cvt.hasError ){
+			err["診察時刻"]　= cvt.getError();
+			visitedAt = "";
+		} else {
+			visitedAt = cvt.getValue();
+		}
+	}
+	{
+		let cvt = new Validator(src.shahokokuho_id)
+			.ensureNumber()
+			.isInteger()
+			.isZeroPositive()
+		if( cvt.hasError ){
+			err["社保・国保番号"] = cvt.getError();
+			shahokokuhoId = 0;
+		} else {
+			shahokokuhoId = cvt.getValue();
+		}
+	}
+	if( Object.keys(err).length > 0 ){
+		return new ValidationError(err);
+	}
+	return new Visit(visitId, patientId, visitedAt, shahokokuhoId,
+		koukikoureiId, roujinId, kouhi1Id, kouhi2Id, kouhi3Id);
+}
+
+/*
 export function validateVisit(visit: Visit,
 	checkVisitId: boolean = true): string[] {
 	let errs: string[] = [];
@@ -52,4 +122,5 @@ export function fromJsonToVisit(src: any): Visit | V.ValidationError {
 		return visit;
 	}
 }
+*/
 

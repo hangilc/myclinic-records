@@ -1,10 +1,10 @@
 import * as moment from "moment";
 
 export class ValidationError {
-	constructor(readonly errors: string[]){}
+	constructor(readonly keys: string[], readonly errors: string[]){}
 
 	toString(): string {
-		return this.errors.join("");
+		return this.keys.join("|") + ":" + this.errors.join("");
 	}
 }
 

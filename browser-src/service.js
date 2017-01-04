@@ -1,6 +1,6 @@
 "use strict";
 const $ = require("jquery");
-const validation_1 = require("./validation");
+const validator_1 = require("./validator");
 const model = require("./model");
 class HttpError {
     constructor(status, text, exception) {
@@ -10,28 +10,32 @@ class HttpError {
     }
 }
 exports.HttpError = HttpError;
-function fromJsonArray(cvtor) {
-    return function (json) {
-        if (Array.isArray(json)) {
-            let list = json;
-            let ret = [];
-            for (let i = 0; i < list.length; i++) {
-                let item = list[i];
-                let obj = cvtor(item);
-                if (obj instanceof validation_1.ValidationError) {
-                    console.log(item);
-                    return obj;
-                }
-                else {
-                    ret.push(obj);
-                }
-            }
-            return ret;
+function arrayConverter(cvt) {
+    return function (src) {
+        return convertArray(src, cvt);
+    };
+}
+function convertArray(src, cvt) {
+    let result = src.map(cvt);
+    let errs = [];
+    let vals = [];
+    result.forEach(r => {
+        if (r instanceof validator_1.ValidationError) {
+            errs.push(r);
         }
         else {
-            return new validation_1.ValidationError(["array expected"]);
+            vals.push(r);
         }
-    };
+    });
+    if (errs.length > 0) {
+        return errs.map(e => e.body);
+    }
+    else {
+        if (vals.length !== src.length) {
+            throw new Error("cannot happen in convertArray");
+        }
+        return vals;
+    }
 }
 function request(service, data, method, cvtor) {
     return new Promise(function (resolve, reject) {
@@ -45,7 +49,7 @@ function request(service, data, method, cvtor) {
             timeout: 15000,
             success: function (result) {
                 let obj = cvtor(result);
-                if (obj instanceof validation_1.ValidationError) {
+                if (obj instanceof validator_1.ValidationError) {
                     console.log(result);
                     reject(obj);
                 }
@@ -63,7 +67,7 @@ function getPatient(patientId) {
     if (!(Number.isInteger(patientId) && patientId > 0)) {
         return Promise.reject("invalid patientId");
     }
-    return request("get_patient", { patient_id: patientId }, "GET", model.fromJsonToPatient);
+    return request("get_patient", { patient_id: patientId }, "GET", model.convertToPatient);
 }
 exports.getPatient = getPatient;
 function listVisitsByDate(at) {

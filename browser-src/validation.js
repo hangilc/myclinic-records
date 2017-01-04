@@ -1,11 +1,12 @@
 "use strict";
 const moment = require("moment");
 class ValidationError {
-    constructor(errors) {
+    constructor(keys, errors) {
+        this.keys = keys;
         this.errors = errors;
     }
     toString() {
-        return this.errors.join("");
+        return this.keys.join("|") + ":" + this.errors.join("");
     }
 }
 exports.ValidationError = ValidationError;

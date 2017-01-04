@@ -1,5 +1,5 @@
 import * as $ from "jquery";
-import { ValidationError } from "./validation";
+import { ValidationError } from "./validator";
 import * as model from "./model";
 
 import Patient = model.Patient;
@@ -30,34 +30,40 @@ export class HttpError {
 	){}
 }
 
-interface fromJson<T> {
-	(json: any) : T | ValidationError 
+interface Converter<T>{
+	(src:any): T | ValidationError
 }
 
-function fromJsonArray<T>(cvtor: fromJson<T>): fromJson<T[]> {
-	return function(json: any) : T[] | ValidationError {
-		if( Array.isArray(json) ){
-			let list: any[] = <any[]>json;
-			let ret: T[] = [];
-			for(let i=0;i<list.length;i++){
-				let item = list[i];
-				let obj = cvtor(item);
-				if( obj instanceof ValidationError ){
-					console.log(item);
-					return obj;
-				} else {
-					ret.push(obj);
-				}
-			}
-			return ret;
+function arrayConverter<T>(cvt: Converter<T>){
+	return function(src: any[]): T[] | ValidationError {
+		return convertArray(src, cvt);
+	}
+}
+
+function convertArray<T>(src: any[], cvt: Converter<T>): 
+	T[] | ValidationError {
+	let result = src.map(cvt);
+	let errs: ValidationError[] = [];
+	let vals: T[] = [];
+	result.forEach(r => {
+		if( r instanceof ValidationError ){
+			errs.push(r);
 		} else {
-			return new ValidationError(["array expected"]);
+			vals.push(r);
 		}
+	});
+	if( errs.length > 0 ){
+		return errs.map(e => e.body);
+	} else {
+		if( vals.length !== src.length ){
+			throw new Error("cannot happen in convertArray")
+		}
+		return vals;
 	}
 }
 
 function request<T>(service: string, data: Object, 
-	method: string, cvtor: fromJson<T>){
+	method: string, cvtor: Converter<T>){
 	return new Promise<T>(function(resolve, reject){
 		$.ajax({
 			url: '/service',
@@ -88,7 +94,7 @@ export function getPatient(patientId: number): Promise<Patient> {
 		return Promise.reject("invalid patientId");
 	}
 	return request<Patient>("get_patient", { patient_id: patientId }, 
-		"GET", model.fromJsonToPatient);
+		"GET", model.convertToPatient);
 }
 
 export function listVisitsByDate(at: string): Promise<Visit[]> {

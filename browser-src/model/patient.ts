@@ -1,4 +1,4 @@
-import * as V from "../validation";
+import { Validator, ValidationError } from "../validator";
 
 export class Patient {
  	constructor(
@@ -14,8 +14,147 @@ export class Patient {
  	){}
 };
 
+export function convertToPatient(src: any): Patient | ValidationError {
+	let patientIdValue: number;
+	let lastNameValue: string;
+	let firstNameValue: string;
+	let lastNameYomiValue: string;
+	let firstNameYomiValue: string;
+	let birthdayValue: string;
+	let sexValue: string;
+	let addressValue: string;
+	let phoneValue: string;
+	let err = {};
+	{
+		let cvt = new Validator(src.patient_id)
+			.isDefined()
+			.ensureNumber()
+			.isInteger()
+			.isPositive()
+		if( cvt.hasError ){
+			err["患者番号"] = cvt.getError();
+			patientIdValue = 0;
+		} else {
+			patientIdValue = cvt.getValue();
+		}
+	}
+	{
+		let cvt = new Validator(src.last_name)
+			.isDefined()
+			.ensureString()
+			.isNotEmpty();
+		if( cvt.hasError ){
+			err["姓"] = cvt.getError();
+			lastNameValue = "";
+		} else {
+			lastNameValue = cvt.getValue();
+		}
+	}
+	{
+		let cvt = new Validator(src.first_name)
+			.isDefined()
+			.ensureString()
+			.isNotEmpty();
+		if( cvt.hasError ){
+			err["名"] = cvt.getError();
+			firstNameValue = "";
+		} else {
+			firstNameValue = cvt.getValue();
+		}
+	}
+	{
+		let cvt = new Validator(src.last_name_yomi)
+			.isDefined()
+			.ensureString()
+			.isNotEmpty();
+		if( cvt.hasError ){
+			err["姓のよみ"] = cvt.getError();
+			lastNameYomiValue = "";
+		} else {
+			lastNameYomiValue = cvt.getValue();
+		}
+	}
+	{
+		let cvt = new Validator(src.first_name_yomi)
+			.isDefined()
+			.ensureString()
+			.isNotEmpty();
+		if( cvt.hasError ){
+			err["名のよみ"] = cvt.getError();
+			firstNameYomiValue = "";
+		} else {
+			firstNameYomiValue = cvt.getValue();
+		}
+	}
+	{
+		let value = src.birth_day;
+		if( value === "0000-00-00" ){
+			birthdayValue = value;
+		} else {
+			let cvt = new Validator(src.birth_day)
+				.isDefined()
+				.ensureString()
+				.matches(/^\d{4}-\d{2}^\d{2}$/)
+				.isValidDate()
+			if( cvt.hasError ){
+				err["生年月日"] = cvt.getError();
+				birthdayValue = "";
+			} else {
+				birthdayValue = value;
+			}
+
+		}
+	}
+	{
+		let cvt = new Validator(src.sex)
+			.isDefined()
+			.ensureString()
+			.oneOf(["M", "F"])
+		if( cvt.hasError ){
+			err["性別"]　= cvt.getError();
+			sexValue = "";
+		} else {
+			sexValue = cvt.getValue()
+		}
+
+	}
+	{
+		let cvt = new Validator(src.address)
+			.isDefined()
+			.ensureString()
+		if( cvt.hasError ){
+			err["住所"] = cvt.getError();
+			addressValue = "";
+		} else {
+			addressValue = cvt.getValue();
+		}
+	}
+	{
+		let cvt = new Validator(src.phone)
+			.isDefined()
+			.ensureString()
+		if( cvt.hasError ){
+			err["電話番号"] = cvt.getError();
+			phoneValue = "";
+		} else {
+			phoneValue = cvt.getValue();
+		}
+	}
+	if( Object.keys(err).length > 0 ){
+		return new ValidationError(err);
+	}
+	return new Patient(patientIdValue, lastNameValue,
+		firstNameValue, lastNameYomiValue,
+		firstNameYomiValue, birthdayValue,
+		sexValue, addressValue, phoneValue);
+}
+
+/**
 export function validatePatient(patient: Patient, 
-	checkPatientId: boolean = true) : string[] {
+	checkPatientId: boolean = true) : null | any {
+	return validateObject(patient, {
+
+	})
 	let errs: string[] = [];
 	if( checkPatientId ){
 		V.validate("患者番号", patient.patientId, errs, [
@@ -45,5 +184,5 @@ export function fromJsonToPatient(src: any) : Patient | V.ValidationError {
  	}
 }
 
-
+**/
 
