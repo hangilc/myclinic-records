@@ -1,4 +1,4 @@
-import { Validator, ValidationError } from "../validator";
+import { Validator, ValidationError, Undefined, ValidatorBase } from "../validator";
 
 export class Patient {
  	constructor(
@@ -13,6 +13,33 @@ export class Patient {
  		readonly phone: string
  	){}
 };
+
+export class PatientValues {
+ 	constructor(
+ 		private patientIdValue: number | ValidationError = Undefined,
+ 		private lastNameValue: string | ValidationError = Undefined,
+ 		private firstNameValue: string | ValidationError = Undefined,
+ 		private lastNameYomiValue: string | ValidationError = Undefined,
+ 		private firstNameYomiValue: string | ValidationError = Undefined,
+ 		private birthdayValue: string | ValidationError = Undefined,
+ 		private sexValue: string | ValidationError = Undefined,
+ 		private addressValue: string | ValidationError = Undefined,
+ 		private phoneValue: string | ValidationError = Undefined
+ 	){}
+
+ 	set patientId(value: any){
+		this.patientIdValue = new Validator(value)
+			.isDefined()
+			.ensureNumber()
+			.isInteger()
+			.isPositive()
+			.result();
+ 	}
+
+ 	get patientId(): ValidatorBase<number>{
+ 		
+ 	}
+}
 
 export function convertToPatient(src: any): Patient | ValidationError {
 	let patientIdValue: number;

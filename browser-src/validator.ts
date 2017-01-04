@@ -10,11 +10,33 @@ export class ValidationError {
 	}
 }
 
+export const Undefined: ValidationError = 
+	new ValidationError("値が設定されていません。");
+
+export function toValue<T>(v: T | ValidationError, onError: (body: any) => void, 
+	defaultValue: T): T {
+	if( v instanceof ValidationError ){
+		onError(v.body);
+		return defaultValue;
+	} else {
+		return v;
+	}
+}
+
 export class ValidatorBase<V> {
 	constructor(
 		protected value: V,
 		protected err: ValidationError | null = null
 	){}
+
+	result(): V | ValidationError {
+		let err = this.err;
+		if( err instanceof ValidationError ){
+			return err;
+		} else {
+			return this.value;
+		}
+	}
 
 	oneOf(candidates: V[]): this {
 		return this.confirm(
