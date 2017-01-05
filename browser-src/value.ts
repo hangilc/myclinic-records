@@ -3,49 +3,36 @@ import * as moment from "moment";
 export class Value<T> {
 
 	constructor(
-		protected value: T | undefined = undefined,
-		protected err: any = null
+		protected _value: T | undefined = undefined,
+		protected _err: any = null
 	){}
 
-	hasError(): boolean {
-		return this.err !== null;
-	}
+	get err(): any { return this._err; }
 
-	getError(): any {
-		if( this.err === null ){
-			throw new Error("There is no error.");
-		} else {
-			return this.err;
+	get value(): T {
+		if( this._err !== null ){
+			throw this._err;
 		}
-	}
-
-	getValue(): T {
-		if( this.hasError() ){
-			throw new Error("There is an error.");
-		}
-		let value = this.value;
-		if( value === undefined ){
-			throw new Error("There is no valud.");
+		if( this._value === undefined ){
+			throw new Error("There is no value.");
 		} else {
-			return value;
+			return this._value;
 		}
 	}
 
 	confirm(pred: (value: T) => boolean, errString: string): this {
-		if( this.hasError ){
+		if( this._err ){
 			return this;
 		}
-		let value = this.value;
+		let value = this._value;
 		if( value === undefined ){
-			throw new Error("Value is not defined");
+			this._err = "Undefined value";
 		} else {
-			if( pred(value) ){
-				return this;
-			} else {
-				this.err = `${ errString } ${ JSON.stringify(value) }`;
-				return this;
+			if( !pred(value) ){
+				this._err = errString;
 			}
 		}
+		return this;
 	}
 
 	convert(onErr: (err: any) => any, defaultValue: T): T {
