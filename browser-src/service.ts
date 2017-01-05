@@ -1,8 +1,7 @@
 import * as $ from "jquery";
-import { ValidationError } from "./validator";
 import * as model from "./model";
 
-import Patient = model.Patient;
+import PatientValue = model.PatientValue;
 import Visit = model.Visit;
 import Text = model.Text;
 import Shahokokuho = model.Shahokokuho;
@@ -31,35 +30,7 @@ export class HttpError {
 }
 
 interface Converter<T>{
-	(src:any): T | ValidationError
-}
-
-function arrayConverter<T>(cvt: Converter<T>){
-	return function(src: any[]): T[] | ValidationError {
-		return convertArray(src, cvt);
-	}
-}
-
-function convertArray<T>(src: any[], cvt: Converter<T>): 
-	T[] | ValidationError {
-	let result = src.map(cvt);
-	let errs: ValidationError[] = [];
-	let vals: T[] = [];
-	result.forEach(r => {
-		if( r instanceof ValidationError ){
-			errs.push(r);
-		} else {
-			vals.push(r);
-		}
-	});
-	if( errs.length > 0 ){
-		return errs.map(e => e.body);
-	} else {
-		if( vals.length !== src.length ){
-			throw new Error("cannot happen in convertArray")
-		}
-		return vals;
-	}
+	(src:any): T
 }
 
 function request<T>(service: string, data: Object, 
@@ -74,12 +45,11 @@ function request<T>(service: string, data: Object,
 			dataType: "json",
 			timeout: 15000,
 			success: function(result){
-				let obj = cvtor(result);
-				if( obj instanceof ValidationError ){
-					console.log(result);
-					reject(obj);
-				} else {
+				try {
+					let obj = cvtor(result);
 					resolve(obj);
+				} catch(ex){
+					reject(ex);
 				}
 			},
 			error: function(xhr, status, ex){
@@ -89,12 +59,12 @@ function request<T>(service: string, data: Object,
 	});
 }
 
-export function getPatient(patientId: number): Promise<Patient> {
+export function getPatient(patientId: number): Promise<PatientValue> {
 	if( !(Number.isInteger(patientId) && patientId > 0) ){
 		return Promise.reject("invalid patientId");
 	}
-	return request<Patient>("get_patient", { patient_id: patientId }, 
-		"GET", model.convertToPatient);
+	return request<PatientValue>("get_patient", { patient_id: patientId }, 
+		"GET", model.jsonToPatientValue);
 }
 
 export function listVisitsByDate(at: string): Promise<Visit[]> {

@@ -1,4 +1,4 @@
-import { Validator, ValidationError, Undefined, ValidatorBase } from "../validator";
+import { Value, Undefined, makeValue } from "../value";
 
 export class Patient {
  	constructor(
@@ -14,167 +14,243 @@ export class Patient {
  	){}
 };
 
-export class PatientValues {
+export class PatientValue {
  	constructor(
- 		private patientIdValue: number | ValidationError = Undefined,
- 		private lastNameValue: string | ValidationError = Undefined,
- 		private firstNameValue: string | ValidationError = Undefined,
- 		private lastNameYomiValue: string | ValidationError = Undefined,
- 		private firstNameYomiValue: string | ValidationError = Undefined,
- 		private birthdayValue: string | ValidationError = Undefined,
- 		private sexValue: string | ValidationError = Undefined,
- 		private addressValue: string | ValidationError = Undefined,
- 		private phoneValue: string | ValidationError = Undefined
+ 		public patientIdValue: Value<number> = Undefined,
+ 		public lastNameValue: Value<string> = Undefined,
+ 		public firstNameValue: Value<string> = Undefined,
+ 		public lastNameYomiValue: Value<string> = Undefined,
+ 		public firstNameYomiValue: Value<string> = Undefined,
+ 		public birthdayValue: Value<string> = Undefined,
+ 		public sexValue: Value<string> = Undefined,
+ 		public addressValue: Value<string> = Undefined,
+ 		public phoneValue: Value<string> = Undefined
  	){}
 
  	set patientId(value: any){
-		this.patientIdValue = new Validator(value)
-			.isDefined()
+		this.patientIdValue = makeValue(value)
 			.ensureNumber()
 			.isInteger()
 			.isPositive()
-			.result();
  	}
 
- 	get patientId(): ValidatorBase<number>{
- 		
+ 	set lastName(value: any){
+ 		this.lastNameValue = makeValue(value)
+ 			.ensureString()
+ 			.isNotEmpty()
  	}
+
+ 	set firstName(value: any){
+ 		this.firstNameValue = makeValue(value)
+ 			.ensureString()
+ 			.isNotEmpty()
+ 	}
+
+ 	set lastNameYomi(value: any){
+ 		this.lastNameYomiValue = makeValue(value)
+ 			.ensureString()
+ 			.isNotEmpty()
+ 	}
+
+ 	set firstNameYomi(value: any){
+ 		this.firstNameYomiValue = makeValue(value)
+ 			.ensureString()
+ 			.isNotEmpty()
+ 	}
+
+ 	set birthday(value: any){
+ 		this.birthdayValue = makeValue(value)
+ 			.ensureString()
+ 			.or(
+ 				v => v.isZeroSqlDate(),
+ 				v => v.isSqlDate().isValidDate()
+			)
+ 	}
+
+ 	set sex(value: any){
+ 		this.sexValue = makeValue(value)
+ 			.ensureString()
+ 			.oneOf("M", "F")
+ 	}
+
+ 	set address(value: any){
+ 		this.address = makeValue(value)
+ 			.ensureString()
+ 	}
+
+ 	set phone(value: any){
+ 		this.phone = makeValue(value)
+ 			.ensureString()
+ 	}
+
+ 	toPatient(): Patient {
+ 		let err = {};
+ 		let patientId: number = this.patientIdValue.convert(e => err["患者番号"] = e, 0);
+ 		let lastName: string = this.lastNameValue.convert(e => err["姓"] = e, "");
+ 		let firstName: string = this.firstNameValue.convert(e => err["名"] = e, "");
+ 		let lastNameYomi: string = this.lastNameValue.convert(e => err["姓のよみ"] = e, "");
+ 		let firstNameYomi: string = this.firstNameValue.convert(e => err["名のよみ"] = e, "");
+ 		let birthday: string = this.birthdayValue.convert(e => err["生年月日"] = e, "");
+ 		let sex: string = this.birthdayValue.convert(e => err["性別"] = e, "");
+ 		let address: string = this.addressValue.convert(e => err["住所"] = e, "");
+ 		let phone: string = this.addressValue.convert(e => err["電話番号"] = e, "");
+ 		if( Object.keys(err).length > 0 ){
+ 			throw err;
+ 		} 
+		return new Patient(patientId, lastName, firstName, lastNameYomi,
+			firstNameYomi, birthday, sex, address, phone);
+  	}
+
 }
 
-export function convertToPatient(src: any): Patient | ValidationError {
-	let patientIdValue: number;
-	let lastNameValue: string;
-	let firstNameValue: string;
-	let lastNameYomiValue: string;
-	let firstNameYomiValue: string;
-	let birthdayValue: string;
-	let sexValue: string;
-	let addressValue: string;
-	let phoneValue: string;
-	let err = {};
-	{
-		let cvt = new Validator(src.patient_id)
-			.isDefined()
-			.ensureNumber()
-			.isInteger()
-			.isPositive()
-		if( cvt.hasError ){
-			err["患者番号"] = cvt.getError();
-			patientIdValue = 0;
-		} else {
-			patientIdValue = cvt.getValue();
-		}
-	}
-	{
-		let cvt = new Validator(src.last_name)
-			.isDefined()
-			.ensureString()
-			.isNotEmpty();
-		if( cvt.hasError ){
-			err["姓"] = cvt.getError();
-			lastNameValue = "";
-		} else {
-			lastNameValue = cvt.getValue();
-		}
-	}
-	{
-		let cvt = new Validator(src.first_name)
-			.isDefined()
-			.ensureString()
-			.isNotEmpty();
-		if( cvt.hasError ){
-			err["名"] = cvt.getError();
-			firstNameValue = "";
-		} else {
-			firstNameValue = cvt.getValue();
-		}
-	}
-	{
-		let cvt = new Validator(src.last_name_yomi)
-			.isDefined()
-			.ensureString()
-			.isNotEmpty();
-		if( cvt.hasError ){
-			err["姓のよみ"] = cvt.getError();
-			lastNameYomiValue = "";
-		} else {
-			lastNameYomiValue = cvt.getValue();
-		}
-	}
-	{
-		let cvt = new Validator(src.first_name_yomi)
-			.isDefined()
-			.ensureString()
-			.isNotEmpty();
-		if( cvt.hasError ){
-			err["名のよみ"] = cvt.getError();
-			firstNameYomiValue = "";
-		} else {
-			firstNameYomiValue = cvt.getValue();
-		}
-	}
-	{
-		let value = src.birth_day;
-		if( value === "0000-00-00" ){
-			birthdayValue = value;
-		} else {
-			let cvt = new Validator(src.birth_day)
-				.isDefined()
-				.ensureString()
-				.matches(/^\d{4}-\d{2}^\d{2}$/)
-				.isValidDate()
-			if( cvt.hasError ){
-				err["生年月日"] = cvt.getError();
-				birthdayValue = "";
-			} else {
-				birthdayValue = value;
-			}
-
-		}
-	}
-	{
-		let cvt = new Validator(src.sex)
-			.isDefined()
-			.ensureString()
-			.oneOf(["M", "F"])
-		if( cvt.hasError ){
-			err["性別"]　= cvt.getError();
-			sexValue = "";
-		} else {
-			sexValue = cvt.getValue()
-		}
-
-	}
-	{
-		let cvt = new Validator(src.address)
-			.isDefined()
-			.ensureString()
-		if( cvt.hasError ){
-			err["住所"] = cvt.getError();
-			addressValue = "";
-		} else {
-			addressValue = cvt.getValue();
-		}
-	}
-	{
-		let cvt = new Validator(src.phone)
-			.isDefined()
-			.ensureString()
-		if( cvt.hasError ){
-			err["電話番号"] = cvt.getError();
-			phoneValue = "";
-		} else {
-			phoneValue = cvt.getValue();
-		}
-	}
-	if( Object.keys(err).length > 0 ){
-		return new ValidationError(err);
-	}
-	return new Patient(patientIdValue, lastNameValue,
-		firstNameValue, lastNameYomiValue,
-		firstNameYomiValue, birthdayValue,
-		sexValue, addressValue, phoneValue);
+export function jsonToPatientValue(src: any): PatientValue {
+	let v = new PatientValue();
+	v.patientId = src.patient_id;
+	v.lastName = src.last_name;
+	v.firstName = src.first_name;
+	v.lastNameYomi = src.last_name_yomi;
+	v.firstNameYomi = src.first_name_yomi;
+	v.birthday = src.birth_day;
+	v.sex = src.sex;
+	v.address = src.address;
+	v.phone = src.phone;
+	return v;
 }
+
+// export function convertToPatient(src: any): Patient | ValidationError {
+// 	let patientIdValue: number;
+// 	let lastNameValue: string;
+// 	let firstNameValue: string;
+// 	let lastNameYomiValue: string;
+// 	let firstNameYomiValue: string;
+// 	let birthdayValue: string;
+// 	let sexValue: string;
+// 	let addressValue: string;
+// 	let phoneValue: string;
+// 	let err = {};
+// 	{
+// 		let cvt = new Validator(src.patient_id)
+// 			.isDefined()
+// 			.ensureNumber()
+// 			.isInteger()
+// 			.isPositive()
+// 		if( cvt.hasError ){
+// 			err["患者番号"] = cvt.getError();
+// 			patientIdValue = 0;
+// 		} else {
+// 			patientIdValue = cvt.getValue();
+// 		}
+// 	}
+// 	{
+// 		let cvt = new Validator(src.last_name)
+// 			.isDefined()
+// 			.ensureString()
+// 			.isNotEmpty();
+// 		if( cvt.hasError ){
+// 			err["姓"] = cvt.getError();
+// 			lastNameValue = "";
+// 		} else {
+// 			lastNameValue = cvt.getValue();
+// 		}
+// 	}
+// 	{
+// 		let cvt = new Validator(src.first_name)
+// 			.isDefined()
+// 			.ensureString()
+// 			.isNotEmpty();
+// 		if( cvt.hasError ){
+// 			err["名"] = cvt.getError();
+// 			firstNameValue = "";
+// 		} else {
+// 			firstNameValue = cvt.getValue();
+// 		}
+// 	}
+// 	{
+// 		let cvt = new Validator(src.last_name_yomi)
+// 			.isDefined()
+// 			.ensureString()
+// 			.isNotEmpty();
+// 		if( cvt.hasError ){
+// 			err["姓のよみ"] = cvt.getError();
+// 			lastNameYomiValue = "";
+// 		} else {
+// 			lastNameYomiValue = cvt.getValue();
+// 		}
+// 	}
+// 	{
+// 		let cvt = new Validator(src.first_name_yomi)
+// 			.isDefined()
+// 			.ensureString()
+// 			.isNotEmpty();
+// 		if( cvt.hasError ){
+// 			err["名のよみ"] = cvt.getError();
+// 			firstNameYomiValue = "";
+// 		} else {
+// 			firstNameYomiValue = cvt.getValue();
+// 		}
+// 	}
+// 	{
+// 		let value = src.birth_day;
+// 		if( value === "0000-00-00" ){
+// 			birthdayValue = value;
+// 		} else {
+// 			let cvt = new Validator(src.birth_day)
+// 				.isDefined()
+// 				.ensureString()
+// 				.matches(/^\d{4}-\d{2}^\d{2}$/)
+// 				.isValidDate()
+// 			if( cvt.hasError ){
+// 				err["生年月日"] = cvt.getError();
+// 				birthdayValue = "";
+// 			} else {
+// 				birthdayValue = value;
+// 			}
+
+// 		}
+// 	}
+// 	{
+// 		let cvt = new Validator(src.sex)
+// 			.isDefined()
+// 			.ensureString()
+// 			.oneOf(["M", "F"])
+// 		if( cvt.hasError ){
+// 			err["性別"]　= cvt.getError();
+// 			sexValue = "";
+// 		} else {
+// 			sexValue = cvt.getValue()
+// 		}
+
+// 	}
+// 	{
+// 		let cvt = new Validator(src.address)
+// 			.isDefined()
+// 			.ensureString()
+// 		if( cvt.hasError ){
+// 			err["住所"] = cvt.getError();
+// 			addressValue = "";
+// 		} else {
+// 			addressValue = cvt.getValue();
+// 		}
+// 	}
+// 	{
+// 		let cvt = new Validator(src.phone)
+// 			.isDefined()
+// 			.ensureString()
+// 		if( cvt.hasError ){
+// 			err["電話番号"] = cvt.getError();
+// 			phoneValue = "";
+// 		} else {
+// 			phoneValue = cvt.getValue();
+// 		}
+// 	}
+// 	if( Object.keys(err).length > 0 ){
+// 		return new ValidationError(err);
+// 	}
+// 	return new Patient(patientIdValue, lastNameValue,
+// 		firstNameValue, lastNameYomiValue,
+// 		firstNameYomiValue, birthdayValue,
+// 		sexValue, addressValue, phoneValue);
+// }
 
 /**
 export function validatePatient(patient: Patient, 
