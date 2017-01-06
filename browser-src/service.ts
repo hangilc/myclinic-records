@@ -86,7 +86,7 @@ export function getText(textId: number): Promise<Text> {
 		return Promise.reject("invalid textId");
 	}
 	return request<Text>("get_text", { text_id: textId }, 
-		"GET", model.fromJsonToText);
+		"GET", model.jsonToText);
 }
 
 export function getShahokokuho(shahokokuhoId: number): Promise<Shahokokuho> {
@@ -207,7 +207,6 @@ export function getShinryouMaster(shinryoucode: number, at: string): Promise<Shi
 		{ shinryoucode: shinryoucode, at: at }, "GET", model.jsonToShinryouMaster);
 }
 
-/**
 export function getKizaiMaster(kizaicode: number, at: string): Promise<KizaiMaster> {
 	if( !(Number.isInteger(kizaicode) && kizaicode > 0) ){
 		return Promise.reject("invalid kizaicode");
@@ -219,6 +218,7 @@ export function getKizaiMaster(kizaicode: number, at: string): Promise<KizaiMast
 		{ kizaicode: kizaicode, at: at }, "GET", model.jsonToKizaiMaster);
 }
 
+/**
 export function getFullVisit(visitId: number): Promise<FullVisit> {
 	if( !(Number.isInteger(visitId) && visitId > 0) ){
 		return Promise.reject("invalid visitId");

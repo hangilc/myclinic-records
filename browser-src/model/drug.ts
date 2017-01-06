@@ -12,8 +12,7 @@ export class Drug {
 	prescribed: boolean;
 }
 
-export function jsonToDrug(src: any): Drug {
-	let drug = new Drug();
+export function fillDrugFromJson(drug: Drug, src: any): void {
 	drug.drugId = src.drug_id;
 	drug.visitId = src.visit_id;
 	drug.iyakuhincode = src.d_iyakuhincode;
@@ -21,6 +20,11 @@ export function jsonToDrug(src: any): Drug {
 	drug.usage = src.d_usage;
 	drug.category = src.d_category;
 	drug.prescribed = src.d_prescribed === 0 ? false : true;
+}
+
+export function jsonToDrug(src: any): Drug {
+	let drug = new Drug();
+	fillDrugFromJson(drug, src);
 	return drug;
 }
 

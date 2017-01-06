@@ -14,8 +14,7 @@ export class IyakuhinMaster {
 	validUpto: string;
 }
 
-export function jsonToIyakuhinMaster(src: any): IyakuhinMaster {
-	let m = new IyakuhinMaster();
+export function fillIyakuhinMasterFromJson(m: IyakuhinMaster, src: any): void {
 	m.iyakuhincode = src.iyakuhincode;
 	m.name = src.name;
 	m.yomi = src.yomi;
@@ -26,6 +25,11 @@ export function jsonToIyakuhinMaster(src: any): IyakuhinMaster {
 	m.zaikei = +src.zaikei;
 	m.validFrom = src.valid_from;
 	m.validUpto = src.valid_upto;
+}
+
+export function jsonToIyakuhinMaster(src: any): IyakuhinMaster {
+	let m = new IyakuhinMaster();
+	fillIyakuhinMasterFromJson(m, src);
 	return m;
 }
 

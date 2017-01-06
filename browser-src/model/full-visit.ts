@@ -1,14 +1,13 @@
 import { Visit, validateVisit } from "./visit";
-import { Text, validateText, fromJsonToText } from "./text";
-import { Shahokokuho, validateShahokokuho, fromJsonToShahokokuho } from "./shahokokuho";
-import { Koukikourei, validateKoukikourei, fromJsonToKoukikourei } from "./koukikourei";
-import { Roujin, validateRoujin, fromJsonToRoujin } from "./roujin";
-import { Kouhi, validateKouhi, fromJsonToKouhi } from "./kouhi";
-import { FullDrug, validateFullDrug, fromJsonToFullDrug } from "./full-drug";
-import { FullShinryou, validateFullShinryou, fromJsonToFullShinryou } from "./full-shinryou";
-import { FullConduct, validateFullConduct, fromJsonToFullConduct } from "./full-conduct";
-import { Charge, validateCharge, fromJsonToCharge } from "./charge";
-import * as V from "../validation";
+import { Text, jsonToText } from "./text";
+import { Shahokokuho, jsonToShahokokuho } from "./shahokokuho";
+import { Koukikourei, jsonToKoukikourei } from "./koukikourei";
+import { Roujin, jsonToRoujin } from "./roujin";
+import { Kouhi, jsonToKouhi } from "./kouhi";
+import { FullDrug, jsonToFullDrug } from "./full-drug";
+import { FullShinryou, jsonToFullShinryou } from "./full-shinryou";
+import { FullConduct, jsonToFullConduct } from "./full-conduct";
+import { Charge, jsonToCharge } from "./charge";
 
 export class FullVisit extends Visit {
 	constructor(

@@ -1,15 +1,46 @@
-import * as V from "../validation";
+import { Value, NumberValue, StringValue, BooleanValue, ensureString,
+	ensureNumber, ensurePositiveInteger } from "../value";
+
 
 export class KizaiMaster {
-	constructor(
-		readonly kizaicode: number,
-		readonly name: string,
-		readonly yomi: string,
-		readonly unit: string,
-		readonly kingaku: number,
-		readonly validFrom: string,
-		readonly validUpto: string
-	){}
+	kizaicode: number;
+	name: string;
+	yomi: string;
+	unit: string;
+	kingaku: number;
+	validFrom: string;
+	validUpto: string;
+}
+
+export function jsonToKizaiMaster(src: any): KizaiMaster {
+	let kizai = new KizaiMaster();
+	kizai.kizaicode = src.kizaicode;
+	kizai.name = src.name;
+	kizai.yomi = src.yomi;
+	kizai.unit = src.unit;
+	kizai.kingaku = +src.kingaku;
+	kizai.validFrom = src.valid_from;
+	kizai.validUpto = src.valid_upto;
+	return kizai;
+}
+
+/*
+export function fromJsonToKizaiMaster(src: any): KizaiMaster | V.ValidationError {
+	let master = new KizaiMaster(
+		src.kizaicode, 
+		src.name, 
+		src.yomi, 
+		src.unit,
+		+src.kingaku, 
+		src.valid_from, 
+		src.valid_upto
+	);
+	let errs = validateKizaiMaster(master);
+	if( errs.length > 0 ){
+		return new V.ValidationError(errs);
+	} else {
+		return master;
+	}
 }
 
 export function validateKizaiMaster(kizaiMaster: KizaiMaster): string[] {
@@ -37,17 +68,8 @@ export function validateKizaiMaster(kizaiMaster: KizaiMaster): string[] {
 	]);
 	return errs;
 }
+*/
 
-export function fromJsonToKizaiMaster(src: any): KizaiMaster | V.ValidationError {
-	let master = new KizaiMaster(src.kizaicode, src.name, src.yomi, src.unit,
-		+src.kingaku, src.valid_from, src.valid_upto);
-	let errs = validateKizaiMaster(master);
-	if( errs.length > 0 ){
-		return new V.ValidationError(errs);
-	} else {
-		return master;
-	}
-}
 
 
 

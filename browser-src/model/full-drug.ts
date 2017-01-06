@@ -1,32 +1,26 @@
-import * as V from "../validation";
-import { Drug, validateDrug } from "./drug";
-import { validateIyakuhinMaster } from "./iyakuhin-master";
+import { Drug, fillDrugFromJson } from "./drug";
+import { fillIyakuhinMasterFromJson } from "./iyakuhin-master";
 
 export class FullDrug extends Drug {
-	constructor(
-		drugId: number,
-		visitId: number,
-		iyakuhincode: number,
-		amount: string,
-		usage: string,
-		days: number,
-		category: number,
-		prescribed: boolean,
-		readonly name: string,
-		readonly yomi: string,
-		readonly unit: string,
-		readonly yakka: number,
-		readonly madoku: number,
-		readonly kouhatsu: boolean,
-		readonly zaikei: number,
-		readonly validFrom: string,
-		readonly validUpto: string
-	){
-		super(drugId, visitId, iyakuhincode, amount, usage, days, 
-			category, prescribed)
-	}
+	name: string;
+	yomi: string;
+	unit: string;
+	yakka: number;
+	madoku: number;
+	kouhatsu: boolean;
+	zaikei: number;
+	validFrom: string;
+	validUpto: string;
 }
 
+export function jsonToFullDrug(src: any): FullDrug {
+	let drug = new FullDrug();
+	fillDrugFromJson(drug, src);
+	fillIyakuhinMasterFromJson(drug, src);
+	return drug;
+}
+
+/**
 export function validateFullDrug(drug: FullDrug): string[] {
 	let errs: string[] = validateDrug(drug);
 	if( errs.length > 0 ){
@@ -50,5 +44,6 @@ export function fromJsonToFullDrug(src: any): FullDrug | V.ValidationError {
 		return drug;
 	}
 }
+**/
 
 

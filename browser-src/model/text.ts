@@ -13,7 +13,7 @@ export class TextValues {
 	public content: StringValue;
 }
 
-export function fromJsonToText(src: any): Text {
+export function jsonToText(src: any): Text {
 	let text = new Text();
 	text.textId = src.text_id;
 	text.visitId = src.visit_id;
