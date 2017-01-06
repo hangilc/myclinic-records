@@ -1,18 +1,30 @@
-import * as V from "../validation";
+import { Value, NumberValue, StringValue, BooleanValue, ensureString,
+	ensureNumber, ensurePositiveInteger } from "../value";
 
 export class Drug {
-	constructor(
-		readonly drugId: number,
-		readonly visitId: number,
-		readonly iyakuhincode: number,
-		readonly amount: string,
-		readonly usage: string,
-		readonly days: number,
-		readonly category: number,
-		readonly prescribed: boolean
-	){}
+	drugId: number;
+	visitId: number;
+	iyakuhincode: number;
+	amount: string;
+	usage: string;
+	days: number;
+	category: number;
+	prescribed: boolean;
 }
 
+export function jsonToDrug(src: any): Drug {
+	let drug = new Drug();
+	drug.drugId = src.drug_id;
+	drug.visitId = src.visit_id;
+	drug.iyakuhincode = src.d_iyakuhincode;
+	drug.amount = src.d_amount;
+	drug.usage = src.d_usage;
+	drug.category = src.d_category;
+	drug.prescribed = src.d_prescribed === 0 ? false : true;
+	return drug;
+}
+
+/**
 export function validateDrug(drug: Drug,
 	checkDrugId: boolean = true): string[] {
 	let errs: string[] = [];
@@ -56,3 +68,4 @@ export function fromJsonToDrug(src: any): Drug | V.ValidationError {
 		return drug;
 	}
 }
+**/

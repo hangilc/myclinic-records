@@ -4,12 +4,12 @@ import * as model from "./model";
 import Patient = model.Patient;
 import Visit = model.Visit;
 import Text = model.Text;
-// import Shahokokuho = model.Shahokokuho;
-// import Koukikourei = model.Koukikourei;
-// import Roujin = model.Roujin;
-// import Kouhi = model.Kouhi;
-// import Drug = model.Drug;
-// import Shinryou = model.Shinryou;
+import Shahokokuho = model.Shahokokuho;
+import Koukikourei = model.Koukikourei;
+import Roujin = model.Roujin;
+import Kouhi = model.Kouhi;
+import Drug = model.Drug;
+import Shinryou = model.Shinryou;
 // import Conduct = model.Conduct;
 // import GazouLabel = model.GazouLabel;
 // import ConductDrug = model.ConductDrug;
@@ -88,14 +88,13 @@ export function getText(textId: number): Promise<Text> {
 	return request<Text>("get_text", { text_id: textId }, 
 		"GET", model.fromJsonToText);
 }
-/**
 
 export function getShahokokuho(shahokokuhoId: number): Promise<Shahokokuho> {
 	if( !(Number.isInteger(shahokokuhoId) && shahokokuhoId > 0) ){
 		return Promise.reject("invalid shahokokuhoId");
 	}
 	return request<Shahokokuho>("get_shahokokuho", { shahokokuho_id: shahokokuhoId }, 
-		"GET", model.fromJsonToShahokokuho);
+		"GET", model.jsonToShahokokuho);
 }
 
 export function getKoukikourei(koukikoureiId: number): Promise<Koukikourei> {
@@ -103,7 +102,7 @@ export function getKoukikourei(koukikoureiId: number): Promise<Koukikourei> {
 		return Promise.reject("invalid koukikoureiId");
 	}
 	return request<Koukikourei>("get_koukikourei", { koukikourei_id: koukikoureiId }, 
-		"GET", model.fromJsonToKoukikourei);
+		"GET", model.jsonToKoukikourei);
 }
 
 export function getRoujin(roujinId: number): Promise<Roujin> {
@@ -111,7 +110,7 @@ export function getRoujin(roujinId: number): Promise<Roujin> {
 		return Promise.reject("invalid roujinId");
 	}
 	return request<Roujin>("get_roujin", { roujin_id: roujinId }, 
-		"GET", model.fromJsonToRoujin);
+		"GET", model.jsonToRoujin);
 }
 
 export function getKouhi(kouhiId: number): Promise<Kouhi> {
@@ -119,7 +118,7 @@ export function getKouhi(kouhiId: number): Promise<Kouhi> {
 		return Promise.reject("invalid kouhiId");
 	}
 	return request<Kouhi>("get_kouhi", { kouhi_id: kouhiId }, 
-		"GET", model.fromJsonToKouhi);
+		"GET", model.jsonToKouhi);
 }
 
 export function getDrug(drugId: number): Promise<Drug> {
@@ -127,7 +126,7 @@ export function getDrug(drugId: number): Promise<Drug> {
 		return Promise.reject("invalid drugId");
 	}
 	return request<Drug>("get_drug", { drug_id: drugId }, 
-		"GET", model.fromJsonToDrug);
+		"GET", model.jsonToDrug);
 }
 
 export function getShinryou(shinryouId: number): Promise<Shinryou> {
@@ -135,9 +134,10 @@ export function getShinryou(shinryouId: number): Promise<Shinryou> {
 		return Promise.reject("invalid shinryouId");
 	}
 	return request<Shinryou>("get_shinryou", { shinryou_id: shinryouId }, 
-		"GET", model.fromJsonToShinryou);
+		"GET", model.jsonToShinryou);
 }
 
+/**
 export function getConduct(conductId: number): Promise<Conduct> {
 	if( !(Number.isInteger(conductId) && conductId > 0) ){
 		return Promise.reject("invalid conductId");

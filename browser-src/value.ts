@@ -114,6 +114,10 @@ export class StringValue extends PrimitiveValue<string> {
 	}
 }
 
+export class BooleanValue extends PrimitiveValue<boolean> {
+
+}
+
 export function ensureNumber(value: any): NumberValue {
 	if( typeof value === "undefined" ){
 		return new NumberValue(0, new PrimitiveError("値が設定されていません。", value));

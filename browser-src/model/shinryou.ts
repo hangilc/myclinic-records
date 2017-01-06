@@ -1,13 +1,21 @@
-import * as V from "../validation";
+import { Value, NumberValue, StringValue, BooleanValue, ensureString,
+	ensureNumber, ensurePositiveInteger } from "../value";
 
 export class Shinryou {
-	constructor(
-		readonly shinryouId: number,
-		readonly visitId: number,
-		readonly shinryoucode: number,
-	){}
+	shinryouId: number;
+	visitId: number;
+	shinryoucode: number;
 }
 
+export function jsonToShinryou(src: any): Shinryou {
+	let shinryou = new Shinryou();
+	shinryou.shinryouId = src.shinryou_id;
+	shinryou.visitId = src.visit_id;
+	shinryou.shinryoucode = src.shinryoucode;
+	return shinryou;
+}
+
+/**
 export function validateShinryou(shinryou: Shinryou,
 	checkShinryouId: boolean = true): string[] {
 	let errs: string[] = [];
@@ -34,3 +42,4 @@ export function fromJsonToShinryou(src: any): Shinryou | V.ValidationError {
 		return shinryou;
 	}
 }
+**/
