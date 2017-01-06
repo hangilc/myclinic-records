@@ -1,25 +1,25 @@
 import * as $ from "jquery";
 import * as model from "./model";
 
-import PatientValue = model.PatientValue;
+import Patient = model.Patient;
 import Visit = model.Visit;
 import Text = model.Text;
-import Shahokokuho = model.Shahokokuho;
-import Koukikourei = model.Koukikourei;
-import Roujin = model.Roujin;
-import Kouhi = model.Kouhi;
-import Drug = model.Drug;
-import Shinryou = model.Shinryou;
-import Conduct = model.Conduct;
-import GazouLabel = model.GazouLabel;
-import ConductDrug = model.ConductDrug;
-import ConductShinryou = model.ConductShinryou;
-import ConductKizai = model.ConductKizai;
-import Charge = model.Charge;
-import FullVisit = model.FullVisit;
-import IyakuhinMaster = model.IyakuhinMaster;
-import ShinryouMaster = model.ShinryouMaster;
-import KizaiMaster = model.KizaiMaster;
+// import Shahokokuho = model.Shahokokuho;
+// import Koukikourei = model.Koukikourei;
+// import Roujin = model.Roujin;
+// import Kouhi = model.Kouhi;
+// import Drug = model.Drug;
+// import Shinryou = model.Shinryou;
+// import Conduct = model.Conduct;
+// import GazouLabel = model.GazouLabel;
+// import ConductDrug = model.ConductDrug;
+// import ConductShinryou = model.ConductShinryou;
+// import ConductKizai = model.ConductKizai;
+// import Charge = model.Charge;
+// import FullVisit = model.FullVisit;
+// import IyakuhinMaster = model.IyakuhinMaster;
+// import ShinryouMaster = model.ShinryouMaster;
+// import KizaiMaster = model.KizaiMaster;
 
 export class HttpError {
 	constructor(
@@ -31,6 +31,12 @@ export class HttpError {
 
 interface Converter<T>{
 	(src:any): T
+}
+
+function arrayConverter<T>(c: Converter<T>): Converter<T[]> {
+	return function(src: any[]): T[] {
+		return src.map(c);
+	}
 }
 
 function request<T>(service: string, data: Object, 
@@ -59,12 +65,12 @@ function request<T>(service: string, data: Object,
 	});
 }
 
-export function getPatient(patientId: number): Promise<PatientValue> {
+export function getPatient(patientId: number): Promise<Patient> {
 	if( !(Number.isInteger(patientId) && patientId > 0) ){
 		return Promise.reject("invalid patientId");
 	}
-	return request<PatientValue>("get_patient", { patient_id: patientId }, 
-		"GET", model.jsonToPatientValue);
+	return request<Patient>("get_patient", { patient_id: patientId }, 
+		"GET", model.jsonToPatient);
 }
 
 export function listVisitsByDate(at: string): Promise<Visit[]> {
@@ -72,7 +78,7 @@ export function listVisitsByDate(at: string): Promise<Visit[]> {
 		return Promise.reject("invalid at");
 	}
 	return request<Visit[]>("list_visits_by_date", { at: at }, "GET",
-		fromJsonArray(model.fromJsonToVisit));
+		arrayConverter(model.jsonToVisit));
 }
 
 export function getText(textId: number): Promise<Text> {
@@ -82,6 +88,7 @@ export function getText(textId: number): Promise<Text> {
 	return request<Text>("get_text", { text_id: textId }, 
 		"GET", model.fromJsonToText);
 }
+/**
 
 export function getShahokokuho(shahokokuhoId: number): Promise<Shahokokuho> {
 	if( !(Number.isInteger(shahokokuhoId) && shahokokuhoId > 0) ){
@@ -220,5 +227,5 @@ export function getFullVisit(visitId: number): Promise<FullVisit> {
 		"GET", model.fromJsonToFullVisit);
 }
 
-
+**/
 

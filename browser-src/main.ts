@@ -14,3 +14,4 @@ function appRecordsByDate(wrapper: HTMLElement): void{
 }
 
 appRecordsByDate(main);
+

@@ -1,120 +1,76 @@
-import { Value, Undefined, makeValue } from "../value";
+import { Value, ensureNumber, ensureString, NumberValue, StringValue } from "../value";
 
 export class Patient {
- 	constructor(
- 		readonly patientId: number,
- 		readonly lastName: string,
- 		readonly firstName: string,
- 		readonly lastNameYomi: string,
- 		readonly firstNameYomi: string,
- 		readonly birthday: string,
- 		readonly sex: string,
- 		readonly address: string,
- 		readonly phone: string
- 	){}
+	public patientId: number;
+	public lastName: string;
+	public firstName: string;
+	public lastNameYomi: string;
+	public firstNameYomi: string;
+	public birthday: string;
+	public sex: string;
+	public address: string;
+	public phone: string;
 };
 
-export class PatientValue {
- 	constructor(
- 		public patientIdValue: Value<number> = Undefined,
- 		public lastNameValue: Value<string> = Undefined,
- 		public firstNameValue: Value<string> = Undefined,
- 		public lastNameYomiValue: Value<string> = Undefined,
- 		public firstNameYomiValue: Value<string> = Undefined,
- 		public birthdayValue: Value<string> = Undefined,
- 		public sexValue: Value<string> = Undefined,
- 		public addressValue: Value<string> = Undefined,
- 		public phoneValue: Value<string> = Undefined
- 	){}
-
- 	set patientId(value: any){
-		this.patientIdValue = makeValue(value)
-			.ensureNumber()
-			.isInteger()
-			.isPositive()
- 	}
-
- 	set lastName(value: any){
- 		this.lastNameValue = makeValue(value)
- 			.ensureString()
- 			.isNotEmpty()
- 	}
-
- 	set firstName(value: any){
- 		this.firstNameValue = makeValue(value)
- 			.ensureString()
- 			.isNotEmpty()
- 	}
-
- 	set lastNameYomi(value: any){
- 		this.lastNameYomiValue = makeValue(value)
- 			.ensureString()
- 			.isNotEmpty()
- 	}
-
- 	set firstNameYomi(value: any){
- 		this.firstNameYomiValue = makeValue(value)
- 			.ensureString()
- 			.isNotEmpty()
- 	}
-
- 	set birthday(value: any){
- 		this.birthdayValue = makeValue(value)
- 			.ensureString()
- 			.or(
- 				v => v.isZeroSqlDate(),
- 				v => v.isSqlDate().isValidDate()
-			)
- 	}
-
- 	set sex(value: any){
- 		this.sexValue = makeValue(value)
- 			.ensureString()
- 			.oneOf("M", "F")
- 	}
-
- 	set address(value: any){
- 		this.address = makeValue(value)
- 			.ensureString()
- 	}
-
- 	set phone(value: any){
- 		this.phone = makeValue(value)
- 			.ensureString()
- 	}
-
- 	toPatient(): Patient {
- 		let err = {};
- 		let patientId: number = this.patientIdValue.convert(e => err["患者番号"] = e, 0);
- 		let lastName: string = this.lastNameValue.convert(e => err["姓"] = e, "");
- 		let firstName: string = this.firstNameValue.convert(e => err["名"] = e, "");
- 		let lastNameYomi: string = this.lastNameValue.convert(e => err["姓のよみ"] = e, "");
- 		let firstNameYomi: string = this.firstNameValue.convert(e => err["名のよみ"] = e, "");
- 		let birthday: string = this.birthdayValue.convert(e => err["生年月日"] = e, "");
- 		let sex: string = this.birthdayValue.convert(e => err["性別"] = e, "");
- 		let address: string = this.addressValue.convert(e => err["住所"] = e, "");
- 		let phone: string = this.addressValue.convert(e => err["電話番号"] = e, "");
- 		if( Object.keys(err).length > 0 ){
- 			throw err;
- 		} 
-		return new Patient(patientId, lastName, firstName, lastNameYomi,
-			firstNameYomi, birthday, sex, address, phone);
-  	}
-
+export class PatientValues {
+	public patientId: NumberValue;
+	public lastName: StringValue;
+	public firstName: StringValue;
+	public lastNameYomi: StringValue;
+	public firstNameYomi: StringValue;
+	public birthday: StringValue;
+	public sex: StringValue;
+	public address: StringValue;
+	public phone: StringValue
 }
 
-export function jsonToPatientValue(src: any): PatientValue {
-	let v = new PatientValue();
-	v.patientId = src.patient_id;
-	v.lastName = src.last_name;
-	v.firstName = src.first_name;
-	v.lastNameYomi = src.last_name_yomi;
-	v.firstNameYomi = src.first_name_yomi;
-	v.birthday = src.birth_day;
-	v.sex = src.sex;
-	v.address = src.address;
-	v.phone = src.phone;
-	return v;
+function hasError(values: PatientValues): boolean {
+	return values.patientId.isError || values.lastName.isError || 
+		values.firstName.isError || values.lastNameYomi.isError || 
+		values.firstNameYomi.isError || values.birthday.isError || 
+		values.sex.isError || values.address.isError || 
+		values.phone.isError;
+}
+
+export function validatePatient(patient: Patient): null | PatientValues {
+	let v = new PatientValues();
+	v.patientId = ensureNumber(patient.patientId)
+		.isInteger()
+		.isPositive()
+	v.lastName = ensureString(patient.lastName)
+		.isNotEmpty()
+	v.firstName = ensureString(patient.firstName)
+		.isNotEmpty()
+	v.lastNameYomi = ensureString(patient.lastNameYomi)
+		.isNotEmpty()
+	v.firstNameYomi = ensureString(patient.firstNameYomi)
+		.isNotEmpty()
+	v.birthday = ensureString(patient.birthday)
+		.isSqlDate()
+		.isZeroOrValidDate()
+	v.sex = ensureString(patient.sex)
+		.oneOf("M", "F")
+	v.address = ensureString(patient.address)
+	v.phone = ensureString(patient.phone)
+	if( hasError(v) ){
+		return v;
+	} else {
+		return null;
+	}
+}
+
+export function jsonToPatient(src: any): Patient {
+	let p = new Patient();
+	p.patientId = src.patient_id;
+	p.lastName = src.last_name;
+	p.firstName = src.first_name;
+	p.lastNameYomi = src.last_name_yomi;
+	p.firstNameYomi = src.first_name_yomi;
+	p.birthday = src.birth_day;
+	p.sex = src.sex;
+	p.address = src.address;
+	p.phone = src.phone;
+	return p;
 }
 
 // export function convertToPatient(src: any): Patient | ValidationError {
