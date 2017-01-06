@@ -1,14 +1,23 @@
-import * as V from "../validation";
+import { Value, NumberValue, StringValue, BooleanValue, ensureString,
+	ensureNumber, ensurePositiveInteger } from "../value";
 
 export class ConductDrug {
-	constructor(
-		readonly conductDrugId: number,
-		readonly conductId: number,
-		readonly iyakuhincode: number,
-		readonly amount: number
-	){}
+	conductDrugId: number;
+	conductId: number;
+	iyakuhincode: number;
+	amount: number;
 }
 
+export function jsonToConductDrug(src: any): ConductDrug {
+	let drug = new ConductDrug();
+	drug.conductDrugId = src.id;
+	drug.conductId = src.visit_conduct_id;
+	drug.iyakuhincode = src.iyakuhincode;
+	drug.amount = src.amount;
+	return drug;
+}
+
+/**
 export function validateConductDrug(conductDrug: ConductDrug,
 		checkConductDrugId: boolean = true): string[] {
 	let errs: string[] = [];
@@ -39,3 +48,4 @@ export function fromJsonToConductDrug(src: any): ConductDrug | V.ValidationError
 		return conductDrug;
 	}
 }
+**/

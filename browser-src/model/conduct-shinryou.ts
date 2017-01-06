@@ -1,13 +1,21 @@
-import * as V from "../validation";
+import { Value, NumberValue, StringValue, BooleanValue, ensureString,
+	ensureNumber, ensurePositiveInteger } from "../value";
 
 export class ConductShinryou {
-	constructor(
-		readonly conductShinryouId: number,
-		readonly conductId: number,
-		readonly shinryoucode: number
-	){}
+	conductShinryouId: number;
+	conductId: number;
+	shinryoucode: number;
 }
 
+export function jsonToConductShinryou(src: any): ConductShinryou {
+	let shinryou = new ConductShinryou();
+	shinryou.conductShinryouId = src.id;
+	shinryou.conductId = src.visit_conduct_id;
+	shinryou.shinryoucode = src.shinryoucode;
+	return shinryou;
+}
+
+/*
 export function validateConductShinryou(conductShinryou: ConductShinryou,
 		checkConductShinryouId: boolean = true): string[] {
 	let errs: string[] = [];
@@ -35,3 +43,4 @@ export function fromJsonToConductShinryou(src: any): ConductShinryou | V.Validat
 		return conductShinryou;
 	}
 }
+*/
