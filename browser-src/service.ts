@@ -10,16 +10,16 @@ import Roujin = model.Roujin;
 import Kouhi = model.Kouhi;
 import Drug = model.Drug;
 import Shinryou = model.Shinryou;
-// import Conduct = model.Conduct;
-// import GazouLabel = model.GazouLabel;
-// import ConductDrug = model.ConductDrug;
-// import ConductShinryou = model.ConductShinryou;
-// import ConductKizai = model.ConductKizai;
-// import Charge = model.Charge;
-// import FullVisit = model.FullVisit;
-// import IyakuhinMaster = model.IyakuhinMaster;
-// import ShinryouMaster = model.ShinryouMaster;
-// import KizaiMaster = model.KizaiMaster;
+import Conduct = model.Conduct;
+import GazouLabel = model.GazouLabel;
+import ConductDrug = model.ConductDrug;
+import ConductShinryou = model.ConductShinryou;
+import ConductKizai = model.ConductKizai;
+import Charge = model.Charge;
+import FullVisit = model.FullVisit;
+import IyakuhinMaster = model.IyakuhinMaster;
+import ShinryouMaster = model.ShinryouMaster;
+import KizaiMaster = model.KizaiMaster;
 
 export class HttpError {
 	constructor(
@@ -137,21 +137,21 @@ export function getShinryou(shinryouId: number): Promise<Shinryou> {
 		"GET", model.jsonToShinryou);
 }
 
-/**
 export function getConduct(conductId: number): Promise<Conduct> {
 	if( !(Number.isInteger(conductId) && conductId > 0) ){
 		return Promise.reject("invalid conductId");
 	}
 	return request<Conduct>("get_conduct", { conduct_id: conductId }, 
-		"GET", model.fromJsonToConduct);
+		"GET", model.jsonToConduct);
 }
 
+/**
 export function getGazouLabel(conductId: number): Promise<GazouLabel> {
 	if( !(Number.isInteger(conductId) && conductId > 0) ){
 		return Promise.reject("invalid conductId");
 	}
 	return request<GazouLabel>("get_gazou_label", { conduct_id: conductId }, 
-		"GET", model.fromJsonToGazouLabel);
+		"GET", model.jsonToGazouLabel);
 }
 
 export function getConductDrug(conductDrugId: number): Promise<ConductDrug> {
@@ -159,7 +159,7 @@ export function getConductDrug(conductDrugId: number): Promise<ConductDrug> {
 		return Promise.reject("invalid conductDrugId");
 	}
 	return request<ConductDrug>("get_conduct_drug", { conduct_drug_id: conductDrugId }, 
-		"GET", model.fromJsonToConductDrug);
+		"GET", model.jsonToConductDrug);
 }
 
 export function getConductShinryou(conductShinryouId: number): Promise<ConductShinryou> {
@@ -167,7 +167,7 @@ export function getConductShinryou(conductShinryouId: number): Promise<ConductSh
 		return Promise.reject("invalid conductShinryouId");
 	}
 	return request<ConductShinryou>("get_conduct_shinryou", { conduct_shinryou_id: conductShinryouId }, 
-		"GET", model.fromJsonToConductShinryou);
+		"GET", model.jsonToConductShinryou);
 }
 
 export function getConductKizai(conductKizaiId: number): Promise<ConductKizai> {
@@ -175,7 +175,7 @@ export function getConductKizai(conductKizaiId: number): Promise<ConductKizai> {
 		return Promise.reject("invalid conductKizaiId");
 	}
 	return request<ConductKizai>("get_conduct_kizai", { conduct_kizai_id: conductKizaiId }, 
-		"GET", model.fromJsonToConductKizai);
+		"GET", model.jsonToConductKizai);
 }
 
 export function getCharge(visitId: number): Promise<Charge> {
@@ -183,7 +183,7 @@ export function getCharge(visitId: number): Promise<Charge> {
 		return Promise.reject("invalid visitId");
 	}
 	return request<Charge>("get_charge", { visit_id: visitId }, 
-		"GET", model.fromJsonToCharge);
+		"GET", model.jsonToCharge);
 }
 
 export function getIyakuhinMaster(iyakuhincode: number, at: string): Promise<IyakuhinMaster> {
@@ -194,7 +194,7 @@ export function getIyakuhinMaster(iyakuhincode: number, at: string): Promise<Iya
 		return Promise.reject("invalid at");
 	}
 	return request<IyakuhinMaster>("get_iyakuhin_master", 
-		{ iyakuhincode: iyakuhincode, at: at }, "GET", model.fromJsonToIyakuhinMaster);
+		{ iyakuhincode: iyakuhincode, at: at }, "GET", model.jsonToIyakuhinMaster);
 }
 
 export function getShinryouMaster(shinryoucode: number, at: string): Promise<ShinryouMaster> {
@@ -205,7 +205,7 @@ export function getShinryouMaster(shinryoucode: number, at: string): Promise<Shi
 		return Promise.reject("invalid at");
 	}
 	return request<ShinryouMaster>("get_shinryou_master", 
-		{ shinryoucode: shinryoucode, at: at }, "GET", model.fromJsonToShinryouMaster);
+		{ shinryoucode: shinryoucode, at: at }, "GET", model.jsonToShinryouMaster);
 }
 
 export function getKizaiMaster(kizaicode: number, at: string): Promise<KizaiMaster> {
@@ -216,7 +216,7 @@ export function getKizaiMaster(kizaicode: number, at: string): Promise<KizaiMast
 		return Promise.reject("invalid at");
 	}
 	return request<KizaiMaster>("get_kizai_master", 
-		{ kizaicode: kizaicode, at: at }, "GET", model.fromJsonToKizaiMaster);
+		{ kizaicode: kizaicode, at: at }, "GET", model.jsonToKizaiMaster);
 }
 
 export function getFullVisit(visitId: number): Promise<FullVisit> {
@@ -224,7 +224,7 @@ export function getFullVisit(visitId: number): Promise<FullVisit> {
 		return Promise.reject("invalid visitId");
 	}
 	return request<FullVisit>("get_full_visit", { visit_id: visitId }, 
-		"GET", model.fromJsonToFullVisit);
+		"GET", model.jsonToFullVisit);
 }
 
 **/

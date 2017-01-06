@@ -1,13 +1,21 @@
-import * as V from "../validation";
+import { Value, NumberValue, StringValue, BooleanValue, ensureString,
+	ensureNumber, ensurePositiveInteger } from "../value";
 
 export class Conduct {
-	constructor(
-		readonly conductId: number,
-		readonly visitId: number,
-		readonly kind: number,
-	){}
+	conductId: number;
+	visitId: number;
+	kind: number;
 }
 
+export function jsonToConduct(src: any): Conduct {
+	let conduct = new Conduct();
+	conduct.conductId = src.id;
+	conduct.visitId = src.visit_id;
+	conduct.kind = src.kind;
+	return conduct;
+}
+
+/**
 export function validateConduct(conduct: Conduct,
 	checkConductId: boolean = true): string[] {
 	let errs: string[] = [];
@@ -34,3 +42,4 @@ export function fromJsonToConduct(src: any): Conduct | V.ValidationError {
 		return conduct;
 	}
 }
+**/
