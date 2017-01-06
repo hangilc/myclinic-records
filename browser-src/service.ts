@@ -145,7 +145,6 @@ export function getConduct(conductId: number): Promise<Conduct> {
 		"GET", model.jsonToConduct);
 }
 
-/**
 export function getGazouLabel(conductId: number): Promise<GazouLabel> {
 	if( !(Number.isInteger(conductId) && conductId > 0) ){
 		return Promise.reject("invalid conductId");
@@ -208,6 +207,7 @@ export function getShinryouMaster(shinryoucode: number, at: string): Promise<Shi
 		{ shinryoucode: shinryoucode, at: at }, "GET", model.jsonToShinryouMaster);
 }
 
+/**
 export function getKizaiMaster(kizaicode: number, at: string): Promise<KizaiMaster> {
 	if( !(Number.isInteger(kizaicode) && kizaicode > 0) ){
 		return Promise.reject("invalid kizaicode");

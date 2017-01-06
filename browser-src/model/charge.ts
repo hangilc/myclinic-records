@@ -1,12 +1,19 @@
-import * as V from "../validation";
+import { Value, NumberValue, StringValue, BooleanValue, ensureString,
+	ensureNumber, ensurePositiveInteger } from "../value";
 
 export class Charge {
-	constructor(
-		readonly visitId: number,
-		readonly charge: number,
-	){}
+	visitId: number;
+	charge: number;
 }
 
+export function jsonToCharge(src: any): Charge {
+	let charge = new Charge();
+	charge.visitId = src.visit_id;
+	charge.charge = src.charge;
+	return charge;
+}
+
+/*
 export function validateCharge(charge: Charge): string[] {
 	let errs: string[] = [];
 	V.validate("visitId", charge.visitId, errs, [
@@ -27,3 +34,4 @@ export function fromJsonToCharge(src: any): Charge | V.ValidationError {
 		return charge;
 	}
 }
+*/

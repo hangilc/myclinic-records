@@ -1,14 +1,23 @@
-import * as V from "../validation";
+import { Value, NumberValue, StringValue, BooleanValue, ensureString,
+	ensureNumber, ensurePositiveInteger } from "../value";
 
 export class ConductKizai {
-	constructor(
-		readonly conductKizaiId: number,
-		readonly conductId: number,
-		readonly kizaicode: number,
-		readonly amount: number
-	){}
+	conductKizaiId: number;
+	conductId: number;
+	kizaicode: number;
+	amount: number;
 }
 
+export function jsonToConductKizai(src: any): ConductKizai {
+	let kizai = new ConductKizai();
+	kizai.conductKizaiId = src.id;
+	kizai.conductId = src.visit_conduct_id;
+	kizai.kizaicode = src.kizaicode;
+	kizai.amount = src.amount;
+	return kizai;
+}
+
+/*
 export function validateConductKizai(conductKizai: ConductKizai,
 		checkConductKizaiId: boolean = true): string[] {
 	let errs: string[] = [];
@@ -39,3 +48,4 @@ export function fromJsonToConductKizai(src: any): ConductKizai | V.ValidationErr
 		return conductKizai;
 	}
 }
+*/
