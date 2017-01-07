@@ -40,7 +40,7 @@ export function jsonToFullVisit(src: any){
 	visit.drugs = src.drugs.map(jsonToFullDrug);
 	visit.shinryouList = src.shinryou_list.map(jsonToFullShinryou);
 	visit.conducts = src.conducts.map(jsonToFullConduct);
-	charge = opt(src.charge, jsonToCharge);
+	visit.charge = opt(src.charge, jsonToCharge);
 	return visit;
 }
 

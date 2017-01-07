@@ -1,16 +1,24 @@
 "use strict";
-const V = require("../validation");
 class ConductShinryou {
-    constructor(conductShinryouId, conductId, shinryoucode) {
-        this.conductShinryouId = conductShinryouId;
-        this.conductId = conductId;
-        this.shinryoucode = shinryoucode;
-    }
 }
 exports.ConductShinryou = ConductShinryou;
-function validateConductShinryou(conductShinryou, checkConductShinryouId = true) {
-    let errs = [];
-    if (checkConductShinryouId) {
+function fillConductShinryouFromJson(shinryou, src) {
+    shinryou.conductShinryouId = src.id;
+    shinryou.conductId = src.visit_conduct_id;
+    shinryou.shinryoucode = src.shinryoucode;
+}
+exports.fillConductShinryouFromJson = fillConductShinryouFromJson;
+function jsonToConductShinryou(src) {
+    let shinryou = new ConductShinryou();
+    fillConductShinryouFromJson(shinryou, src);
+    return shinryou;
+}
+exports.jsonToConductShinryou = jsonToConductShinryou;
+/*
+export function validateConductShinryou(conductShinryou: ConductShinryou,
+        checkConductShinryouId: boolean = true): string[] {
+    let errs: string[] = [];
+    if( checkConductShinryouId ){
         V.validate("conductShinryouId", conductShinryou.conductShinryouId, errs, [
             V.isDefined, V.isInteger, V.isPositive
         ]);
@@ -23,15 +31,15 @@ function validateConductShinryou(conductShinryou, checkConductShinryouId = true)
     ]);
     return errs;
 }
-exports.validateConductShinryou = validateConductShinryou;
-function fromJsonToConductShinryou(src) {
-    let conductShinryou = new ConductShinryou(src.id, src.visit_conduct_id, src.shinryoucode);
+
+export function fromJsonToConductShinryou(src: any): ConductShinryou | V.ValidationError {
+    let conductShinryou = new ConductShinryou(src.id, src.visit_conduct_id,
+            src.shinryoucode);
     let errs = validateConductShinryou(conductShinryou, true);
-    if (errs.length > 0) {
+    if( errs.length > 0 ){
         return new V.ValidationError(errs);
-    }
-    else {
+    } else {
         return conductShinryou;
     }
 }
-exports.fromJsonToConductShinryou = fromJsonToConductShinryou;
+*/

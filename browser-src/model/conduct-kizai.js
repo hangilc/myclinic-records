@@ -1,17 +1,25 @@
 "use strict";
-const V = require("../validation");
 class ConductKizai {
-    constructor(conductKizaiId, conductId, kizaicode, amount) {
-        this.conductKizaiId = conductKizaiId;
-        this.conductId = conductId;
-        this.kizaicode = kizaicode;
-        this.amount = amount;
-    }
 }
 exports.ConductKizai = ConductKizai;
-function validateConductKizai(conductKizai, checkConductKizaiId = true) {
-    let errs = [];
-    if (checkConductKizaiId) {
+function fillConductKizaiFromJson(kizai, src) {
+    kizai.conductKizaiId = src.id;
+    kizai.conductId = src.visit_conduct_id;
+    kizai.kizaicode = src.kizaicode;
+    kizai.amount = src.amount;
+}
+exports.fillConductKizaiFromJson = fillConductKizaiFromJson;
+function jsonToConductKizai(src) {
+    let kizai = new ConductKizai();
+    fillConductKizaiFromJson(kizai, src);
+    return kizai;
+}
+exports.jsonToConductKizai = jsonToConductKizai;
+/*
+export function validateConductKizai(conductKizai: ConductKizai,
+        checkConductKizaiId: boolean = true): string[] {
+    let errs: string[] = [];
+    if( checkConductKizaiId ){
         V.validate("conductKizaiId", conductKizai.conductKizaiId, errs, [
             V.isDefined, V.isInteger, V.isPositive
         ]);
@@ -27,15 +35,15 @@ function validateConductKizai(conductKizai, checkConductKizaiId = true) {
     ]);
     return errs;
 }
-exports.validateConductKizai = validateConductKizai;
-function fromJsonToConductKizai(src) {
-    let conductKizai = new ConductKizai(src.id, src.visit_conduct_id, src.kizaicode, src.amount);
+
+export function fromJsonToConductKizai(src: any): ConductKizai | V.ValidationError {
+    let conductKizai = new ConductKizai(src.id, src.visit_conduct_id,
+            src.kizaicode, src.amount);
     let errs = validateConductKizai(conductKizai, true);
-    if (errs.length > 0) {
+    if( errs.length > 0 ){
         return new V.ValidationError(errs);
-    }
-    else {
+    } else {
         return conductKizai;
     }
 }
-exports.fromJsonToConductKizai = fromJsonToConductKizai;
+*/

@@ -23,19 +23,6 @@ export class Value<T,E> {
 		}
 		return this._value;
 	}
-
-	oneOf(...choices: T[]): this {
-		if( this.isError ){
-			return this;
-		}
-		let value = this._value;
-		for(let i=0;i<choices.length;i++){
-			let choice = choices[i];
-			if( value === choice ){
-				return this;
-			}
-		}
-	}
 }
 
 export class PrimitiveValue<T> extends Value<T, PrimitiveError> {
@@ -65,6 +52,7 @@ export class PrimitiveValue<T> extends Value<T, PrimitiveError> {
 			}
 		}
 		this.error = new PrimitiveError("選択できる値のひとつでありません。", this._value);
+		return this;
 	}
 }
 

@@ -1,16 +1,20 @@
 "use strict";
-const V = require("../validation");
 class Conduct {
-    constructor(conductId, visitId, kind) {
-        this.conductId = conductId;
-        this.visitId = visitId;
-        this.kind = kind;
-    }
 }
 exports.Conduct = Conduct;
-function validateConduct(conduct, checkConductId = true) {
-    let errs = [];
-    if (checkConductId) {
+function jsonToConduct(src) {
+    let conduct = new Conduct();
+    conduct.conductId = src.id;
+    conduct.visitId = src.visit_id;
+    conduct.kind = src.kind;
+    return conduct;
+}
+exports.jsonToConduct = jsonToConduct;
+/**
+export function validateConduct(conduct: Conduct,
+    checkConductId: boolean = true): string[] {
+    let errs: string[] = [];
+    if( checkConductId ){
         V.validate("conductId", conduct.conductId, errs, [
             V.isDefined, V.isInteger, V.isPositive
         ]);
@@ -23,15 +27,14 @@ function validateConduct(conduct, checkConductId = true) {
     ]);
     return errs;
 }
-exports.validateConduct = validateConduct;
-function fromJsonToConduct(src) {
+
+export function fromJsonToConduct(src: any): Conduct | V.ValidationError {
     let conduct = new Conduct(src.id, src.visit_id, src.kind);
     let errs = validateConduct(conduct, true);
-    if (errs.length > 0) {
+    if( errs.length > 0 ){
         return new V.ValidationError(errs);
-    }
-    else {
+    } else {
         return conduct;
     }
 }
-exports.fromJsonToConduct = fromJsonToConduct;
+**/ 

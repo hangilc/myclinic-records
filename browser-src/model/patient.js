@@ -1,160 +1,193 @@
 "use strict";
-const validator_1 = require("../validator");
+const value_1 = require("../value");
 class Patient {
-    constructor(patientId, lastName, firstName, lastNameYomi, firstNameYomi, birthday, sex, address, phone) {
-        this.patientId = patientId;
-        this.lastName = lastName;
-        this.firstName = firstName;
-        this.lastNameYomi = lastNameYomi;
-        this.firstNameYomi = firstNameYomi;
-        this.birthday = birthday;
-        this.sex = sex;
-        this.address = address;
-        this.phone = phone;
-    }
 }
 exports.Patient = Patient;
 ;
-function convertToPatient(src) {
-    let patientIdValue;
-    let lastNameValue;
-    let firstNameValue;
-    let lastNameYomiValue;
-    let firstNameYomiValue;
-    let birthdayValue;
-    let sexValue;
-    let addressValue;
-    let phoneValue;
-    let err = {};
-    {
-        let cvt = new validator_1.Validator(src.patient_id)
-            .isDefined()
-            .ensureNumber()
-            .isInteger()
-            .isPositive();
-        if (cvt.hasError) {
-            err["患者番号"] = cvt.getError();
-            patientIdValue = 0;
-        }
-        else {
-            patientIdValue = cvt.getValue();
-        }
-    }
-    {
-        let cvt = new validator_1.Validator(src.last_name)
-            .isDefined()
-            .ensureString()
-            .isNotEmpty();
-        if (cvt.hasError) {
-            err["姓"] = cvt.getError();
-            lastNameValue = "";
-        }
-        else {
-            lastNameValue = cvt.getValue();
-        }
-    }
-    {
-        let cvt = new validator_1.Validator(src.first_name)
-            .isDefined()
-            .ensureString()
-            .isNotEmpty();
-        if (cvt.hasError) {
-            err["名"] = cvt.getError();
-            firstNameValue = "";
-        }
-        else {
-            firstNameValue = cvt.getValue();
-        }
-    }
-    {
-        let cvt = new validator_1.Validator(src.last_name_yomi)
-            .isDefined()
-            .ensureString()
-            .isNotEmpty();
-        if (cvt.hasError) {
-            err["姓のよみ"] = cvt.getError();
-            lastNameYomiValue = "";
-        }
-        else {
-            lastNameYomiValue = cvt.getValue();
-        }
-    }
-    {
-        let cvt = new validator_1.Validator(src.first_name_yomi)
-            .isDefined()
-            .ensureString()
-            .isNotEmpty();
-        if (cvt.hasError) {
-            err["名のよみ"] = cvt.getError();
-            firstNameYomiValue = "";
-        }
-        else {
-            firstNameYomiValue = cvt.getValue();
-        }
-    }
-    {
-        let value = src.birth_day;
-        if (value === "0000-00-00") {
-            birthdayValue = value;
-        }
-        else {
-            let cvt = new validator_1.Validator(src.birth_day)
-                .isDefined()
-                .ensureString()
-                .matches(/^\d{4}-\d{2}^\d{2}$/)
-                .isValidDate();
-            if (cvt.hasError) {
-                err["生年月日"] = cvt.getError();
-                birthdayValue = "";
-            }
-            else {
-                birthdayValue = value;
-            }
-        }
-    }
-    {
-        let cvt = new validator_1.Validator(src.sex)
-            .isDefined()
-            .ensureString()
-            .oneOf(["M", "F"]);
-        if (cvt.hasError) {
-            err["性別"] = cvt.getError();
-            sexValue = "";
-        }
-        else {
-            sexValue = cvt.getValue();
-        }
-    }
-    {
-        let cvt = new validator_1.Validator(src.address)
-            .isDefined()
-            .ensureString();
-        if (cvt.hasError) {
-            err["住所"] = cvt.getError();
-            addressValue = "";
-        }
-        else {
-            addressValue = cvt.getValue();
-        }
-    }
-    {
-        let cvt = new validator_1.Validator(src.phone)
-            .isDefined()
-            .ensureString();
-        if (cvt.hasError) {
-            err["電話番号"] = cvt.getError();
-            phoneValue = "";
-        }
-        else {
-            phoneValue = cvt.getValue();
-        }
-    }
-    if (Object.keys(err).length > 0) {
-        return new validator_1.ValidationError(err);
-    }
-    return new Patient(patientIdValue, lastNameValue, firstNameValue, lastNameYomiValue, firstNameYomiValue, birthdayValue, sexValue, addressValue, phoneValue);
+class PatientValues {
 }
-exports.convertToPatient = convertToPatient;
+exports.PatientValues = PatientValues;
+function hasError(values) {
+    return values.patientId.isError || values.lastName.isError ||
+        values.firstName.isError || values.lastNameYomi.isError ||
+        values.firstNameYomi.isError || values.birthday.isError ||
+        values.sex.isError || values.address.isError ||
+        values.phone.isError;
+}
+function validatePatient(patient) {
+    let v = new PatientValues();
+    v.patientId = value_1.ensureNumber(patient.patientId)
+        .isInteger()
+        .isPositive();
+    v.lastName = value_1.ensureString(patient.lastName)
+        .isNotEmpty();
+    v.firstName = value_1.ensureString(patient.firstName)
+        .isNotEmpty();
+    v.lastNameYomi = value_1.ensureString(patient.lastNameYomi)
+        .isNotEmpty();
+    v.firstNameYomi = value_1.ensureString(patient.firstNameYomi)
+        .isNotEmpty();
+    v.birthday = value_1.ensureString(patient.birthday)
+        .isSqlDate()
+        .isZeroOrValidDate();
+    v.sex = value_1.ensureString(patient.sex)
+        .oneOf("M", "F");
+    v.address = value_1.ensureString(patient.address);
+    v.phone = value_1.ensureString(patient.phone);
+    if (hasError(v)) {
+        return v;
+    }
+    else {
+        return null;
+    }
+}
+exports.validatePatient = validatePatient;
+function jsonToPatient(src) {
+    let p = new Patient();
+    p.patientId = src.patient_id;
+    p.lastName = src.last_name;
+    p.firstName = src.first_name;
+    p.lastNameYomi = src.last_name_yomi;
+    p.firstNameYomi = src.first_name_yomi;
+    p.birthday = src.birth_day;
+    p.sex = src.sex;
+    p.address = src.address;
+    p.phone = src.phone;
+    return p;
+}
+exports.jsonToPatient = jsonToPatient;
+// export function convertToPatient(src: any): Patient | ValidationError {
+// 	let patientIdValue: number;
+// 	let lastNameValue: string;
+// 	let firstNameValue: string;
+// 	let lastNameYomiValue: string;
+// 	let firstNameYomiValue: string;
+// 	let birthdayValue: string;
+// 	let sexValue: string;
+// 	let addressValue: string;
+// 	let phoneValue: string;
+// 	let err = {};
+// 	{
+// 		let cvt = new Validator(src.patient_id)
+// 			.isDefined()
+// 			.ensureNumber()
+// 			.isInteger()
+// 			.isPositive()
+// 		if( cvt.hasError ){
+// 			err["患者番号"] = cvt.getError();
+// 			patientIdValue = 0;
+// 		} else {
+// 			patientIdValue = cvt.getValue();
+// 		}
+// 	}
+// 	{
+// 		let cvt = new Validator(src.last_name)
+// 			.isDefined()
+// 			.ensureString()
+// 			.isNotEmpty();
+// 		if( cvt.hasError ){
+// 			err["姓"] = cvt.getError();
+// 			lastNameValue = "";
+// 		} else {
+// 			lastNameValue = cvt.getValue();
+// 		}
+// 	}
+// 	{
+// 		let cvt = new Validator(src.first_name)
+// 			.isDefined()
+// 			.ensureString()
+// 			.isNotEmpty();
+// 		if( cvt.hasError ){
+// 			err["名"] = cvt.getError();
+// 			firstNameValue = "";
+// 		} else {
+// 			firstNameValue = cvt.getValue();
+// 		}
+// 	}
+// 	{
+// 		let cvt = new Validator(src.last_name_yomi)
+// 			.isDefined()
+// 			.ensureString()
+// 			.isNotEmpty();
+// 		if( cvt.hasError ){
+// 			err["姓のよみ"] = cvt.getError();
+// 			lastNameYomiValue = "";
+// 		} else {
+// 			lastNameYomiValue = cvt.getValue();
+// 		}
+// 	}
+// 	{
+// 		let cvt = new Validator(src.first_name_yomi)
+// 			.isDefined()
+// 			.ensureString()
+// 			.isNotEmpty();
+// 		if( cvt.hasError ){
+// 			err["名のよみ"] = cvt.getError();
+// 			firstNameYomiValue = "";
+// 		} else {
+// 			firstNameYomiValue = cvt.getValue();
+// 		}
+// 	}
+// 	{
+// 		let value = src.birth_day;
+// 		if( value === "0000-00-00" ){
+// 			birthdayValue = value;
+// 		} else {
+// 			let cvt = new Validator(src.birth_day)
+// 				.isDefined()
+// 				.ensureString()
+// 				.matches(/^\d{4}-\d{2}^\d{2}$/)
+// 				.isValidDate()
+// 			if( cvt.hasError ){
+// 				err["生年月日"] = cvt.getError();
+// 				birthdayValue = "";
+// 			} else {
+// 				birthdayValue = value;
+// 			}
+// 		}
+// 	}
+// 	{
+// 		let cvt = new Validator(src.sex)
+// 			.isDefined()
+// 			.ensureString()
+// 			.oneOf(["M", "F"])
+// 		if( cvt.hasError ){
+// 			err["性別"]　= cvt.getError();
+// 			sexValue = "";
+// 		} else {
+// 			sexValue = cvt.getValue()
+// 		}
+// 	}
+// 	{
+// 		let cvt = new Validator(src.address)
+// 			.isDefined()
+// 			.ensureString()
+// 		if( cvt.hasError ){
+// 			err["住所"] = cvt.getError();
+// 			addressValue = "";
+// 		} else {
+// 			addressValue = cvt.getValue();
+// 		}
+// 	}
+// 	{
+// 		let cvt = new Validator(src.phone)
+// 			.isDefined()
+// 			.ensureString()
+// 		if( cvt.hasError ){
+// 			err["電話番号"] = cvt.getError();
+// 			phoneValue = "";
+// 		} else {
+// 			phoneValue = cvt.getValue();
+// 		}
+// 	}
+// 	if( Object.keys(err).length > 0 ){
+// 		return new ValidationError(err);
+// 	}
+// 	return new Patient(patientIdValue, lastNameValue,
+// 		firstNameValue, lastNameYomiValue,
+// 		firstNameYomiValue, birthdayValue,
+// 		sexValue, addressValue, phoneValue);
+// }
 /**
 export function validatePatient(patient: Patient,
     checkPatientId: boolean = true) : null | any {

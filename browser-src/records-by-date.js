@@ -81,7 +81,9 @@ class RecordItem {
                 typed_dom_1.f.a(e => { }, {}, ["全診療記録"]),
                 "]",
                 " ",
+                formatVisitTime(visit.visitedAt),
             ]),
+            content.dom
         ]);
     }
 }

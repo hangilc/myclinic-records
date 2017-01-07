@@ -1,87 +1,88 @@
 "use strict";
-const V = require("../validation");
 const conduct_1 = require("./conduct");
 const full_conduct_shinryou_1 = require("./full-conduct-shinryou");
 const full_conduct_drug_1 = require("./full-conduct-drug");
 const full_conduct_kizai_1 = require("./full-conduct-kizai");
 class FullConduct extends conduct_1.Conduct {
-    constructor(conductId, visitId, kind, gazouLabel, drugs, shinryouList, kizaiList) {
-        super(conductId, visitId, kind);
-        this.gazouLabel = gazouLabel;
-        this.drugs = drugs;
-        this.shinryouList = shinryouList;
-        this.kizaiList = kizaiList;
-    }
 }
 exports.FullConduct = FullConduct;
-function validateFullConduct(conduct) {
-    let errs = conduct_1.validateConduct(conduct);
+function jsonToFullConduct(src) {
+    let conduct = new FullConduct();
+    conduct.gazouLabel = src.gazou_label;
+    let drugs = src.drugs || [];
+    conduct.drugs = drugs.map(full_conduct_drug_1.jsonToFullConductDrug);
+    let shinryouList = src.shinryou_list || [];
+    conduct.shinryouList = shinryouList.map(full_conduct_shinryou_1.jsonToFullConductShinryou);
+    let kizaiList = src.kizai_list || [];
+    conduct.kizaiList = kizaiList.map(full_conduct_kizai_1.jsonToFullConductKizai);
+    return conduct;
+}
+exports.jsonToFullConduct = jsonToFullConduct;
+/**
+export function validateFullConduct(conduct: FullConduct): string[] {
+    let errs = validateConduct(conduct);
     V.validate("画像ラベル", conduct.gazouLabel, errs, [
         V.isDefined, V.isOptionalString
     ]);
     conduct.drugs.forEach(s => {
-        errs = errs.concat(full_conduct_drug_1.validateFullConductDrug(s));
-    });
+        errs = errs.concat(validateFullConductDrug(s));
+    })
     conduct.shinryouList.forEach(s => {
-        errs = errs.concat(full_conduct_shinryou_1.validateFullConductShinryou(s));
-    });
+        errs = errs.concat(validateFullConductShinryou(s));
+    })
     conduct.kizaiList.forEach(s => {
-        errs = errs.concat(full_conduct_kizai_1.validateFullConductKizai(s));
-    });
+        errs = errs.concat(validateFullConductKizai(s));
+    })
     return errs;
 }
-exports.validateFullConduct = validateFullConduct;
-function fromJsonToFullConduct(src) {
-    let gazouLabel;
+
+export function fromJsonToFullConduct(src: any): FullConduct | V.ValidationError {
+    let gazouLabel: string | null;
     {
         let val = src.gazou_label;
-        if (typeof val === "string") {
+        if( typeof val === "string" ){
             gazouLabel = val;
-        }
-        else if (val === undefined || val === null) {
+        } else if( val === undefined || val === null ){
             gazouLabel = null;
-        }
-        else {
+        } else {
             return new V.ValidationError(["invalid gazou_label"]);
         }
     }
-    let drugs;
+    let drugs: FullConductDrug[];
     {
-        let result = V.mapConvert(src.drugs, full_conduct_drug_1.fromJsonToFullConductDrug);
-        if (result instanceof V.ValidationError) {
+        let result = V.mapConvert(src.drugs, fromJsonToFullConductDrug);
+        if( result instanceof V.ValidationError ){
             return result;
-        }
-        else {
+        } else {
             drugs = result;
         }
     }
-    let shinryouList;
+    let shinryouList: FullConductShinryou[];
     {
-        let result = V.mapConvert(src.shinryou_list, full_conduct_shinryou_1.fromJsonToFullConductShinryou);
-        if (result instanceof V.ValidationError) {
+        let result = V.mapConvert(src.shinryou_list, fromJsonToFullConductShinryou);
+        if( result instanceof V.ValidationError ){
             return result;
-        }
-        else {
+        } else {
             shinryouList = result;
         }
     }
-    let kizaiList;
+    let kizaiList: FullConductKizai[];
     {
-        let result = V.mapConvert(src.kizai_list, full_conduct_kizai_1.fromJsonToFullConductKizai);
-        if (result instanceof V.ValidationError) {
+        let result = V.mapConvert(src.kizai_list, fromJsonToFullConductKizai);
+        if( result instanceof V.ValidationError ){
             return result;
-        }
-        else {
+        } else {
             kizaiList = result;
         }
     }
-    let conduct = new FullConduct(src.id, src.visit_id, src.kind, gazouLabel, drugs, shinryouList, kizaiList);
+    let conduct = new FullConduct(src.id, src.visit_id, src.kind, gazouLabel,
+        drugs, shinryouList, kizaiList);
     let errs = validateFullConduct(conduct);
-    if (errs.length > 0) {
+    if( errs.length > 0 ){
         return new V.ValidationError(errs);
-    }
-    else {
+    } else {
         return conduct;
     }
 }
-exports.fromJsonToFullConduct = fromJsonToFullConduct;
+
+**/ 

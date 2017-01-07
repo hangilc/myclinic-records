@@ -218,7 +218,6 @@ export function getKizaiMaster(kizaicode: number, at: string): Promise<KizaiMast
 		{ kizaicode: kizaicode, at: at }, "GET", model.jsonToKizaiMaster);
 }
 
-/**
 export function getFullVisit(visitId: number): Promise<FullVisit> {
 	if( !(Number.isInteger(visitId) && visitId > 0) ){
 		return Promise.reject("invalid visitId");
@@ -226,6 +225,4 @@ export function getFullVisit(visitId: number): Promise<FullVisit> {
 	return request<FullVisit>("get_full_visit", { visit_id: visitId }, 
 		"GET", model.jsonToFullVisit);
 }
-
-**/
 

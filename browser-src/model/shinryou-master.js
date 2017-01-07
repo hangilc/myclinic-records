@@ -1,26 +1,45 @@
 "use strict";
-const V = require("../validation");
 class ShinryouMaster {
-    constructor(shinryoucode, name, tensuu, tensuuShikibetsu, houketsuKensa, oushinKubun, kensaGroup, roujinTekiyou, codeShou, codeBu, codeAlpha, codeKubun, validFrom, validUpto) {
-        this.shinryoucode = shinryoucode;
-        this.name = name;
-        this.tensuu = tensuu;
-        this.tensuuShikibetsu = tensuuShikibetsu;
-        this.houketsuKensa = houketsuKensa;
-        this.oushinKubun = oushinKubun;
-        this.kensaGroup = kensaGroup;
-        this.roujinTekiyou = roujinTekiyou;
-        this.codeShou = codeShou;
-        this.codeBu = codeBu;
-        this.codeAlpha = codeAlpha;
-        this.codeKubun = codeKubun;
-        this.validFrom = validFrom;
-        this.validUpto = validUpto;
-    }
 }
 exports.ShinryouMaster = ShinryouMaster;
-function validateShinryouMaster(shinryouMaster) {
-    let errs = [];
+function fillShinryouMasterFromJson(m, src) {
+    m.shinryoucode = src.shinryoucode;
+    m.name = src.name;
+    m.tensuu = +src.tensuu;
+    m.tensuuShikibetsu = +src.tensuu_shikibetsu;
+    m.houketsuKensa = src.houkatsukensa;
+    m.oushinKubun = +src.oushinkubun;
+    m.kensaGroup = src.kensaGroup;
+    m.roujinTekiyou = +src.roujintekiyou;
+    m.codeShou = +src.code_shou;
+    m.codeBu = src.code_bu;
+    m.codeAlpha = src.code_alpha;
+    m.codeKubun = src.code_kubun;
+    m.validFrom = src.valid_from;
+    m.validUpto = src.valid_upto;
+}
+exports.fillShinryouMasterFromJson = fillShinryouMasterFromJson;
+function jsonToShinryouMaster(src) {
+    let m = new ShinryouMaster();
+    fillShinryouMasterFromJson(m, src);
+    return m;
+}
+exports.jsonToShinryouMaster = jsonToShinryouMaster;
+/**
+export function fromJsonToShinryouMaster(src: any): ShinryouMaster | V.ValidationError {
+    let master = new ShinryouMaster(src.shinryoucode, src.name, +src.tensuu,
+        +src.tensuu_shikibetsu, src.houkatsukensa, +src.oushinkubun,
+        src.kensagroup, +src.roujintekiyou, +src.code_shou,
+        src.code_bu, src.code_alpha, src.code_kubun, src.valid_from, src.valid_upto);
+    let errs = validateShinryouMaster(master);
+    if( errs.length > 0 ){
+        return new V.ValidationError(errs);
+    } else {
+        return master;
+    }
+}
+export function validateShinryouMaster(shinryouMaster: ShinryouMaster): string[] {
+    let errs: string[] = [];
     V.validate("診療コード", shinryouMaster.shinryoucode, errs, [
         V.isDefined, V.isInteger, V.isPositive
     ]);
@@ -65,15 +84,4 @@ function validateShinryouMaster(shinryouMaster) {
     ]);
     return errs;
 }
-exports.validateShinryouMaster = validateShinryouMaster;
-function fromJsonToShinryouMaster(src) {
-    let master = new ShinryouMaster(src.shinryoucode, src.name, +src.tensuu, +src.tensuu_shikibetsu, src.houkatsukensa, +src.oushinkubun, src.kensagroup, +src.roujintekiyou, +src.code_shou, src.code_bu, src.code_alpha, src.code_kubun, src.valid_from, src.valid_upto);
-    let errs = validateShinryouMaster(master);
-    if (errs.length > 0) {
-        return new V.ValidationError(errs);
-    }
-    else {
-        return master;
-    }
-}
-exports.fromJsonToShinryouMaster = fromJsonToShinryouMaster;
+**/

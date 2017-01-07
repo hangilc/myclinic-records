@@ -1,19 +1,44 @@
 "use strict";
-const V = require("../validation");
 class KizaiMaster {
-    constructor(kizaicode, name, yomi, unit, kingaku, validFrom, validUpto) {
-        this.kizaicode = kizaicode;
-        this.name = name;
-        this.yomi = yomi;
-        this.unit = unit;
-        this.kingaku = kingaku;
-        this.validFrom = validFrom;
-        this.validUpto = validUpto;
-    }
 }
 exports.KizaiMaster = KizaiMaster;
-function validateKizaiMaster(kizaiMaster) {
-    let errs = [];
+function fillKizaiMasterFromJson(m, src) {
+    m.kizaicode = src.kizaicode;
+    m.name = src.name;
+    m.yomi = src.yomi;
+    m.unit = src.unit;
+    m.kingaku = +src.kingaku;
+    m.validFrom = src.valid_from;
+    m.validUpto = src.valid_upto;
+}
+exports.fillKizaiMasterFromJson = fillKizaiMasterFromJson;
+function jsonToKizaiMaster(src) {
+    let m = new KizaiMaster();
+    fillKizaiMasterFromJson(m, src);
+    return m;
+}
+exports.jsonToKizaiMaster = jsonToKizaiMaster;
+/*
+export function fromJsonToKizaiMaster(src: any): KizaiMaster | V.ValidationError {
+    let master = new KizaiMaster(
+        src.kizaicode,
+        src.name,
+        src.yomi,
+        src.unit,
+        +src.kingaku,
+        src.valid_from,
+        src.valid_upto
+    );
+    let errs = validateKizaiMaster(master);
+    if( errs.length > 0 ){
+        return new V.ValidationError(errs);
+    } else {
+        return master;
+    }
+}
+
+export function validateKizaiMaster(kizaiMaster: KizaiMaster): string[] {
+    let errs: string[] = [];
     V.validate("器材コード", kizaiMaster.kizaicode, errs, [
         V.isDefined, V.isInteger, V.isPositive
     ]);
@@ -37,15 +62,4 @@ function validateKizaiMaster(kizaiMaster) {
     ]);
     return errs;
 }
-exports.validateKizaiMaster = validateKizaiMaster;
-function fromJsonToKizaiMaster(src) {
-    let master = new KizaiMaster(src.kizaicode, src.name, src.yomi, src.unit, +src.kingaku, src.valid_from, src.valid_upto);
-    let errs = validateKizaiMaster(master);
-    if (errs.length > 0) {
-        return new V.ValidationError(errs);
-    }
-    else {
-        return master;
-    }
-}
-exports.fromJsonToKizaiMaster = fromJsonToKizaiMaster;
+*/

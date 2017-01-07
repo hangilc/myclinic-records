@@ -266,7 +266,9 @@
 	                typed_dom_1.f.a(e => { }, {}, ["全診療記録"]),
 	                "]",
 	                " ",
+	                formatVisitTime(visit.visitedAt),
 	            ]),
+	            content.dom
 	        ]);
 	    }
 	}
@@ -15742,8 +15744,7 @@
 
 	"use strict";
 	const $ = __webpack_require__(117);
-	const validator_1 = __webpack_require__(148);
-	const model = __webpack_require__(119);
+	const model = __webpack_require__(118);
 	class HttpError {
 	    constructor(status, text, exception) {
 	        this.status = status;
@@ -15752,32 +15753,10 @@
 	    }
 	}
 	exports.HttpError = HttpError;
-	function arrayConverter(cvt) {
+	function arrayConverter(c) {
 	    return function (src) {
-	        return convertArray(src, cvt);
+	        return src.map(c);
 	    };
-	}
-	function convertArray(src, cvt) {
-	    let result = src.map(cvt);
-	    let errs = [];
-	    let vals = [];
-	    result.forEach(r => {
-	        if (r instanceof validator_1.ValidationError) {
-	            errs.push(r);
-	        }
-	        else {
-	            vals.push(r);
-	        }
-	    });
-	    if (errs.length > 0) {
-	        return errs.map(e => e.body);
-	    }
-	    else {
-	        if (vals.length !== src.length) {
-	            throw new Error("cannot happen in convertArray");
-	        }
-	        return vals;
-	    }
 	}
 	function request(service, data, method, cvtor) {
 	    return new Promise(function (resolve, reject) {
@@ -15790,13 +15769,12 @@
 	            dataType: "json",
 	            timeout: 15000,
 	            success: function (result) {
-	                let obj = cvtor(result);
-	                if (obj instanceof validator_1.ValidationError) {
-	                    console.log(result);
-	                    reject(obj);
-	                }
-	                else {
+	                try {
+	                    let obj = cvtor(result);
 	                    resolve(obj);
+	                }
+	                catch (ex) {
+	                    reject(ex);
 	                }
 	            },
 	            error: function (xhr, status, ex) {
@@ -15809,105 +15787,105 @@
 	    if (!(Number.isInteger(patientId) && patientId > 0)) {
 	        return Promise.reject("invalid patientId");
 	    }
-	    return request("get_patient", { patient_id: patientId }, "GET", model.convertToPatient);
+	    return request("get_patient", { patient_id: patientId }, "GET", model.jsonToPatient);
 	}
 	exports.getPatient = getPatient;
 	function listVisitsByDate(at) {
 	    if (!(/^\d{4}-\d{2}-\d{2}( \d{2}:\d{2}:\d{2})?$/.test(at))) {
 	        return Promise.reject("invalid at");
 	    }
-	    return request("list_visits_by_date", { at: at }, "GET", fromJsonArray(model.fromJsonToVisit));
+	    return request("list_visits_by_date", { at: at }, "GET", arrayConverter(model.jsonToVisit));
 	}
 	exports.listVisitsByDate = listVisitsByDate;
 	function getText(textId) {
 	    if (!(Number.isInteger(textId) && textId > 0)) {
 	        return Promise.reject("invalid textId");
 	    }
-	    return request("get_text", { text_id: textId }, "GET", model.fromJsonToText);
+	    return request("get_text", { text_id: textId }, "GET", model.jsonToText);
 	}
 	exports.getText = getText;
 	function getShahokokuho(shahokokuhoId) {
 	    if (!(Number.isInteger(shahokokuhoId) && shahokokuhoId > 0)) {
 	        return Promise.reject("invalid shahokokuhoId");
 	    }
-	    return request("get_shahokokuho", { shahokokuho_id: shahokokuhoId }, "GET", model.fromJsonToShahokokuho);
+	    return request("get_shahokokuho", { shahokokuho_id: shahokokuhoId }, "GET", model.jsonToShahokokuho);
 	}
 	exports.getShahokokuho = getShahokokuho;
 	function getKoukikourei(koukikoureiId) {
 	    if (!(Number.isInteger(koukikoureiId) && koukikoureiId > 0)) {
 	        return Promise.reject("invalid koukikoureiId");
 	    }
-	    return request("get_koukikourei", { koukikourei_id: koukikoureiId }, "GET", model.fromJsonToKoukikourei);
+	    return request("get_koukikourei", { koukikourei_id: koukikoureiId }, "GET", model.jsonToKoukikourei);
 	}
 	exports.getKoukikourei = getKoukikourei;
 	function getRoujin(roujinId) {
 	    if (!(Number.isInteger(roujinId) && roujinId > 0)) {
 	        return Promise.reject("invalid roujinId");
 	    }
-	    return request("get_roujin", { roujin_id: roujinId }, "GET", model.fromJsonToRoujin);
+	    return request("get_roujin", { roujin_id: roujinId }, "GET", model.jsonToRoujin);
 	}
 	exports.getRoujin = getRoujin;
 	function getKouhi(kouhiId) {
 	    if (!(Number.isInteger(kouhiId) && kouhiId > 0)) {
 	        return Promise.reject("invalid kouhiId");
 	    }
-	    return request("get_kouhi", { kouhi_id: kouhiId }, "GET", model.fromJsonToKouhi);
+	    return request("get_kouhi", { kouhi_id: kouhiId }, "GET", model.jsonToKouhi);
 	}
 	exports.getKouhi = getKouhi;
 	function getDrug(drugId) {
 	    if (!(Number.isInteger(drugId) && drugId > 0)) {
 	        return Promise.reject("invalid drugId");
 	    }
-	    return request("get_drug", { drug_id: drugId }, "GET", model.fromJsonToDrug);
+	    return request("get_drug", { drug_id: drugId }, "GET", model.jsonToDrug);
 	}
 	exports.getDrug = getDrug;
 	function getShinryou(shinryouId) {
 	    if (!(Number.isInteger(shinryouId) && shinryouId > 0)) {
 	        return Promise.reject("invalid shinryouId");
 	    }
-	    return request("get_shinryou", { shinryou_id: shinryouId }, "GET", model.fromJsonToShinryou);
+	    return request("get_shinryou", { shinryou_id: shinryouId }, "GET", model.jsonToShinryou);
 	}
 	exports.getShinryou = getShinryou;
 	function getConduct(conductId) {
 	    if (!(Number.isInteger(conductId) && conductId > 0)) {
 	        return Promise.reject("invalid conductId");
 	    }
-	    return request("get_conduct", { conduct_id: conductId }, "GET", model.fromJsonToConduct);
+	    return request("get_conduct", { conduct_id: conductId }, "GET", model.jsonToConduct);
 	}
 	exports.getConduct = getConduct;
 	function getGazouLabel(conductId) {
 	    if (!(Number.isInteger(conductId) && conductId > 0)) {
 	        return Promise.reject("invalid conductId");
 	    }
-	    return request("get_gazou_label", { conduct_id: conductId }, "GET", model.fromJsonToGazouLabel);
+	    return request("get_gazou_label", { conduct_id: conductId }, "GET", model.jsonToGazouLabel);
 	}
 	exports.getGazouLabel = getGazouLabel;
 	function getConductDrug(conductDrugId) {
 	    if (!(Number.isInteger(conductDrugId) && conductDrugId > 0)) {
 	        return Promise.reject("invalid conductDrugId");
 	    }
-	    return request("get_conduct_drug", { conduct_drug_id: conductDrugId }, "GET", model.fromJsonToConductDrug);
+	    return request("get_conduct_drug", { conduct_drug_id: conductDrugId }, "GET", model.jsonToConductDrug);
 	}
 	exports.getConductDrug = getConductDrug;
 	function getConductShinryou(conductShinryouId) {
 	    if (!(Number.isInteger(conductShinryouId) && conductShinryouId > 0)) {
 	        return Promise.reject("invalid conductShinryouId");
 	    }
-	    return request("get_conduct_shinryou", { conduct_shinryou_id: conductShinryouId }, "GET", model.fromJsonToConductShinryou);
+	    return request("get_conduct_shinryou", { conduct_shinryou_id: conductShinryouId }, "GET", model.jsonToConductShinryou);
 	}
 	exports.getConductShinryou = getConductShinryou;
 	function getConductKizai(conductKizaiId) {
 	    if (!(Number.isInteger(conductKizaiId) && conductKizaiId > 0)) {
 	        return Promise.reject("invalid conductKizaiId");
 	    }
-	    return request("get_conduct_kizai", { conduct_kizai_id: conductKizaiId }, "GET", model.fromJsonToConductKizai);
+	    return request("get_conduct_kizai", { conduct_kizai_id: conductKizaiId }, "GET", model.jsonToConductKizai);
 	}
 	exports.getConductKizai = getConductKizai;
 	function getCharge(visitId) {
 	    if (!(Number.isInteger(visitId) && visitId > 0)) {
 	        return Promise.reject("invalid visitId");
 	    }
-	    return request("get_charge", { visit_id: visitId }, "GET", model.fromJsonToCharge);
+	    return request("get_charge", { visit_id: visitId }, "GET", model.jsonToCharge);
 	}
 	exports.getCharge = getCharge;
 	function getIyakuhinMaster(iyakuhincode, at) {
@@ -15917,7 +15895,7 @@
 	    if (!(/^\d{4}-\d{2}-\d{2}( \d{2}:\d{2}:\d{2})?$/.test(at))) {
 	        return Promise.reject("invalid at");
 	    }
-	    return request("get_iyakuhin_master", { iyakuhincode: iyakuhincode, at: at }, "GET", model.fromJsonToIyakuhinMaster);
+	    return request("get_iyakuhin_master", { iyakuhincode: iyakuhincode, at: at }, "GET", model.jsonToIyakuhinMaster);
 	}
 	exports.getIyakuhinMaster = getIyakuhinMaster;
 	function getShinryouMaster(shinryoucode, at) {
@@ -15927,7 +15905,7 @@
 	    if (!(/^\d{4}-\d{2}-\d{2}( \d{2}:\d{2}:\d{2})?$/.test(at))) {
 	        return Promise.reject("invalid at");
 	    }
-	    return request("get_shinryou_master", { shinryoucode: shinryoucode, at: at }, "GET", model.fromJsonToShinryouMaster);
+	    return request("get_shinryou_master", { shinryoucode: shinryoucode, at: at }, "GET", model.jsonToShinryouMaster);
 	}
 	exports.getShinryouMaster = getShinryouMaster;
 	function getKizaiMaster(kizaicode, at) {
@@ -15937,14 +15915,14 @@
 	    if (!(/^\d{4}-\d{2}-\d{2}( \d{2}:\d{2}:\d{2})?$/.test(at))) {
 	        return Promise.reject("invalid at");
 	    }
-	    return request("get_kizai_master", { kizaicode: kizaicode, at: at }, "GET", model.fromJsonToKizaiMaster);
+	    return request("get_kizai_master", { kizaicode: kizaicode, at: at }, "GET", model.jsonToKizaiMaster);
 	}
 	exports.getKizaiMaster = getKizaiMaster;
 	function getFullVisit(visitId) {
 	    if (!(Number.isInteger(visitId) && visitId > 0)) {
 	        return Promise.reject("invalid visitId");
 	    }
-	    return request("get_full_visit", { visit_id: visitId }, "GET", model.fromJsonToFullVisit);
+	    return request("get_full_visit", { visit_id: visitId }, "GET", model.jsonToFullVisit);
 	}
 	exports.getFullVisit = getFullVisit;
 
@@ -26180,187 +26158,10 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	const moment = __webpack_require__(4);
-	class ValidationError {
-	    constructor(keys, errors) {
-	        this.keys = keys;
-	        this.errors = errors;
-	    }
-	    toString() {
-	        return this.keys.join("|") + ":" + this.errors.join("");
-	    }
-	}
-	exports.ValidationError = ValidationError;
-	function mapConvert(arr, cvt) {
-	    let res = [];
-	    for (let i = 0; i < arr.length; i++) {
-	        let c = cvt(arr[i]);
-	        if (c instanceof ValidationError) {
-	            return c;
-	        }
-	        else {
-	            res.push(c);
-	        }
-	    }
-	    return res;
-	}
-	exports.mapConvert = mapConvert;
-	function isDefined(name, value) {
-	    if (value === undefined) {
-	        return `${name}の値が指摘されていません。`;
-	    }
-	    else {
-	        return null;
-	    }
-	}
-	exports.isDefined = isDefined;
-	function isNumber(name, value) {
-	    if (typeof value === "number") {
-	        return null;
-	    }
-	    else {
-	        return `${name}の値が数値でありません。`;
-	    }
-	}
-	exports.isNumber = isNumber;
-	function isInteger(name, value) {
-	    if (Number.isInteger(value)) {
-	        return null;
-	    }
-	    else {
-	        return `${name}の値が整数でありません。`;
-	    }
-	}
-	exports.isInteger = isInteger;
-	function isString(name, value) {
-	    if (typeof value === "string") {
-	        return null;
-	    }
-	    else {
-	        return `${name}の値が文字列でありません。`;
-	    }
-	}
-	exports.isString = isString;
-	function isBoolean(name, value) {
-	    if (typeof value === "boolean") {
-	        return null;
-	    }
-	    else {
-	        return `${name}の値が真偽値でありません。`;
-	    }
-	}
-	exports.isBoolean = isBoolean;
-	function isPositive(name, value) {
-	    if (value > 0) {
-	        return null;
-	    }
-	    else {
-	        return `${name}の値が正数でありません。`;
-	    }
-	}
-	exports.isPositive = isPositive;
-	function isZeroOrPositive(name, value) {
-	    if (value >= 0) {
-	        return null;
-	    }
-	    else {
-	        return `${name}の値がゼロあるいは正数でありません。`;
-	    }
-	}
-	exports.isZeroOrPositive = isZeroOrPositive;
-	function isNotEmpty(name, value) {
-	    if (value === "" || value == null) {
-	        return `${name}の値が空白です。`;
-	    }
-	    else {
-	        return null;
-	    }
-	}
-	exports.isNotEmpty = isNotEmpty;
-	function isSqlDate(name, value) {
-	    if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-	        let m = moment(value);
-	        if (m.isValid()) {
-	            return null;
-	        }
-	    }
-	    return `${name}の値が不適切です。`;
-	}
-	exports.isSqlDate = isSqlDate;
-	function isSqlDateOrZero(name, value) {
-	    if (value === "0000-00-00") {
-	        return null;
-	    }
-	    if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-	        let m = moment(value);
-	        if (m.isValid()) {
-	            return null;
-	        }
-	    }
-	    return `${name}の値が不適切です。`;
-	}
-	exports.isSqlDateOrZero = isSqlDateOrZero;
-	function isSqlDateTime(name, value) {
-	    if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(value)) {
-	        let m = moment(value);
-	        if (m.isValid()) {
-	            return null;
-	        }
-	    }
-	    return `${name}の値が不適切です。`;
-	}
-	exports.isSqlDateTime = isSqlDateTime;
-	function isOneOf(...list) {
-	    return function (name, value) {
-	        for (let i = 0; i < list.length; i++) {
-	            if (value === list[i]) {
-	                return null;
-	            }
-	        }
-	        return `${name}の値が不適切です。`;
-	    };
-	}
-	exports.isOneOf = isOneOf;
-	function isFloatCompatibleString(name, value) {
-	    if (/^\d+(\.\d+)?$/.test(value)) {
-	        return null;
-	    }
-	    else {
-	        return `${name}の値が数値をあらわす文字列でありません。`;
-	    }
-	}
-	exports.isFloatCompatibleString = isFloatCompatibleString;
-	function isOptionalString(name, value) {
-	    if (value == null || typeof value === "string") {
-	        return null;
-	    }
-	    else {
-	        return `${name}の値が不適切です。`;
-	    }
-	}
-	exports.isOptionalString = isOptionalString;
-	function validate(name, value, errs, validators) {
-	    for (let i = 0; i < validators.length; i++) {
-	        let validator = validators[i];
-	        let err = validator(name, value);
-	        if (err) {
-	            errs.push(err);
-	            return;
-	        }
-	    }
-	}
-	exports.validate = validate;
-
-
-/***/ },
-/* 119 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
 	function __export(m) {
 	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 	}
-	__export(__webpack_require__(120));
+	__export(__webpack_require__(119));
 	__export(__webpack_require__(121));
 	__export(__webpack_require__(122));
 	__export(__webpack_require__(123));
@@ -26385,166 +26186,199 @@
 
 
 /***/ },
-/* 120 */
+/* 119 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	const validator_1 = __webpack_require__(148);
+	const value_1 = __webpack_require__(120);
 	class Patient {
-	    constructor(patientId, lastName, firstName, lastNameYomi, firstNameYomi, birthday, sex, address, phone) {
-	        this.patientId = patientId;
-	        this.lastName = lastName;
-	        this.firstName = firstName;
-	        this.lastNameYomi = lastNameYomi;
-	        this.firstNameYomi = firstNameYomi;
-	        this.birthday = birthday;
-	        this.sex = sex;
-	        this.address = address;
-	        this.phone = phone;
-	    }
 	}
 	exports.Patient = Patient;
 	;
-	function convertToPatient(src) {
-	    let patientIdValue;
-	    let lastNameValue;
-	    let firstNameValue;
-	    let lastNameYomiValue;
-	    let firstNameYomiValue;
-	    let birthdayValue;
-	    let sexValue;
-	    let addressValue;
-	    let phoneValue;
-	    let err = {};
-	    {
-	        let cvt = new validator_1.Validator(src.patient_id)
-	            .isDefined()
-	            .ensureNumber()
-	            .isInteger()
-	            .isPositive();
-	        if (cvt.hasError) {
-	            err["患者番号"] = cvt.getError();
-	            patientIdValue = 0;
-	        }
-	        else {
-	            patientIdValue = cvt.getValue();
-	        }
-	    }
-	    {
-	        let cvt = new validator_1.Validator(src.last_name)
-	            .isDefined()
-	            .ensureString()
-	            .isNotEmpty();
-	        if (cvt.hasError) {
-	            err["姓"] = cvt.getError();
-	            lastNameValue = "";
-	        }
-	        else {
-	            lastNameValue = cvt.getValue();
-	        }
-	    }
-	    {
-	        let cvt = new validator_1.Validator(src.first_name)
-	            .isDefined()
-	            .ensureString()
-	            .isNotEmpty();
-	        if (cvt.hasError) {
-	            err["名"] = cvt.getError();
-	            firstNameValue = "";
-	        }
-	        else {
-	            firstNameValue = cvt.getValue();
-	        }
-	    }
-	    {
-	        let cvt = new validator_1.Validator(src.last_name_yomi)
-	            .isDefined()
-	            .ensureString()
-	            .isNotEmpty();
-	        if (cvt.hasError) {
-	            err["姓のよみ"] = cvt.getError();
-	            lastNameYomiValue = "";
-	        }
-	        else {
-	            lastNameYomiValue = cvt.getValue();
-	        }
-	    }
-	    {
-	        let cvt = new validator_1.Validator(src.first_name_yomi)
-	            .isDefined()
-	            .ensureString()
-	            .isNotEmpty();
-	        if (cvt.hasError) {
-	            err["名のよみ"] = cvt.getError();
-	            firstNameYomiValue = "";
-	        }
-	        else {
-	            firstNameYomiValue = cvt.getValue();
-	        }
-	    }
-	    {
-	        let value = src.birth_day;
-	        if (value === "0000-00-00") {
-	            birthdayValue = value;
-	        }
-	        else {
-	            let cvt = new validator_1.Validator(src.birth_day)
-	                .isDefined()
-	                .ensureString()
-	                .matches(/^\d{4}-\d{2}^\d{2}$/)
-	                .isValidDate();
-	            if (cvt.hasError) {
-	                err["生年月日"] = cvt.getError();
-	                birthdayValue = "";
-	            }
-	            else {
-	                birthdayValue = value;
-	            }
-	        }
-	    }
-	    {
-	        let cvt = new validator_1.Validator(src.sex)
-	            .isDefined()
-	            .ensureString()
-	            .oneOf(["M", "F"]);
-	        if (cvt.hasError) {
-	            err["性別"] = cvt.getError();
-	            sexValue = "";
-	        }
-	        else {
-	            sexValue = cvt.getValue();
-	        }
-	    }
-	    {
-	        let cvt = new validator_1.Validator(src.address)
-	            .isDefined()
-	            .ensureString();
-	        if (cvt.hasError) {
-	            err["住所"] = cvt.getError();
-	            addressValue = "";
-	        }
-	        else {
-	            addressValue = cvt.getValue();
-	        }
-	    }
-	    {
-	        let cvt = new validator_1.Validator(src.phone)
-	            .isDefined()
-	            .ensureString();
-	        if (cvt.hasError) {
-	            err["電話番号"] = cvt.getError();
-	            phoneValue = "";
-	        }
-	        else {
-	            phoneValue = cvt.getValue();
-	        }
-	    }
-	    if (Object.keys(err).length > 0) {
-	        return new validator_1.ValidationError(err);
-	    }
-	    return new Patient(patientIdValue, lastNameValue, firstNameValue, lastNameYomiValue, firstNameYomiValue, birthdayValue, sexValue, addressValue, phoneValue);
+	class PatientValues {
 	}
-	exports.convertToPatient = convertToPatient;
+	exports.PatientValues = PatientValues;
+	function hasError(values) {
+	    return values.patientId.isError || values.lastName.isError ||
+	        values.firstName.isError || values.lastNameYomi.isError ||
+	        values.firstNameYomi.isError || values.birthday.isError ||
+	        values.sex.isError || values.address.isError ||
+	        values.phone.isError;
+	}
+	function validatePatient(patient) {
+	    let v = new PatientValues();
+	    v.patientId = value_1.ensureNumber(patient.patientId)
+	        .isInteger()
+	        .isPositive();
+	    v.lastName = value_1.ensureString(patient.lastName)
+	        .isNotEmpty();
+	    v.firstName = value_1.ensureString(patient.firstName)
+	        .isNotEmpty();
+	    v.lastNameYomi = value_1.ensureString(patient.lastNameYomi)
+	        .isNotEmpty();
+	    v.firstNameYomi = value_1.ensureString(patient.firstNameYomi)
+	        .isNotEmpty();
+	    v.birthday = value_1.ensureString(patient.birthday)
+	        .isSqlDate()
+	        .isZeroOrValidDate();
+	    v.sex = value_1.ensureString(patient.sex)
+	        .oneOf("M", "F");
+	    v.address = value_1.ensureString(patient.address);
+	    v.phone = value_1.ensureString(patient.phone);
+	    if (hasError(v)) {
+	        return v;
+	    }
+	    else {
+	        return null;
+	    }
+	}
+	exports.validatePatient = validatePatient;
+	function jsonToPatient(src) {
+	    let p = new Patient();
+	    p.patientId = src.patient_id;
+	    p.lastName = src.last_name;
+	    p.firstName = src.first_name;
+	    p.lastNameYomi = src.last_name_yomi;
+	    p.firstNameYomi = src.first_name_yomi;
+	    p.birthday = src.birth_day;
+	    p.sex = src.sex;
+	    p.address = src.address;
+	    p.phone = src.phone;
+	    return p;
+	}
+	exports.jsonToPatient = jsonToPatient;
+	// export function convertToPatient(src: any): Patient | ValidationError {
+	// 	let patientIdValue: number;
+	// 	let lastNameValue: string;
+	// 	let firstNameValue: string;
+	// 	let lastNameYomiValue: string;
+	// 	let firstNameYomiValue: string;
+	// 	let birthdayValue: string;
+	// 	let sexValue: string;
+	// 	let addressValue: string;
+	// 	let phoneValue: string;
+	// 	let err = {};
+	// 	{
+	// 		let cvt = new Validator(src.patient_id)
+	// 			.isDefined()
+	// 			.ensureNumber()
+	// 			.isInteger()
+	// 			.isPositive()
+	// 		if( cvt.hasError ){
+	// 			err["患者番号"] = cvt.getError();
+	// 			patientIdValue = 0;
+	// 		} else {
+	// 			patientIdValue = cvt.getValue();
+	// 		}
+	// 	}
+	// 	{
+	// 		let cvt = new Validator(src.last_name)
+	// 			.isDefined()
+	// 			.ensureString()
+	// 			.isNotEmpty();
+	// 		if( cvt.hasError ){
+	// 			err["姓"] = cvt.getError();
+	// 			lastNameValue = "";
+	// 		} else {
+	// 			lastNameValue = cvt.getValue();
+	// 		}
+	// 	}
+	// 	{
+	// 		let cvt = new Validator(src.first_name)
+	// 			.isDefined()
+	// 			.ensureString()
+	// 			.isNotEmpty();
+	// 		if( cvt.hasError ){
+	// 			err["名"] = cvt.getError();
+	// 			firstNameValue = "";
+	// 		} else {
+	// 			firstNameValue = cvt.getValue();
+	// 		}
+	// 	}
+	// 	{
+	// 		let cvt = new Validator(src.last_name_yomi)
+	// 			.isDefined()
+	// 			.ensureString()
+	// 			.isNotEmpty();
+	// 		if( cvt.hasError ){
+	// 			err["姓のよみ"] = cvt.getError();
+	// 			lastNameYomiValue = "";
+	// 		} else {
+	// 			lastNameYomiValue = cvt.getValue();
+	// 		}
+	// 	}
+	// 	{
+	// 		let cvt = new Validator(src.first_name_yomi)
+	// 			.isDefined()
+	// 			.ensureString()
+	// 			.isNotEmpty();
+	// 		if( cvt.hasError ){
+	// 			err["名のよみ"] = cvt.getError();
+	// 			firstNameYomiValue = "";
+	// 		} else {
+	// 			firstNameYomiValue = cvt.getValue();
+	// 		}
+	// 	}
+	// 	{
+	// 		let value = src.birth_day;
+	// 		if( value === "0000-00-00" ){
+	// 			birthdayValue = value;
+	// 		} else {
+	// 			let cvt = new Validator(src.birth_day)
+	// 				.isDefined()
+	// 				.ensureString()
+	// 				.matches(/^\d{4}-\d{2}^\d{2}$/)
+	// 				.isValidDate()
+	// 			if( cvt.hasError ){
+	// 				err["生年月日"] = cvt.getError();
+	// 				birthdayValue = "";
+	// 			} else {
+	// 				birthdayValue = value;
+	// 			}
+	// 		}
+	// 	}
+	// 	{
+	// 		let cvt = new Validator(src.sex)
+	// 			.isDefined()
+	// 			.ensureString()
+	// 			.oneOf(["M", "F"])
+	// 		if( cvt.hasError ){
+	// 			err["性別"]　= cvt.getError();
+	// 			sexValue = "";
+	// 		} else {
+	// 			sexValue = cvt.getValue()
+	// 		}
+	// 	}
+	// 	{
+	// 		let cvt = new Validator(src.address)
+	// 			.isDefined()
+	// 			.ensureString()
+	// 		if( cvt.hasError ){
+	// 			err["住所"] = cvt.getError();
+	// 			addressValue = "";
+	// 		} else {
+	// 			addressValue = cvt.getValue();
+	// 		}
+	// 	}
+	// 	{
+	// 		let cvt = new Validator(src.phone)
+	// 			.isDefined()
+	// 			.ensureString()
+	// 		if( cvt.hasError ){
+	// 			err["電話番号"] = cvt.getError();
+	// 			phoneValue = "";
+	// 		} else {
+	// 			phoneValue = cvt.getValue();
+	// 		}
+	// 	}
+	// 	if( Object.keys(err).length > 0 ){
+	// 		return new ValidationError(err);
+	// 	}
+	// 	return new Patient(patientIdValue, lastNameValue,
+	// 		firstNameValue, lastNameYomiValue,
+	// 		firstNameYomiValue, birthdayValue,
+	// 		sexValue, addressValue, phoneValue);
+	// }
 	/**
 	export function validatePatient(patient: Patient,
 	    checkPatientId: boolean = true) : null | any {
@@ -26584,95 +26418,425 @@
 
 
 /***/ },
+/* 120 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	const moment = __webpack_require__(4);
+	class PrimitiveError {
+	    constructor(message, value) {
+	        this.message = message;
+	        this.value = value;
+	    }
+	}
+	class Value {
+	    constructor(_value, error = null) {
+	        this._value = _value;
+	        this.error = error;
+	    }
+	    get isError() {
+	        return this.error !== null;
+	    }
+	    get value() {
+	        if (this.isError) {
+	            throw this.error;
+	        }
+	        return this._value;
+	    }
+	}
+	exports.Value = Value;
+	class PrimitiveValue extends Value {
+	    constructor(value, error = null) {
+	        super(value, error);
+	    }
+	    confirm(pred, message) {
+	        if (!this.isError && !pred(this._value)) {
+	            this.error = new PrimitiveError(message, this._value);
+	        }
+	        return this;
+	    }
+	    oneOf(...choices) {
+	        if (this.isError) {
+	            return this;
+	        }
+	        let value = this._value;
+	        for (let i = 0; i < choices.length; i++) {
+	            let choice = choices[i];
+	            if (value === choice) {
+	                return this;
+	            }
+	        }
+	        this.error = new PrimitiveError("選択できる値のひとつでありません。", this._value);
+	        return this;
+	    }
+	}
+	exports.PrimitiveValue = PrimitiveValue;
+	class NumberValue extends PrimitiveValue {
+	    isInteger() {
+	        return this.confirm(value => Number.isInteger(value), "整数でありません。");
+	    }
+	    isPositive() {
+	        return this.confirm(value => value > 0, "正の数値でありません。");
+	    }
+	    isZeroOrPositive() {
+	        return this.confirm(value => value >= 0, "正またはｾﾞﾛでありません。");
+	    }
+	}
+	exports.NumberValue = NumberValue;
+	class StringValue extends PrimitiveValue {
+	    isNotEmpty() {
+	        return this.confirm(value => value !== "", "空の文字列です。");
+	    }
+	    matches(re) {
+	        return this.confirm(value => re.test(value), "文字列の値が不適切です。");
+	    }
+	    isValidDate() {
+	        return this.confirm(value => moment(value).isValid(), "正しい日付でありません。");
+	    }
+	    isValidDateTime() {
+	        return this.confirm(value => moment(value).isValid(), "正しい日付時刻でありません。");
+	    }
+	    isZeroOrValidDate() {
+	        return this.confirm(value => value === "0000-00-00" || moment(value).isValid(), "（'0000-00-00' を含む）正しい日付でありません。");
+	    }
+	    isSqlDate() {
+	        return this.confirm(value => /^\d{4}-\d{2}-\d{2}$/.test(value), "日付の形式に合致しません。");
+	    }
+	    isSqlDateTime() {
+	        return this.confirm(value => /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(value), "日付の形式に合致しません。");
+	    }
+	}
+	exports.StringValue = StringValue;
+	class BooleanValue extends PrimitiveValue {
+	}
+	exports.BooleanValue = BooleanValue;
+	function ensureNumber(value) {
+	    if (typeof value === "undefined") {
+	        return new NumberValue(0, new PrimitiveError("値が設定されていません。", value));
+	    }
+	    if (typeof value === "number") {
+	        return new NumberValue(value);
+	    }
+	    else {
+	        return new NumberValue(0, new PrimitiveError("値が数値でありません。", value));
+	    }
+	}
+	exports.ensureNumber = ensureNumber;
+	function ensureString(value) {
+	    if (typeof value === "undefined") {
+	        return new StringValue("", new PrimitiveError("値が設定されていません。", value));
+	    }
+	    if (typeof value === "string") {
+	        return new StringValue(value);
+	    }
+	    else {
+	        return new StringValue("", new PrimitiveError("値が文字列でありません。", value));
+	    }
+	}
+	exports.ensureString = ensureString;
+	function ensurePositiveInteger(value) {
+	    return ensureNumber(value).isInteger().isPositive();
+	}
+	exports.ensurePositiveInteger = ensurePositiveInteger;
+	/**
+	export class Value<T> {
+
+	    constructor(
+	        protected _value: T | undefined = undefined,
+	        protected _err: any = null
+	    ){}
+
+	    get err(): any { return this._err; }
+
+	    get value(): T {
+	        if( this._err !== null ){
+	            throw this._err;
+	        }
+	        if( this._value === undefined ){
+	            throw new Error("There is no value.");
+	        } else {
+	            return this._value;
+	        }
+	    }
+
+	    confirm(pred: (value: T) => boolean, errString: string): this {
+	        if( this._err ){
+	            return this;
+	        }
+	        let value = this._value;
+	        if( value === undefined ){
+	            this._err = "Undefined value";
+	        } else {
+	            if( !pred(value) ){
+	                this._err = errString;
+	            }
+	        }
+	        return this;
+	    }
+
+	    convert(onErr: (err: any) => any, defaultValue: T): T {
+	        if( this.hasError() ){
+	            onErr(this.getError());
+	            return defaultValue;
+	        } else {
+	            return this.getValue();
+	        }
+	    }
+
+	    or(c1: (v: this) => this, c2: (v: this) => this): this {
+	        let v1 = c1(this);
+	        if( !v1.hasError() ){
+	            return v1;
+	        } else {
+	            return c2(this);
+	        }
+	    }
+
+	    oneOf(...choices: T[]): this {
+	        if( this.hasError() ){
+	            return this;
+	        }
+	        let value = this.getValue();
+	        for(let i=0;i<choices.length;i++){
+	            let c = choices[i];
+	            if( c === value ){
+	                return this;
+	            }
+	        }
+	        this.err = "選択できる値のひとつでありません。";
+	        return this;
+	    }
+	}
+
+	export function makeValue(src: any){
+	    return new SrcValue(src);
+	}
+
+	export let Undefined = new Value<any>(undefined, "値が設定されていません。");
+
+	class SrcValue extends Value<any> {
+
+	    ensureNumber(): NumberValue {
+	        if( this.hasError ){
+	            return new NumberValue(undefined, this.err);
+	        }
+	        if( typeof this.value === "number" ){
+	            return new NumberValue(<number>this.value);
+	        } else {
+	            return new NumberValue(undefined, "数値でありません。");
+	        }
+	    }
+
+	    ensureString(): StringValue {
+	        if( this.hasError ){
+	            return new StringValue(undefined, this.err);
+	        }
+	        if( typeof this.value === "string" ){
+	            return new StringValue(<string>this.value);
+	        } else {
+	            return new StringValue(undefined, "文字列でありません。");
+	        }
+	    }
+	}
+
+	class NumberValue extends Value<number> {
+
+	    isInteger(): NumberValue {
+	        return this.confirm(
+	            value => Number.isInteger(value),
+	            "整数でありません。"
+	        );
+	    }
+
+	    isPositive(): NumberValue {
+	        return this.confirm(
+	            value => value > 0,
+	            "正の数値でありません。"
+	        );
+	    }
+
+	    isZeroPositive(): NumberValue {
+	        return this.confirm(
+	            value => value >= 0,
+	            "正またはｾﾞﾛでありません。"
+	        );
+	    }
+	}
+
+	class StringValue extends Value<string> {
+
+	    isNotEmpty(): StringValue {
+	        return this.confirm(
+	            value => value !== "",
+	            "空の文字列です。"
+	        );
+	    }
+
+	    matches(re: RegExp): StringValue {
+	        return this.confirm(
+	            value => re.test(value),
+	            "文字列の値が不適切です。"
+	        );
+	    }
+
+	    isValidDate(): StringValue {
+	        return this.confirm(
+	            value => moment(value).isValid(),
+	            "正しい日付でありません。"
+	        );
+	    }
+
+	    isSqlDate(): StringValue {
+	        return this.confirm(
+	            value => /^\d{4}-\d{2}-\d{2}$/.test(value),
+	            "日付の形式に合致しません。"
+	        );
+	    }
+
+	    isZeroSqlDate(): StringValue {
+	        return this.confirm(
+	            value => value === "0000-00-00",
+	            "0000-00-00 でありません。"
+	        )
+	    }
+
+	    isSqlDateTime(): StringValue {
+	        return this.confirm(
+	            value => /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(value),
+	            "日付時間の形式に合致しません。"
+	        );
+	    }
+	}
+
+	**/
+
+
+/***/ },
 /* 121 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	const validator_1 = __webpack_require__(148);
+	const value_1 = __webpack_require__(120);
 	class Visit {
-	    constructor(visitId, patientId, visitedAt, shahokokuhoId, koukikoureiId, roujinId, kouhi1Id, kouhi2Id, kouhi3Id) {
-	        this.visitId = visitId;
-	        this.patientId = patientId;
-	        this.visitedAt = visitedAt;
-	        this.shahokokuhoId = shahokokuhoId;
-	        this.koukikoureiId = koukikoureiId;
-	        this.roujinId = roujinId;
-	        this.kouhi1Id = kouhi1Id;
-	        this.kouhi2Id = kouhi2Id;
-	        this.kouhi3Id = kouhi3Id;
-	    }
 	}
 	exports.Visit = Visit;
-	function convertToVisit(src) {
-	    let visitId;
-	    let patientId;
-	    let visitedAt;
-	    let shahokokuhoId;
-	    let koukikoureiId;
-	    let roujinId;
-	    let kouhi1Id;
-	    let kouhi2Id;
-	    let kouhi3Id;
-	    let err = {};
-	    {
-	        let cvt = new validator_1.Validator(src.visit_id)
-	            .isDefined()
-	            .ensureNumber()
-	            .isInteger()
-	            .isPositive();
-	        if (cvt.hasError) {
-	            err["visitId"] = cvt.getError();
-	            visitId = 0;
-	        }
-	        else {
-	            visitId = cvt.getValue();
-	        }
-	    }
-	    {
-	        let cvt = new validator_1.Validator(src.patient_id)
-	            .isDefined()
-	            .ensureNumber()
-	            .isInteger()
-	            .isPositive();
-	        if (cvt.hasError) {
-	            err["患者番号"] = cvt.getError();
-	            patientId = 0;
-	        }
-	        else {
-	            patientId = cvt.getValue();
-	        }
-	    }
-	    {
-	        let cvt = new validator_1.Validator(src.v_datetime)
-	            .ensureString()
-	            .isSqlDateTime()
-	            .isValidDate();
-	        if (cvt.hasError) {
-	            err["診察時刻"] = cvt.getError();
-	            visitedAt = "";
-	        }
-	        else {
-	            visitedAt = cvt.getValue();
-	        }
-	    }
-	    {
-	        let cvt = new validator_1.Validator(src.shahokokuho_id)
-	            .ensureNumber()
-	            .isInteger()
-	            .isZeroPositive();
-	        if (cvt.hasError) {
-	            err["社保・国保番号"] = cvt.getError();
-	            shahokokuhoId = 0;
-	        }
-	        else {
-	            shahokokuhoId = cvt.getValue();
-	        }
-	    }
-	    if (Object.keys(err).length > 0) {
-	        return new validator_1.ValidationError(err);
-	    }
-	    return new Visit(visitId, patientId, visitedAt, shahokokuhoId, koukikoureiId, roujinId, kouhi1Id, kouhi2Id, kouhi3Id);
+	class VisitValues {
 	}
+	exports.VisitValues = VisitValues;
+	function hasError(values) {
+	    return values.visitId.isError || values.patientId.isError ||
+	        values.visitedAt.isError || values.shahokokuhoId.isError ||
+	        values.koukikoureiId.isError || values.roujinId.isError ||
+	        values.kouhi1Id.isError || values.kouhi2Id.isError ||
+	        values.kouhi3Id.isError;
+	}
+	function validateVisit(visit) {
+	    let v = new VisitValues();
+	    v.visitId = value_1.ensurePositiveInteger(visit.visitId);
+	    v.patientId = value_1.ensurePositiveInteger(visit.patientId);
+	    v.visitedAt = value_1.ensureString(visit.visitedAt)
+	        .isSqlDateTime().isValidDateTime();
+	    v.shahokokuhoId = value_1.ensureNumber(visit.shahokokuhoId)
+	        .isInteger().isZeroOrPositive();
+	    v.koukikoureiId = value_1.ensureNumber(visit.koukikoureiId)
+	        .isInteger().isZeroOrPositive();
+	    v.roujinId = value_1.ensureNumber(visit.roujinId)
+	        .isInteger().isZeroOrPositive();
+	    v.kouhi1Id = value_1.ensureNumber(visit.kouhi1Id)
+	        .isInteger().isZeroOrPositive();
+	    v.kouhi2Id = value_1.ensureNumber(visit.kouhi2Id)
+	        .isInteger().isZeroOrPositive();
+	    v.kouhi3Id = value_1.ensureNumber(visit.kouhi3Id)
+	        .isInteger().isZeroOrPositive();
+	    return hasError(v) ? v : null;
+	}
+	exports.validateVisit = validateVisit;
+	function fillVisitFromJson(visit, src) {
+	    visit.visitId = src.visit_id;
+	    visit.patientId = src.patient_id;
+	    visit.visitedAt = src.v_datetime;
+	    visit.shahokokuhoId = src.shahokokuho_id;
+	    visit.koukikoureiId = src.koukikourei_id;
+	    visit.roujinId = src.roujin_id;
+	    visit.kouhi1Id = src.kouhi_1_id;
+	    visit.kouhi2Id = src.kouhi_2_id;
+	    visit.kouhi3Id = src.kouhi_3_id;
+	}
+	exports.fillVisitFromJson = fillVisitFromJson;
+	function jsonToVisit(src) {
+	    let visit = new Visit();
+	    fillVisitFromJson(visit, src);
+	    return visit;
+	}
+	exports.jsonToVisit = jsonToVisit;
+	// function convertToVisit(src: any): 
+	// 	Visit | ValidationError {
+	// 	let visitId: number;
+	// 	let patientId: number;
+	// 	let visitedAt: string;
+	// 	let shahokokuhoId: number;
+	// 	let koukikoureiId: number;
+	// 	let roujinId: number;
+	// 	let kouhi1Id: number;
+	// 	let kouhi2Id: number;
+	// 	let kouhi3Id: number;
+	// 	let err = {};
+	// 	{
+	// 		let cvt = new Validator(src.visit_id)
+	// 			.isDefined()
+	// 			.ensureNumber()
+	// 			.isInteger()
+	// 			.isPositive()
+	// 		if( cvt.hasError ){
+	// 			err["visitId"] = cvt.getError();
+	// 			visitId = 0;
+	// 		} else {
+	// 			visitId = cvt.getValue();
+	// 		}
+	// 	}
+	// 	{
+	// 		let cvt = new Validator(src.patient_id)
+	// 			.isDefined()
+	// 			.ensureNumber()
+	// 			.isInteger()
+	// 			.isPositive()
+	// 		if( cvt.hasError ){
+	// 			err["患者番号"] = cvt.getError();
+	// 			patientId = 0;
+	// 		} else {
+	// 			patientId = cvt.getValue();
+	// 		}
+	// 	}
+	// 	{
+	// 		let cvt = new Validator(src.v_datetime)
+	// 			.ensureString()
+	// 			.isSqlDateTime()
+	// 			.isValidDate()
+	// 		if( cvt.hasError ){
+	// 			err["診察時刻"]　= cvt.getError();
+	// 			visitedAt = "";
+	// 		} else {
+	// 			visitedAt = cvt.getValue();
+	// 		}
+	// 	}
+	// 	{
+	// 		let cvt = new Validator(src.shahokokuho_id)
+	// 			.ensureNumber()
+	// 			.isInteger()
+	// 			.isZeroPositive()
+	// 		if( cvt.hasError ){
+	// 			err["社保・国保番号"] = cvt.getError();
+	// 			shahokokuhoId = 0;
+	// 		} else {
+	// 			shahokokuhoId = cvt.getValue();
+	// 		}
+	// 	}
+	// 	if( Object.keys(err).length > 0 ){
+	// 		return new ValidationError(err);
+	// 	}
+	// 	return new Visit(visitId, patientId, visitedAt, shahokokuhoId,
+	// 		koukikoureiId, roujinId, kouhi1Id, kouhi2Id, kouhi3Id);
+	// }
 	/*
 	export function validateVisit(visit: Visit,
 	    checkVisitId: boolean = true): string[] {
@@ -26717,307 +26881,328 @@
 
 /***/ },
 /* 122 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	"use strict";
-	const V = __webpack_require__(118);
 	class Text {
-	    constructor(textId, visitId, content) {
-	        this.textId = textId;
-	        this.visitId = visitId;
-	        this.content = content;
-	    }
 	}
 	exports.Text = Text;
-	function validateText(text, checkTextId = true) {
-	    let errs = [];
-	    if (checkTextId) {
-	        V.validate("textId", text.textId, errs, [
-	            V.isDefined, V.isInteger, V.isPositive
-	        ]);
-	    }
-	    V.validate("visitId", text.visitId, errs, [
-	        V.isInteger, V.isPositive
-	    ]);
-	    V.validate("content", text.content, errs, [V.isString]);
-	    return errs;
+	class TextValues {
 	}
-	exports.validateText = validateText;
-	function fromJsonToText(src) {
-	    let text = new Text(src.text_id, src.visit_id, src.content);
-	    let errs = validateText(text, true);
-	    if (errs.length > 0) {
-	        return new V.ValidationError(errs);
-	    }
-	    else {
-	        return text;
-	    }
+	exports.TextValues = TextValues;
+	function jsonToText(src) {
+	    let text = new Text();
+	    text.textId = src.text_id;
+	    text.visitId = src.visit_id;
+	    text.content = src.content;
+	    return text;
 	}
-	exports.fromJsonToText = fromJsonToText;
+	exports.jsonToText = jsonToText;
+	// export function validateText(text: Text,
+	// 	checkTextId: boolean = true): string[] {
+	// 	let errs: string[] = [];
+	// 	if( checkTextId ){
+	// 		V.validate("textId", text.textId, errs, [
+	// 			V.isDefined, V.isInteger, V.isPositive
+	// 		]);
+	// 	}
+	// 	V.validate("visitId", text.visitId, errs, [
+	// 		V.isInteger, V.isPositive
+	// 	]);
+	// 	V.validate("content", text.content, errs, [V.isString])
+	// 	return errs;
+	// }
+	// export function fromJsonToText(src: any): Text | V.ValidationError {
+	// 	let text = new Text(src.text_id, src.visit_id, src.content);
+	// 	let errs = validateText(text, true);
+	// 	if( errs.length > 0 ){
+	// 		return new V.ValidationError(errs);
+	// 	} else {
+	// 		return text;
+	// 	}
+	// } 
 
 
 /***/ },
 /* 123 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	"use strict";
-	const V = __webpack_require__(118);
 	class Shahokokuho {
-	    constructor(shahokokuhoId, patientId, hokenshaBangou, hihokenshaKigou, hihokenshaBangou, honnin, validFrom, validUpto, kourei) {
-	        this.shahokokuhoId = shahokokuhoId;
-	        this.patientId = patientId;
-	        this.hokenshaBangou = hokenshaBangou;
-	        this.hihokenshaKigou = hihokenshaKigou;
-	        this.hihokenshaBangou = hihokenshaBangou;
-	        this.honnin = honnin;
-	        this.validFrom = validFrom;
-	        this.validUpto = validUpto;
-	        this.kourei = kourei;
-	    }
 	}
 	exports.Shahokokuho = Shahokokuho;
-	function validateShahokokuho(shahokokuho, checkShahokokuhoId = true) {
-	    let errs = [];
-	    if (checkShahokokuhoId) {
-	        V.validate("shahokokuhoId", shahokokuho.shahokokuhoId, errs, [
-	            V.isDefined, V.isInteger, V.isPositive
-	        ]);
-	    }
-	    V.validate("患者番号", shahokokuho.patientId, errs, [
-	        V.isDefined, V.isInteger, V.isPositive
-	    ]);
-	    V.validate("保険者番号", shahokokuho.hokenshaBangou, errs, [
-	        V.isDefined, V.isInteger, V.isPositive
-	    ]);
-	    V.validate("被保険者記号", shahokokuho.hihokenshaKigou, errs, [
-	        V.isDefined, V.isString, V.isNotEmpty
-	    ]);
-	    V.validate("被保険者番号", shahokokuho.hihokenshaBangou, errs, [
-	        V.isDefined, V.isString, V.isNotEmpty
-	    ]);
-	    V.validate("本人", shahokokuho.honnin, errs, [
-	        V.isDefined, V.isBoolean
-	    ]);
-	    V.validate("有効期限（開始）", shahokokuho.validFrom, errs, [
-	        V.isDefined, V.isSqlDate
-	    ]);
-	    V.validate("有効期限（終了）", shahokokuho.validFrom, errs, [
-	        V.isDefined, V.isSqlDateOrZero
-	    ]);
-	    V.validate("高齢", shahokokuho.kourei, errs, [
-	        V.isDefined, V.isInteger, V.isZeroOrPositive
-	    ]);
-	    return errs;
+	class ShahokokuhoValues {
 	}
-	exports.validateShahokokuho = validateShahokokuho;
-	function fromJsonToShahokokuho(src) {
-	    let shahokokuho = new Shahokokuho(src.shahokokuho_id, src.patient_id, src.hokensha_bangou, src.hihokensha_kigou, src.hihokensha_bangou, src.honnin === 0 ? false : true, src.valid_from, src.valid_upto, src.kourei);
-	    let errs = validateShahokokuho(shahokokuho, true);
-	    if (errs.length > 0) {
-	        return new V.ValidationError(errs);
-	    }
-	    else {
-	        return shahokokuho;
-	    }
+	exports.ShahokokuhoValues = ShahokokuhoValues;
+	function jsonToShahokokuho(src) {
+	    let shaho = new Shahokokuho();
+	    shaho.shahokokuhoId = src.shahokokuho_id;
+	    shaho.patientId = src.patient_id;
+	    shaho.hokenshaBangou = src.hokensha_bangou;
+	    shaho.hihokenshaKigou = src.hihokensha_kigou;
+	    shaho.hihokenshaBangou = src.hihokensha_bangou;
+	    shaho.honnin = src.honnin === 0 ? false : true;
+	    shaho.validFrom = src.valid_from;
+	    shaho.validUpto = src.valid_upto;
+	    shaho.kourei = src.kourei;
+	    return shaho;
 	}
-	exports.fromJsonToShahokokuho = fromJsonToShahokokuho;
+	exports.jsonToShahokokuho = jsonToShahokokuho;
+	// export function validateShahokokuho(shahokokuho: Shahokokuho,
+	// 	checkShahokokuhoId: boolean = true): string[] {
+	// 	let errs: string[] = [];
+	// 	if( checkShahokokuhoId ){
+	// 		V.validate("shahokokuhoId", shahokokuho.shahokokuhoId, errs, [
+	// 			V.isDefined, V.isInteger, V.isPositive
+	// 		]);
+	// 	}
+	// 	V.validate("患者番号", shahokokuho.patientId, errs, [
+	// 		V.isDefined, V.isInteger, V.isPositive
+	// 	]);
+	// 	V.validate("保険者番号", shahokokuho.hokenshaBangou, errs, [
+	// 		V.isDefined, V.isInteger, V.isPositive
+	// 	]);
+	// 	V.validate("被保険者記号", shahokokuho.hihokenshaKigou, errs, [
+	// 		V.isDefined, V.isString, V.isNotEmpty
+	// 	]);
+	// 	V.validate("被保険者番号", shahokokuho.hihokenshaBangou, errs, [
+	// 		V.isDefined, V.isString, V.isNotEmpty
+	// 	]);
+	// 	V.validate("本人", shahokokuho.honnin, errs, [
+	// 		V.isDefined, V.isBoolean
+	// 	]);
+	// 	V.validate("有効期限（開始）", shahokokuho.validFrom, errs, [
+	// 		V.isDefined, V.isSqlDate
+	// 	]);
+	// 	V.validate("有効期限（終了）", shahokokuho.validFrom, errs, [
+	// 		V.isDefined, V.isSqlDateOrZero
+	// 	]);
+	// 	V.validate("高齢", shahokokuho.kourei, errs, [
+	// 		V.isDefined, V.isInteger, V.isZeroOrPositive
+	// 	]);
+	// 	return errs;
+	// }
+	// export function fromJsonToShahokokuho(src: any): Shahokokuho | V.ValidationError {
+	// 	let shahokokuho = new Shahokokuho(src.shahokokuho_id, src.patient_id, 
+	// 		src.hokensha_bangou, src.hihokensha_kigou, src.hihokensha_bangou, 
+	// 		src.honnin === 0 ? false : true, src.valid_from, 
+	// 		src.valid_upto, src.kourei);
+	// 	let errs = validateShahokokuho(shahokokuho, true);
+	// 	if( errs.length > 0 ){
+	// 		return new V.ValidationError(errs);
+	// 	} else {
+	// 		return shahokokuho;
+	// 	}
+	// }
 
 
 /***/ },
 /* 124 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	"use strict";
-	const V = __webpack_require__(118);
 	class Koukikourei {
-	    constructor(koukikoureiId, patientId, hokenshaBangou, hihokenshaBangou, futanWari, validFrom, validUpto) {
-	        this.koukikoureiId = koukikoureiId;
-	        this.patientId = patientId;
-	        this.hokenshaBangou = hokenshaBangou;
-	        this.hihokenshaBangou = hihokenshaBangou;
-	        this.futanWari = futanWari;
-	        this.validFrom = validFrom;
-	        this.validUpto = validUpto;
-	    }
 	}
 	exports.Koukikourei = Koukikourei;
-	function validateKoukikourei(koukikourei, checkKoukikoureiId = true) {
-	    let errs = [];
-	    if (checkKoukikoureiId) {
-	        V.validate("koukikoureiId", koukikourei.koukikoureiId, errs, [
-	            V.isDefined, V.isInteger, V.isPositive
-	        ]);
-	    }
-	    V.validate("患者番号", koukikourei.patientId, errs, [
-	        V.isDefined, V.isInteger, V.isPositive
-	    ]);
-	    V.validate("保険者番号", koukikourei.hokenshaBangou, errs, [
-	        V.isDefined, V.isString, V.isNotEmpty
-	    ]);
-	    V.validate("被保険者番号", koukikourei.hihokenshaBangou, errs, [
-	        V.isDefined, V.isString, V.isNotEmpty
-	    ]);
-	    V.validate("負担割", koukikourei.futanWari, errs, [
-	        V.isDefined, V.isInteger, V.isZeroOrPositive
-	    ]);
-	    V.validate("有効期限（開始）", koukikourei.validFrom, errs, [
-	        V.isDefined, V.isSqlDate
-	    ]);
-	    V.validate("有効期限（終了）", koukikourei.validFrom, errs, [
-	        V.isDefined, V.isSqlDateOrZero
-	    ]);
-	    return errs;
+	function jsonToKoukikourei(src) {
+	    let hoken = new Koukikourei();
+	    hoken.koukikoureiId = src.koukikourei_id;
+	    hoken.patientId = src.patient_id;
+	    hoken.hokenshaBangou = src.hokensha_bangou;
+	    hoken.hihokenshaBangou = src.hihokensha_bangou;
+	    hoken.futanWari = src.futan_wari;
+	    hoken.validFrom = src.valid_from;
+	    hoken.validUpto = src.valid_upto;
+	    return hoken;
 	}
-	exports.validateKoukikourei = validateKoukikourei;
-	function fromJsonToKoukikourei(src) {
-	    let koukikourei = new Koukikourei(src.koukikourei_id, src.patient_id, src.hokensha_bangou, src.hihokensha_bangou, src.futan_wari, src.valid_from, src.valid_upto);
-	    let errs = validateKoukikourei(koukikourei, true);
-	    if (errs.length > 0) {
-	        return new V.ValidationError(errs);
-	    }
-	    else {
-	        return koukikourei;
-	    }
-	}
-	exports.fromJsonToKoukikourei = fromJsonToKoukikourei;
+	exports.jsonToKoukikourei = jsonToKoukikourei;
+	// export function validateKoukikourei(koukikourei: Koukikourei,
+	// 	checkKoukikoureiId: boolean = true): string[] {
+	// 	let errs: string[] = [];
+	// 	if( checkKoukikoureiId ){
+	// 		V.validate("koukikoureiId", koukikourei.koukikoureiId, errs, [
+	// 			V.isDefined, V.isInteger, V.isPositive
+	// 		]);
+	// 	}
+	// 	V.validate("患者番号", koukikourei.patientId, errs, [
+	// 		V.isDefined, V.isInteger, V.isPositive
+	// 	]);
+	// 	V.validate("保険者番号", koukikourei.hokenshaBangou, errs, [
+	// 		V.isDefined, V.isString, V.isNotEmpty
+	// 	]);
+	// 	V.validate("被保険者番号", koukikourei.hihokenshaBangou, errs, [
+	// 		V.isDefined, V.isString, V.isNotEmpty
+	// 	]);
+	// 	V.validate("負担割", koukikourei.futanWari, errs, [
+	// 		V.isDefined, V.isInteger, V.isZeroOrPositive
+	// 	]);
+	// 	V.validate("有効期限（開始）", koukikourei.validFrom, errs, [
+	// 		V.isDefined, V.isSqlDate
+	// 	]);
+	// 	V.validate("有効期限（終了）", koukikourei.validFrom, errs, [
+	// 		V.isDefined, V.isSqlDateOrZero
+	// 	]);
+	// 	return errs;
+	// }
+	// export function fromJsonToKoukikourei(src: any): Koukikourei | V.ValidationError {
+	// 	let koukikourei = new Koukikourei(src.koukikourei_id, src.patient_id, 
+	// 		src.hokensha_bangou, src.hihokensha_bangou, 
+	// 		src.futan_wari, src.valid_from, src.valid_upto);
+	// 	let errs = validateKoukikourei(koukikourei, true);
+	// 	if( errs.length > 0 ){
+	// 		return new V.ValidationError(errs);
+	// 	} else {
+	// 		return koukikourei;
+	// 	}
+	// }
 
 
 /***/ },
 /* 125 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	"use strict";
-	const V = __webpack_require__(118);
 	class Roujin {
-	    constructor(roujinId, patientId, shichouson, jukyuusha, futanWari, validFrom, validUpto) {
-	        this.roujinId = roujinId;
-	        this.patientId = patientId;
-	        this.shichouson = shichouson;
-	        this.jukyuusha = jukyuusha;
-	        this.futanWari = futanWari;
-	        this.validFrom = validFrom;
-	        this.validUpto = validUpto;
-	    }
 	}
 	exports.Roujin = Roujin;
-	function validateRoujin(roujin, checkRoujinId = true) {
-	    let errs = [];
-	    if (checkRoujinId) {
-	        V.validate("roujinId", roujin.roujinId, errs, [
-	            V.isDefined, V.isInteger, V.isPositive
-	        ]);
-	    }
-	    V.validate("患者番号", roujin.patientId, errs, [
-	        V.isDefined, V.isInteger, V.isPositive
-	    ]);
-	    V.validate("市町村番号", roujin.shichouson, errs, [
-	        V.isDefined, V.isInteger, V.isPositive
-	    ]);
-	    V.validate("受給者番号", roujin.jukyuusha, errs, [
-	        V.isDefined, V.isInteger, V.isPositive
-	    ]);
-	    V.validate("負担割", roujin.futanWari, errs, [
-	        V.isDefined, V.isInteger, V.isZeroOrPositive
-	    ]);
-	    V.validate("有効期限（開始）", roujin.validFrom, errs, [
-	        V.isDefined, V.isSqlDate
-	    ]);
-	    V.validate("有効期限（終了）", roujin.validFrom, errs, [
-	        V.isDefined, V.isSqlDateOrZero
-	    ]);
-	    return errs;
+	function jsonToRoujin(src) {
+	    let hoken = new Roujin();
+	    hoken.roujinId = src.roujin_id;
+	    hoken.patientId = src.patient_id;
+	    hoken.shichouson = src.shichouson;
+	    hoken.jukyuusha = src.jukyuusha;
+	    hoken.futanWari = src.futan_wari;
+	    hoken.validFrom = src.valid_from;
+	    hoken.validUpto = src.valid_upto;
+	    return hoken;
 	}
-	exports.validateRoujin = validateRoujin;
-	function fromJsonToRoujin(src) {
-	    let roujin = new Roujin(src.roujin_id, src.patient_id, src.shichouson, src.jukyuusha, src.futan_wari, src.valid_from, src.valid_upto);
-	    let errs = validateRoujin(roujin, true);
-	    if (errs.length > 0) {
-	        return new V.ValidationError(errs);
-	    }
-	    else {
-	        return roujin;
-	    }
-	}
-	exports.fromJsonToRoujin = fromJsonToRoujin;
+	exports.jsonToRoujin = jsonToRoujin;
+	// export function validateRoujin(roujin: Roujin,
+	// 	checkRoujinId: boolean = true): string[] {
+	// 	let errs: string[] = [];
+	// 	if( checkRoujinId ){
+	// 		V.validate("roujinId", roujin.roujinId, errs, [
+	// 			V.isDefined, V.isInteger, V.isPositive
+	// 		]);
+	// 	}
+	// 	V.validate("患者番号", roujin.patientId, errs, [
+	// 		V.isDefined, V.isInteger, V.isPositive
+	// 	]);
+	// 	V.validate("市町村番号", roujin.shichouson, errs, [
+	// 		V.isDefined, V.isInteger, V.isPositive
+	// 	]);
+	// 	V.validate("受給者番号", roujin.jukyuusha, errs, [
+	// 		V.isDefined, V.isInteger, V.isPositive
+	// 	]);
+	// 	V.validate("負担割", roujin.futanWari, errs, [
+	// 		V.isDefined, V.isInteger, V.isZeroOrPositive
+	// 	]);
+	// 	V.validate("有効期限（開始）", roujin.validFrom, errs, [
+	// 		V.isDefined, V.isSqlDate
+	// 	]);
+	// 	V.validate("有効期限（終了）", roujin.validFrom, errs, [
+	// 		V.isDefined, V.isSqlDateOrZero
+	// 	]);
+	// 	return errs;
+	// }
+	// export function fromJsonToRoujin(src: any): Roujin | V.ValidationError {
+	// 	let roujin = new Roujin(src.roujin_id, src.patient_id, 
+	// 		src.shichouson, src.jukyuusha, 
+	// 		src.futan_wari, src.valid_from, src.valid_upto);
+	// 	let errs = validateRoujin(roujin, true);
+	// 	if( errs.length > 0 ){
+	// 		return new V.ValidationError(errs);
+	// 	} else {
+	// 		return roujin;
+	// 	}
+	// }
 
 
 /***/ },
 /* 126 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	"use strict";
-	const V = __webpack_require__(118);
 	class Kouhi {
-	    constructor(kouhiId, patientId, futansha, jukyuusha, validFrom, validUpto) {
-	        this.kouhiId = kouhiId;
-	        this.patientId = patientId;
-	        this.futansha = futansha;
-	        this.jukyuusha = jukyuusha;
-	        this.validFrom = validFrom;
-	        this.validUpto = validUpto;
-	    }
 	}
 	exports.Kouhi = Kouhi;
-	function validateKouhi(kouhi, checkKouhiId = true) {
-	    let errs = [];
-	    if (checkKouhiId) {
-	        V.validate("kouhiId", kouhi.kouhiId, errs, [
-	            V.isDefined, V.isInteger, V.isPositive
-	        ]);
-	    }
-	    V.validate("患者番号", kouhi.patientId, errs, [
-	        V.isDefined, V.isInteger, V.isPositive
-	    ]);
-	    V.validate("負担者番号", kouhi.futansha, errs, [
-	        V.isDefined, V.isInteger, V.isPositive
-	    ]);
-	    V.validate("受給者番号", kouhi.jukyuusha, errs, [
-	        V.isDefined, V.isInteger, V.isPositive
-	    ]);
-	    V.validate("有効期限（開始）", kouhi.validFrom, errs, [
-	        V.isDefined, V.isSqlDate
-	    ]);
-	    V.validate("有効期限（終了）", kouhi.validFrom, errs, [
-	        V.isDefined, V.isSqlDateOrZero
-	    ]);
-	    return errs;
+	function jsonToKouhi(src) {
+	    let kouhi = new Kouhi();
+	    kouhi.kouhiId = src.kouhi_id;
+	    kouhi.patientId = src.patient_id;
+	    kouhi.futansha = src.futansha;
+	    kouhi.jukyuusha = src.jukyuusha;
+	    kouhi.validFrom = src.valid_from;
+	    kouhi.validUpto = src.valid_upto;
+	    return kouhi;
 	}
-	exports.validateKouhi = validateKouhi;
-	function fromJsonToKouhi(src) {
-	    let kouhi = new Kouhi(src.kouhi_id, src.patient_id, src.futansha, src.jukyuusha, src.valid_from, src.valid_upto);
-	    let errs = validateKouhi(kouhi, true);
-	    if (errs.length > 0) {
-	        return new V.ValidationError(errs);
-	    }
-	    else {
-	        return kouhi;
-	    }
-	}
-	exports.fromJsonToKouhi = fromJsonToKouhi;
+	exports.jsonToKouhi = jsonToKouhi;
+	// export function validateKouhi(kouhi: Kouhi,
+	// 	checkKouhiId: boolean = true): string[] {
+	// 	let errs: string[] = [];
+	// 	if( checkKouhiId ){
+	// 		V.validate("kouhiId", kouhi.kouhiId, errs, [
+	// 			V.isDefined, V.isInteger, V.isPositive
+	// 		]);
+	// 	}
+	// 	V.validate("患者番号", kouhi.patientId, errs, [
+	// 		V.isDefined, V.isInteger, V.isPositive
+	// 	]);
+	// 	V.validate("負担者番号", kouhi.futansha, errs, [
+	// 		V.isDefined, V.isInteger, V.isPositive
+	// 	]);
+	// 	V.validate("受給者番号", kouhi.jukyuusha, errs, [
+	// 		V.isDefined, V.isInteger, V.isPositive
+	// 	]);
+	// 	V.validate("有効期限（開始）", kouhi.validFrom, errs, [
+	// 		V.isDefined, V.isSqlDate
+	// 	]);
+	// 	V.validate("有効期限（終了）", kouhi.validFrom, errs, [
+	// 		V.isDefined, V.isSqlDateOrZero
+	// 	]);
+	// 	return errs;
+	// }
+	// export function fromJsonToKouhi(src: any): Kouhi | V.ValidationError {
+	// 	let kouhi = new Kouhi(src.kouhi_id, src.patient_id, 
+	// 		src.futansha, src.jukyuusha, src.valid_from, src.valid_upto);
+	// 	let errs = validateKouhi(kouhi, true);
+	// 	if( errs.length > 0 ){
+	// 		return new V.ValidationError(errs);
+	// 	} else {
+	// 		return kouhi;
+	// 	}
+	// }
 
 
 /***/ },
 /* 127 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	"use strict";
-	const V = __webpack_require__(118);
 	class Drug {
-	    constructor(drugId, visitId, iyakuhincode, amount, usage, days, category, prescribed) {
-	        this.drugId = drugId;
-	        this.visitId = visitId;
-	        this.iyakuhincode = iyakuhincode;
-	        this.amount = amount;
-	        this.usage = usage;
-	        this.days = days;
-	        this.category = category;
-	        this.prescribed = prescribed;
-	    }
 	}
 	exports.Drug = Drug;
-	function validateDrug(drug, checkDrugId = true) {
-	    let errs = [];
-	    if (checkDrugId) {
+	function fillDrugFromJson(drug, src) {
+	    drug.drugId = src.drug_id;
+	    drug.visitId = src.visit_id;
+	    drug.iyakuhincode = src.d_iyakuhincode;
+	    drug.amount = src.d_amount;
+	    drug.usage = src.d_usage;
+	    drug.category = src.d_category;
+	    drug.prescribed = src.d_prescribed === 0 ? false : true;
+	}
+	exports.fillDrugFromJson = fillDrugFromJson;
+	function jsonToDrug(src) {
+	    let drug = new Drug();
+	    fillDrugFromJson(drug, src);
+	    return drug;
+	}
+	exports.jsonToDrug = jsonToDrug;
+	/**
+	export function validateDrug(drug: Drug,
+	    checkDrugId: boolean = true): string[] {
+	    let errs: string[] = [];
+	    if( checkDrugId ){
 	        V.validate("drugId", drug.drugId, errs, [
 	            V.isDefined, V.isInteger, V.isPositive
 	        ]);
@@ -27045,37 +27230,46 @@
 	    ]);
 	    return errs;
 	}
-	exports.validateDrug = validateDrug;
-	function fromJsonToDrug(src) {
-	    let drug = new Drug(src.drug_id, src.visit_id, src.d_iyakuhincode, src.d_amount, src.d_usage, src.d_days, src.d_category, src.d_prescribed === 0 ? false : true);
+
+	export function fromJsonToDrug(src: any): Drug | V.ValidationError {
+	    let drug = new Drug(src.drug_id, src.visit_id, src.d_iyakuhincode,
+	        src.d_amount, src.d_usage, src.d_days, src.d_category,
+	        src.d_prescribed === 0 ? false : true);
 	    let errs = validateDrug(drug, true);
-	    if (errs.length > 0) {
+	    if( errs.length > 0 ){
 	        return new V.ValidationError(errs);
-	    }
-	    else {
+	    } else {
 	        return drug;
 	    }
 	}
-	exports.fromJsonToDrug = fromJsonToDrug;
+	**/ 
 
 
 /***/ },
 /* 128 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	"use strict";
-	const V = __webpack_require__(118);
 	class Shinryou {
-	    constructor(shinryouId, visitId, shinryoucode) {
-	        this.shinryouId = shinryouId;
-	        this.visitId = visitId;
-	        this.shinryoucode = shinryoucode;
-	    }
 	}
 	exports.Shinryou = Shinryou;
-	function validateShinryou(shinryou, checkShinryouId = true) {
-	    let errs = [];
-	    if (checkShinryouId) {
+	function fillShinryouFromJson(shinryou, src) {
+	    shinryou.shinryouId = src.shinryou_id;
+	    shinryou.visitId = src.visit_id;
+	    shinryou.shinryoucode = src.shinryoucode;
+	}
+	exports.fillShinryouFromJson = fillShinryouFromJson;
+	function jsonToShinryou(src) {
+	    let shinryou = new Shinryou();
+	    fillShinryouFromJson(shinryou, src);
+	    return shinryou;
+	}
+	exports.jsonToShinryou = jsonToShinryou;
+	/**
+	export function validateShinryou(shinryou: Shinryou,
+	    checkShinryouId: boolean = true): string[] {
+	    let errs: string[] = [];
+	    if( checkShinryouId ){
 	        V.validate("shinryouId", shinryou.shinryouId, errs, [
 	            V.isDefined, V.isInteger, V.isPositive
 	        ]);
@@ -27088,37 +27282,40 @@
 	    ]);
 	    return errs;
 	}
-	exports.validateShinryou = validateShinryou;
-	function fromJsonToShinryou(src) {
+
+	export function fromJsonToShinryou(src: any): Shinryou | V.ValidationError {
 	    let shinryou = new Shinryou(src.shinryou_id, src.visit_id, src.shinryoucode);
 	    let errs = validateShinryou(shinryou, true);
-	    if (errs.length > 0) {
+	    if( errs.length > 0 ){
 	        return new V.ValidationError(errs);
-	    }
-	    else {
+	    } else {
 	        return shinryou;
 	    }
 	}
-	exports.fromJsonToShinryou = fromJsonToShinryou;
+	**/ 
 
 
 /***/ },
 /* 129 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	"use strict";
-	const V = __webpack_require__(118);
 	class Conduct {
-	    constructor(conductId, visitId, kind) {
-	        this.conductId = conductId;
-	        this.visitId = visitId;
-	        this.kind = kind;
-	    }
 	}
 	exports.Conduct = Conduct;
-	function validateConduct(conduct, checkConductId = true) {
-	    let errs = [];
-	    if (checkConductId) {
+	function jsonToConduct(src) {
+	    let conduct = new Conduct();
+	    conduct.conductId = src.id;
+	    conduct.visitId = src.visit_id;
+	    conduct.kind = src.kind;
+	    return conduct;
+	}
+	exports.jsonToConduct = jsonToConduct;
+	/**
+	export function validateConduct(conduct: Conduct,
+	    checkConductId: boolean = true): string[] {
+	    let errs: string[] = [];
+	    if( checkConductId ){
 	        V.validate("conductId", conduct.conductId, errs, [
 	            V.isDefined, V.isInteger, V.isPositive
 	        ]);
@@ -27131,75 +27328,81 @@
 	    ]);
 	    return errs;
 	}
-	exports.validateConduct = validateConduct;
-	function fromJsonToConduct(src) {
+
+	export function fromJsonToConduct(src: any): Conduct | V.ValidationError {
 	    let conduct = new Conduct(src.id, src.visit_id, src.kind);
 	    let errs = validateConduct(conduct, true);
-	    if (errs.length > 0) {
+	    if( errs.length > 0 ){
 	        return new V.ValidationError(errs);
-	    }
-	    else {
+	    } else {
 	        return conduct;
 	    }
 	}
-	exports.fromJsonToConduct = fromJsonToConduct;
+	**/ 
 
 
 /***/ },
 /* 130 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	"use strict";
-	const V = __webpack_require__(118);
 	class GazouLabel {
-	    constructor(conductId, label) {
-	        this.conductId = conductId;
-	        this.label = label;
-	    }
 	}
 	exports.GazouLabel = GazouLabel;
-	function validateGazouLabel(gazouLabel) {
-	    let errs = [];
-	    V.validate("conductId", gazouLabel.conductId, errs, [
-	        V.isDefined, V.isInteger, V.isPositive
-	    ]);
-	    V.validate("ラベル", gazouLabel.label, errs, [
-	        V.isDefined, V.isString
-	    ]);
-	    return errs;
+	function jsonToGazouLabel(src) {
+	    let label = new GazouLabel();
+	    label.conductId = src.visit_conduct_id;
+	    label.label = src.label;
+	    return label;
 	}
-	exports.validateGazouLabel = validateGazouLabel;
-	function fromJsonToGazouLabel(src) {
-	    let gazouLabel = new GazouLabel(src.visit_conduct_id, src.label);
-	    let errs = validateGazouLabel(gazouLabel);
-	    if (errs.length > 0) {
-	        return new V.ValidationError(errs);
-	    }
-	    else {
-	        return gazouLabel;
-	    }
-	}
-	exports.fromJsonToGazouLabel = fromJsonToGazouLabel;
+	exports.jsonToGazouLabel = jsonToGazouLabel;
+	// export function validateGazouLabel(gazouLabel: GazouLabel): string[] {
+	// 	let errs: string[] = [];
+	// 	V.validate("conductId", gazouLabel.conductId, errs, [
+	// 		V.isDefined, V.isInteger, V.isPositive
+	// 	]);
+	// 	V.validate("ラベル", gazouLabel.label, errs, [
+	// 		V.isDefined, V.isString
+	// 	]);
+	// 	return errs;
+	// }
+	// export function fromJsonToGazouLabel(src: any): GazouLabel | V.ValidationError {
+	// 	let gazouLabel = new GazouLabel(src.visit_conduct_id, src.label);
+	// 	let errs = validateGazouLabel(gazouLabel);
+	// 	if( errs.length > 0 ){
+	// 		return new V.ValidationError(errs);
+	// 	} else {
+	// 		return gazouLabel;
+	// 	}
+	// }
 
 
 /***/ },
 /* 131 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	"use strict";
-	const V = __webpack_require__(118);
 	class ConductDrug {
-	    constructor(conductDrugId, conductId, iyakuhincode, amount) {
-	        this.conductDrugId = conductDrugId;
-	        this.conductId = conductId;
-	        this.iyakuhincode = iyakuhincode;
-	        this.amount = amount;
-	    }
 	}
 	exports.ConductDrug = ConductDrug;
-	function validateConductDrug(conductDrug, checkConductDrugId = true) {
-	    let errs = [];
-	    if (checkConductDrugId) {
+	function fillConductDrugFromJson(drug, src) {
+	    drug.conductDrugId = src.id;
+	    drug.conductId = src.visit_conduct_id;
+	    drug.iyakuhincode = src.iyakuhincode;
+	    drug.amount = src.amount;
+	}
+	exports.fillConductDrugFromJson = fillConductDrugFromJson;
+	function jsonToConductDrug(src) {
+	    let drug = new ConductDrug();
+	    fillConductDrugFromJson(drug, src);
+	    return drug;
+	}
+	exports.jsonToConductDrug = jsonToConductDrug;
+	/**
+	export function validateConductDrug(conductDrug: ConductDrug,
+	        checkConductDrugId: boolean = true): string[] {
+	    let errs: string[] = [];
+	    if( checkConductDrugId ){
 	        V.validate("conductDrugId", conductDrug.conductDrugId, errs, [
 	            V.isDefined, V.isInteger, V.isPositive
 	        ]);
@@ -27215,37 +27418,45 @@
 	    ]);
 	    return errs;
 	}
-	exports.validateConductDrug = validateConductDrug;
-	function fromJsonToConductDrug(src) {
-	    let conductDrug = new ConductDrug(src.id, src.visit_conduct_id, src.iyakuhincode, src.amount);
+
+	export function fromJsonToConductDrug(src: any): ConductDrug | V.ValidationError {
+	    let conductDrug = new ConductDrug(src.id, src.visit_conduct_id,
+	            src.iyakuhincode, src.amount);
 	    let errs = validateConductDrug(conductDrug, true);
-	    if (errs.length > 0) {
+	    if( errs.length > 0 ){
 	        return new V.ValidationError(errs);
-	    }
-	    else {
+	    } else {
 	        return conductDrug;
 	    }
 	}
-	exports.fromJsonToConductDrug = fromJsonToConductDrug;
+	**/
 
 
 /***/ },
 /* 132 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	"use strict";
-	const V = __webpack_require__(118);
 	class ConductShinryou {
-	    constructor(conductShinryouId, conductId, shinryoucode) {
-	        this.conductShinryouId = conductShinryouId;
-	        this.conductId = conductId;
-	        this.shinryoucode = shinryoucode;
-	    }
 	}
 	exports.ConductShinryou = ConductShinryou;
-	function validateConductShinryou(conductShinryou, checkConductShinryouId = true) {
-	    let errs = [];
-	    if (checkConductShinryouId) {
+	function fillConductShinryouFromJson(shinryou, src) {
+	    shinryou.conductShinryouId = src.id;
+	    shinryou.conductId = src.visit_conduct_id;
+	    shinryou.shinryoucode = src.shinryoucode;
+	}
+	exports.fillConductShinryouFromJson = fillConductShinryouFromJson;
+	function jsonToConductShinryou(src) {
+	    let shinryou = new ConductShinryou();
+	    fillConductShinryouFromJson(shinryou, src);
+	    return shinryou;
+	}
+	exports.jsonToConductShinryou = jsonToConductShinryou;
+	/*
+	export function validateConductShinryou(conductShinryou: ConductShinryou,
+	        checkConductShinryouId: boolean = true): string[] {
+	    let errs: string[] = [];
+	    if( checkConductShinryouId ){
 	        V.validate("conductShinryouId", conductShinryou.conductShinryouId, errs, [
 	            V.isDefined, V.isInteger, V.isPositive
 	        ]);
@@ -27258,38 +27469,46 @@
 	    ]);
 	    return errs;
 	}
-	exports.validateConductShinryou = validateConductShinryou;
-	function fromJsonToConductShinryou(src) {
-	    let conductShinryou = new ConductShinryou(src.id, src.visit_conduct_id, src.shinryoucode);
+
+	export function fromJsonToConductShinryou(src: any): ConductShinryou | V.ValidationError {
+	    let conductShinryou = new ConductShinryou(src.id, src.visit_conduct_id,
+	            src.shinryoucode);
 	    let errs = validateConductShinryou(conductShinryou, true);
-	    if (errs.length > 0) {
+	    if( errs.length > 0 ){
 	        return new V.ValidationError(errs);
-	    }
-	    else {
+	    } else {
 	        return conductShinryou;
 	    }
 	}
-	exports.fromJsonToConductShinryou = fromJsonToConductShinryou;
+	*/
 
 
 /***/ },
 /* 133 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	"use strict";
-	const V = __webpack_require__(118);
 	class ConductKizai {
-	    constructor(conductKizaiId, conductId, kizaicode, amount) {
-	        this.conductKizaiId = conductKizaiId;
-	        this.conductId = conductId;
-	        this.kizaicode = kizaicode;
-	        this.amount = amount;
-	    }
 	}
 	exports.ConductKizai = ConductKizai;
-	function validateConductKizai(conductKizai, checkConductKizaiId = true) {
-	    let errs = [];
-	    if (checkConductKizaiId) {
+	function fillConductKizaiFromJson(kizai, src) {
+	    kizai.conductKizaiId = src.id;
+	    kizai.conductId = src.visit_conduct_id;
+	    kizai.kizaicode = src.kizaicode;
+	    kizai.amount = src.amount;
+	}
+	exports.fillConductKizaiFromJson = fillConductKizaiFromJson;
+	function jsonToConductKizai(src) {
+	    let kizai = new ConductKizai();
+	    fillConductKizaiFromJson(kizai, src);
+	    return kizai;
+	}
+	exports.jsonToConductKizai = jsonToConductKizai;
+	/*
+	export function validateConductKizai(conductKizai: ConductKizai,
+	        checkConductKizaiId: boolean = true): string[] {
+	    let errs: string[] = [];
+	    if( checkConductKizaiId ){
 	        V.validate("conductKizaiId", conductKizai.conductKizaiId, errs, [
 	            V.isDefined, V.isInteger, V.isPositive
 	        ]);
@@ -27305,35 +27524,38 @@
 	    ]);
 	    return errs;
 	}
-	exports.validateConductKizai = validateConductKizai;
-	function fromJsonToConductKizai(src) {
-	    let conductKizai = new ConductKizai(src.id, src.visit_conduct_id, src.kizaicode, src.amount);
+
+	export function fromJsonToConductKizai(src: any): ConductKizai | V.ValidationError {
+	    let conductKizai = new ConductKizai(src.id, src.visit_conduct_id,
+	            src.kizaicode, src.amount);
 	    let errs = validateConductKizai(conductKizai, true);
-	    if (errs.length > 0) {
+	    if( errs.length > 0 ){
 	        return new V.ValidationError(errs);
-	    }
-	    else {
+	    } else {
 	        return conductKizai;
 	    }
 	}
-	exports.fromJsonToConductKizai = fromJsonToConductKizai;
+	*/
 
 
 /***/ },
 /* 134 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	"use strict";
-	const V = __webpack_require__(118);
 	class Charge {
-	    constructor(visitId, charge) {
-	        this.visitId = visitId;
-	        this.charge = charge;
-	    }
 	}
 	exports.Charge = Charge;
-	function validateCharge(charge) {
-	    let errs = [];
+	function jsonToCharge(src) {
+	    let charge = new Charge();
+	    charge.visitId = src.visit_id;
+	    charge.charge = src.charge;
+	    return charge;
+	}
+	exports.jsonToCharge = jsonToCharge;
+	/*
+	export function validateCharge(charge: Charge): string[] {
+	    let errs: string[] = [];
 	    V.validate("visitId", charge.visitId, errs, [
 	        V.isDefined, V.isInteger, V.isPositive
 	    ]);
@@ -27342,18 +27564,17 @@
 	    ]);
 	    return errs;
 	}
-	exports.validateCharge = validateCharge;
-	function fromJsonToCharge(src) {
+
+	export function fromJsonToCharge(src: any): Charge | V.ValidationError {
 	    let charge = new Charge(src.visit_id, src.charge);
 	    let errs = validateCharge(charge);
-	    if (errs.length > 0) {
+	    if( errs.length > 0 ){
 	        return new V.ValidationError(errs);
-	    }
-	    else {
+	    } else {
 	        return charge;
 	    }
 	}
-	exports.fromJsonToCharge = fromJsonToCharge;
+	*/
 
 
 /***/ },
@@ -27371,142 +27592,157 @@
 	const full_shinryou_1 = __webpack_require__(138);
 	const full_conduct_1 = __webpack_require__(140);
 	const charge_1 = __webpack_require__(134);
-	const V = __webpack_require__(118);
 	class FullVisit extends visit_1.Visit {
-	    constructor(visitId, patientId, visitedAt, shahokokuhoId, koukikoureiId, roujinId, kouhi1Id, kouhi2Id, kouhi3Id, texts, shahokokuho, koukikourei, roujin, kouhiList, drugs, shinryouList, conducts, charge) {
-	        super(visitId, patientId, visitedAt, shahokokuhoId, koukikoureiId, roujinId, kouhi1Id, kouhi2Id, kouhi3Id);
-	        this.texts = texts;
-	        this.shahokokuho = shahokokuho;
-	        this.koukikourei = koukikourei;
-	        this.roujin = roujin;
-	        this.kouhiList = kouhiList;
-	        this.drugs = drugs;
-	        this.shinryouList = shinryouList;
-	        this.conducts = conducts;
-	        this.charge = charge;
-	    }
 	}
 	exports.FullVisit = FullVisit;
-	function validateFullVisit(visit) {
-	    let errs;
-	    errs = visit_1.validateVisit(visit);
+	function opt(src, cvt) {
+	    if (src === null || src === undefined) {
+	        return null;
+	    }
+	    else {
+	        return cvt(src);
+	    }
+	}
+	function jsonToFullVisit(src) {
+	    let visit = new FullVisit();
+	    visit_1.fillVisitFromJson(visit, src);
+	    visit.texts = src.texts.map(text_1.jsonToText);
+	    visit.shahokokuho = opt(src.shahokokuho, shahokokuho_1.jsonToShahokokuho);
+	    visit.koukikourei = opt(src.koukikourei, koukikourei_1.jsonToKoukikourei);
+	    visit.roujin = opt(src.roujin, roujin_1.jsonToRoujin);
+	    visit.kouhiList = src.kouhi_list.map(kouhi_1.jsonToKouhi);
+	    visit.drugs = src.drugs.map(full_drug_1.jsonToFullDrug);
+	    visit.shinryouList = src.shinryou_list.map(full_shinryou_1.jsonToFullShinryou);
+	    visit.conducts = src.conducts.map(full_conduct_1.jsonToFullConduct);
+	    visit.charge = opt(src.charge, charge_1.jsonToCharge);
+	    return visit;
+	}
+	exports.jsonToFullVisit = jsonToFullVisit;
+	/*
+
+	export function validateFullVisit(visit: FullVisit): string[] {
+	    let errs: string[];
+	    errs = validateVisit(visit);
 	    visit.texts.forEach(t => {
-	        errs = errs.concat(text_1.validateText(t));
-	    });
-	    if (visit.shahokokuho) {
-	        errs = errs.concat(shahokokuho_1.validateShahokokuho(visit.shahokokuho));
+	        errs = errs.concat(validateText(t));
+	    })
+	    if( visit.shahokokuho ){
+	        errs = errs.concat(validateShahokokuho(visit.shahokokuho));
 	    }
-	    if (visit.koukikourei) {
-	        errs = errs.concat(koukikourei_1.validateKoukikourei(visit.koukikourei));
+	    if( visit.koukikourei ){
+	        errs = errs.concat(validateKoukikourei(visit.koukikourei));
 	    }
-	    if (visit.roujin) {
-	        errs = errs.concat(roujin_1.validateRoujin(visit.roujin));
+	    if( visit.roujin ){
+	        errs = errs.concat(validateRoujin(visit.roujin));
 	    }
-	    if (visit.kouhiList) {
-	        visit.kouhiList.forEach(function (kouhi) {
-	            errs = errs.concat(kouhi_1.validateKouhi(kouhi));
-	        });
+	    if( visit.kouhiList ){
+	        visit.kouhiList.forEach(function(kouhi){
+	            errs = errs.concat(validateKouhi(kouhi));
+	        })
 	    }
 	    visit.drugs.forEach(t => {
-	        errs = errs.concat(full_drug_1.validateFullDrug(t));
-	    });
+	        errs = errs.concat(validateFullDrug(t));
+	    })
 	    visit.shinryouList.forEach(s => {
-	        errs = errs.concat(full_shinryou_1.validateFullShinryou(s));
-	    });
+	        errs = errs.concat(validateFullShinryou(s));
+	    })
 	    visit.conducts.forEach(t => {
-	        errs = errs.concat(full_conduct_1.validateFullConduct(t));
-	    });
-	    if (visit.charge) {
-	        errs = errs.concat(charge_1.validateCharge(visit.charge));
+	        errs = errs.concat(validateFullConduct(t));
+	    })
+	    if( visit.charge ){
+	        errs = errs.concat(validateCharge(visit.charge));
 	    }
 	    return errs;
 	}
-	exports.validateFullVisit = validateFullVisit;
-	function fromJsonToFullVisit(src) {
-	    let texts;
+
+	export function fromJsonToFullVisit(src: any): FullVisit | V.ValidationError {
+	    let texts: Text[];
 	    {
-	        let result = V.mapConvert(src.texts, text_1.fromJsonToText);
-	        if (result instanceof V.ValidationError) {
+	        let result = V.mapConvert(src.texts, fromJsonToText);
+	        if( result instanceof V.ValidationError ){
 	            return result;
 	        }
 	        texts = result;
 	    }
-	    let shahokokuho = null;
-	    if (src.shahokokuho) {
-	        let result = shahokokuho_1.fromJsonToShahokokuho(src.shahokokuho);
-	        if (result instanceof V.ValidationError) {
+	    let shahokokuho: Shahokokuho | null = null;
+	    if( src.shahokokuho ){
+	        let result = fromJsonToShahokokuho(src.shahokokuho);
+	        if( result instanceof V.ValidationError ){
 	            return result;
 	        }
 	        shahokokuho = result;
 	    }
-	    let koukikourei = null;
-	    if (src.koukikourei) {
-	        let result = koukikourei_1.fromJsonToKoukikourei(src.koukikourei);
-	        if (result instanceof V.ValidationError) {
+	    let koukikourei: Koukikourei | null = null;
+	    if( src.koukikourei ){
+	        let result = fromJsonToKoukikourei(src.koukikourei);
+	        if( result instanceof V.ValidationError ){
 	            return result;
 	        }
 	        koukikourei = result;
 	    }
-	    let roujin = null;
-	    if (src.roujin) {
-	        let result = roujin_1.fromJsonToRoujin(src.roujin);
-	        if (result instanceof V.ValidationError) {
+	    let roujin: Roujin | null = null;
+	    if( src.roujin ){
+	        let result = fromJsonToRoujin(src.roujin);
+	        if ( result instanceof V.ValidationError ){
 	            return result;
 	        }
 	        roujin = result;
 	    }
-	    let kouhiList;
+	    let kouhiList: Kouhi[];
 	    {
-	        let result = V.mapConvert(src.kouhi_list, kouhi_1.fromJsonToKouhi);
-	        if (result instanceof V.ValidationError) {
+	        let result = V.mapConvert(src.kouhi_list, fromJsonToKouhi);
+	        if( result instanceof V.ValidationError ){
 	            return result;
 	        }
 	        kouhiList = result;
 	    }
-	    let drugs;
+	    let drugs: FullDrug[];
 	    {
-	        let result = V.mapConvert(src.drugs, full_drug_1.fromJsonToFullDrug);
-	        if (result instanceof V.ValidationError) {
+	        let result = V.mapConvert(src.drugs, fromJsonToFullDrug);
+	        if( result instanceof V.ValidationError ){
 	            return result;
 	        }
 	        drugs = result;
 	    }
-	    let shinryouList;
+	    let shinryouList: FullShinryou[];
 	    {
-	        let result = V.mapConvert(src.shinryou_list, full_shinryou_1.fromJsonToFullShinryou);
-	        if (result instanceof V.ValidationError) {
+	        let result = V.mapConvert(src.shinryou_list, fromJsonToFullShinryou);
+	        if( result instanceof V.ValidationError ){
 	            return result;
 	        }
 	        shinryouList = result;
 	    }
-	    let conducts;
+	    let conducts: FullConduct[];
 	    {
-	        let result = V.mapConvert(src.conducts, full_conduct_1.fromJsonToFullConduct);
-	        if (result instanceof V.ValidationError) {
+	        let result = V.mapConvert(src.conducts, fromJsonToFullConduct);
+	        if( result instanceof V.ValidationError ){
 	            return result;
 	        }
 	        conducts = result;
 	    }
-	    let charge = null;
-	    if (src.charge) {
-	        let result = charge_1.fromJsonToCharge(src.charge);
-	        if (result instanceof V.ValidationError) {
+	    let charge: Charge | null = null;
+	    if( src.charge ){
+	        let result = fromJsonToCharge(src.charge);
+	        if( result instanceof V.ValidationError ){
 	            return result;
-	        }
-	        else {
+	        } else {
 	            charge = result;
 	        }
 	    }
-	    let visit = new FullVisit(src.visit_id, src.patient_id, src.v_datetime, src.shahokokuho_id, src.koukikourei_id, src.roujin_id, src.kouhi_1_id, src.kouhi_2_id, src.kouhi_3_id, texts, shahokokuho, koukikourei, roujin, kouhiList, drugs, shinryouList, conducts, charge);
+	    let visit = new FullVisit(src.visit_id, src.patient_id, src.v_datetime,
+	        src.shahokokuho_id, src.koukikourei_id, src.roujin_id,
+	        src.kouhi_1_id, src.kouhi_2_id, src.kouhi_3_id,
+	        texts, shahokokuho, koukikourei, roujin, kouhiList,
+	        drugs, shinryouList, conducts, charge);
 	    let errs = validateFullVisit(visit);
-	    if (errs.length > 0) {
+	    if( errs.length > 0 ){
 	        return new V.ValidationError(errs);
-	    }
-	    else {
+	    } else {
 	        return visit;
 	    }
 	}
-	exports.fromJsonToFullVisit = fromJsonToFullVisit;
+
+	*/
 
 
 /***/ },
@@ -27514,69 +27750,86 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	const V = __webpack_require__(118);
 	const drug_1 = __webpack_require__(127);
 	const iyakuhin_master_1 = __webpack_require__(137);
 	class FullDrug extends drug_1.Drug {
-	    constructor(drugId, visitId, iyakuhincode, amount, usage, days, category, prescribed, name, yomi, unit, yakka, madoku, kouhatsu, zaikei, validFrom, validUpto) {
-	        super(drugId, visitId, iyakuhincode, amount, usage, days, category, prescribed);
-	        this.name = name;
-	        this.yomi = yomi;
-	        this.unit = unit;
-	        this.yakka = yakka;
-	        this.madoku = madoku;
-	        this.kouhatsu = kouhatsu;
-	        this.zaikei = zaikei;
-	        this.validFrom = validFrom;
-	        this.validUpto = validUpto;
-	    }
 	}
 	exports.FullDrug = FullDrug;
-	function validateFullDrug(drug) {
-	    let errs = drug_1.validateDrug(drug);
-	    if (errs.length > 0) {
+	function jsonToFullDrug(src) {
+	    let drug = new FullDrug();
+	    drug_1.fillDrugFromJson(drug, src);
+	    iyakuhin_master_1.fillIyakuhinMasterFromJson(drug, src);
+	    return drug;
+	}
+	exports.jsonToFullDrug = jsonToFullDrug;
+	/**
+	export function validateFullDrug(drug: FullDrug): string[] {
+	    let errs: string[] = validateDrug(drug);
+	    if( errs.length > 0 ){
 	        return errs;
 	    }
-	    errs = errs.concat(iyakuhin_master_1.validateIyakuhinMaster(drug));
+	    errs = errs.concat(validateIyakuhinMaster(drug));
 	    return errs;
 	}
-	exports.validateFullDrug = validateFullDrug;
-	function fromJsonToFullDrug(src) {
-	    let drug = new FullDrug(src.drug_id, src.visit_id, src.d_iyakuhincode, src.d_amount, src.d_usage, src.d_days, src.d_category, src.d_prescribed === 0 ? false : true, src.name, src.yomi, src.unit, +src.yakka, +src.madoku, src.kouhatsu === 0 ? false : true, +src.zaikei, src.valid_from, src.valid_upto);
+
+	export function fromJsonToFullDrug(src: any): FullDrug | V.ValidationError {
+	    let drug = new FullDrug(src.drug_id, src.visit_id, src.d_iyakuhincode,
+	        src.d_amount, src.d_usage, src.d_days, src.d_category,
+	        src.d_prescribed === 0 ? false : true,
+	        src.name, src.yomi, src.unit,
+	        +src.yakka, +src.madoku, src.kouhatsu === 0 ? false : true,
+	        +src.zaikei, src.valid_from, src.valid_upto);
 	    let errs = validateFullDrug(drug);
-	    if (errs.length > 0) {
+	    if( errs.length > 0 ){
 	        return new V.ValidationError(errs);
-	    }
-	    else {
+	    } else {
 	        return drug;
 	    }
 	}
-	exports.fromJsonToFullDrug = fromJsonToFullDrug;
+	**/
 
 
 /***/ },
 /* 137 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	"use strict";
-	const V = __webpack_require__(118);
 	class IyakuhinMaster {
-	    constructor(iyakuhincode, name, yomi, unit, yakka, madoku, kouhatsu, zaikei, validFrom, validUpto) {
-	        this.iyakuhincode = iyakuhincode;
-	        this.name = name;
-	        this.yomi = yomi;
-	        this.unit = unit;
-	        this.yakka = yakka;
-	        this.madoku = madoku;
-	        this.kouhatsu = kouhatsu;
-	        this.zaikei = zaikei;
-	        this.validFrom = validFrom;
-	        this.validUpto = validUpto;
-	    }
 	}
 	exports.IyakuhinMaster = IyakuhinMaster;
-	function validateIyakuhinMaster(iyakuhinMaster) {
-	    let errs = [];
+	function fillIyakuhinMasterFromJson(m, src) {
+	    m.iyakuhincode = src.iyakuhincode;
+	    m.name = src.name;
+	    m.yomi = src.yomi;
+	    m.unit = src.unit;
+	    m.yakka = +src.yakka;
+	    m.madoku = +src.madoku;
+	    m.kouhatsu = src.kouhatsu === 0 ? false : true;
+	    m.zaikei = +src.zaikei;
+	    m.validFrom = src.valid_from;
+	    m.validUpto = src.valid_upto;
+	}
+	exports.fillIyakuhinMasterFromJson = fillIyakuhinMasterFromJson;
+	function jsonToIyakuhinMaster(src) {
+	    let m = new IyakuhinMaster();
+	    fillIyakuhinMasterFromJson(m, src);
+	    return m;
+	}
+	exports.jsonToIyakuhinMaster = jsonToIyakuhinMaster;
+	/*
+	export function fromJsonToIyakuhinMaster(src: any): IyakuhinMaster | V.ValidationError {
+	    let master = new IyakuhinMaster(src.iyakuhincode, src.name, src.yomi, src.unit,
+	        +src.yakka, +src.madoku, src.kouhatsu === 0 ? false : true,
+	        +src.zaikei, src.valid_from, src.valid_upto);
+	    let errs = validateIyakuhinMaster(master);
+	    if( errs.length > 0 ){
+	        return new V.ValidationError(errs);
+	    } else {
+	        return master;
+	    }
+	}
+	export function validateIyakuhinMaster(iyakuhinMaster: IyakuhinMaster): string[] {
+	    let errs: string[] = [];
 	    V.validate("医薬品コード", iyakuhinMaster.iyakuhincode, errs, [
 	        V.isDefined, V.isInteger, V.isPositive
 	    ]);
@@ -27609,18 +27862,7 @@
 	    ]);
 	    return errs;
 	}
-	exports.validateIyakuhinMaster = validateIyakuhinMaster;
-	function fromJsonToIyakuhinMaster(src) {
-	    let master = new IyakuhinMaster(src.iyakuhincode, src.name, src.yomi, src.unit, +src.yakka, +src.madoku, src.kouhatsu === 0 ? false : true, +src.zaikei, src.valid_from, src.valid_upto);
-	    let errs = validateIyakuhinMaster(master);
-	    if (errs.length > 0) {
-	        return new V.ValidationError(errs);
-	    }
-	    else {
-	        return master;
-	    }
-	}
-	exports.fromJsonToIyakuhinMaster = fromJsonToIyakuhinMaster;
+	*/
 
 
 /***/ },
@@ -27628,77 +27870,91 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	const V = __webpack_require__(118);
 	const shinryou_1 = __webpack_require__(128);
 	const shinryou_master_1 = __webpack_require__(139);
 	class FullShinryou extends shinryou_1.Shinryou {
-	    constructor(shinryouId, visitId, shinryoucode, name, tensuu, tensuuShikibetsu, houketsuKensa, oushinKubun, kensaGroup, roujinTekiyou, codeShou, codeBu, codeAlpha, codeKubun, validFrom, validUpto) {
-	        super(shinryouId, visitId, shinryoucode);
-	        this.name = name;
-	        this.tensuu = tensuu;
-	        this.tensuuShikibetsu = tensuuShikibetsu;
-	        this.houketsuKensa = houketsuKensa;
-	        this.oushinKubun = oushinKubun;
-	        this.kensaGroup = kensaGroup;
-	        this.roujinTekiyou = roujinTekiyou;
-	        this.codeShou = codeShou;
-	        this.codeBu = codeBu;
-	        this.codeAlpha = codeAlpha;
-	        this.codeKubun = codeKubun;
-	        this.validFrom = validFrom;
-	        this.validUpto = validUpto;
-	    }
 	}
 	exports.FullShinryou = FullShinryou;
-	function validateFullShinryou(shinryou) {
-	    let errs = shinryou_1.validateShinryou(shinryou);
-	    if (errs.length > 0) {
+	function jsonToFullShinryou(src) {
+	    let shinryou = new FullShinryou();
+	    shinryou_1.fillShinryouFromJson(shinryou, src);
+	    shinryou_master_1.fillShinryouMasterFromJson(shinryou, src);
+	    return shinryou;
+	}
+	exports.jsonToFullShinryou = jsonToFullShinryou;
+	/**
+	export function validateFullShinryou(shinryou: FullShinryou): string[] {
+	    let errs: string[] = validateShinryou(shinryou);
+	    if( errs.length > 0 ){
 	        return errs;
 	    }
-	    errs = errs.concat(shinryou_master_1.validateShinryouMaster(shinryou));
+	    errs = errs.concat(validateShinryouMaster(shinryou));
 	    return errs;
 	}
-	exports.validateFullShinryou = validateFullShinryou;
-	function fromJsonToFullShinryou(src) {
-	    let shinryou = new FullShinryou(src.shinryou_id, src.visit_id, src.shinryoucode, src.name, +src.tensuu, +src.tensuu_shikibetsu, src.houkatsukensa, +src.oushinkubun, src.kensagroup, +src.roujintekiyou, +src.code_shou, src.code_bu, src.code_alpha, src.code_kubun, src.valid_from, src.valid_upto);
+
+	export function fromJsonToFullShinryou(src: any): FullShinryou | V.ValidationError {
+	    let shinryou = new FullShinryou(src.shinryou_id, src.visit_id, src.shinryoucode,
+	        src.name, +src.tensuu,
+	        +src.tensuu_shikibetsu, src.houkatsukensa, +src.oushinkubun,
+	        src.kensagroup, +src.roujintekiyou, +src.code_shou,
+	        src.code_bu, src.code_alpha, src.code_kubun, src.valid_from, src.valid_upto);
 	    let errs = validateFullShinryou(shinryou);
-	    if (errs.length > 0) {
+	    if( errs.length > 0 ){
 	        return new V.ValidationError(errs);
-	    }
-	    else {
+	    } else {
 	        return shinryou;
 	    }
 	}
-	exports.fromJsonToFullShinryou = fromJsonToFullShinryou;
+
+	**/
 
 
 /***/ },
 /* 139 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	"use strict";
-	const V = __webpack_require__(118);
 	class ShinryouMaster {
-	    constructor(shinryoucode, name, tensuu, tensuuShikibetsu, houketsuKensa, oushinKubun, kensaGroup, roujinTekiyou, codeShou, codeBu, codeAlpha, codeKubun, validFrom, validUpto) {
-	        this.shinryoucode = shinryoucode;
-	        this.name = name;
-	        this.tensuu = tensuu;
-	        this.tensuuShikibetsu = tensuuShikibetsu;
-	        this.houketsuKensa = houketsuKensa;
-	        this.oushinKubun = oushinKubun;
-	        this.kensaGroup = kensaGroup;
-	        this.roujinTekiyou = roujinTekiyou;
-	        this.codeShou = codeShou;
-	        this.codeBu = codeBu;
-	        this.codeAlpha = codeAlpha;
-	        this.codeKubun = codeKubun;
-	        this.validFrom = validFrom;
-	        this.validUpto = validUpto;
-	    }
 	}
 	exports.ShinryouMaster = ShinryouMaster;
-	function validateShinryouMaster(shinryouMaster) {
-	    let errs = [];
+	function fillShinryouMasterFromJson(m, src) {
+	    m.shinryoucode = src.shinryoucode;
+	    m.name = src.name;
+	    m.tensuu = +src.tensuu;
+	    m.tensuuShikibetsu = +src.tensuu_shikibetsu;
+	    m.houketsuKensa = src.houkatsukensa;
+	    m.oushinKubun = +src.oushinkubun;
+	    m.kensaGroup = src.kensaGroup;
+	    m.roujinTekiyou = +src.roujintekiyou;
+	    m.codeShou = +src.code_shou;
+	    m.codeBu = src.code_bu;
+	    m.codeAlpha = src.code_alpha;
+	    m.codeKubun = src.code_kubun;
+	    m.validFrom = src.valid_from;
+	    m.validUpto = src.valid_upto;
+	}
+	exports.fillShinryouMasterFromJson = fillShinryouMasterFromJson;
+	function jsonToShinryouMaster(src) {
+	    let m = new ShinryouMaster();
+	    fillShinryouMasterFromJson(m, src);
+	    return m;
+	}
+	exports.jsonToShinryouMaster = jsonToShinryouMaster;
+	/**
+	export function fromJsonToShinryouMaster(src: any): ShinryouMaster | V.ValidationError {
+	    let master = new ShinryouMaster(src.shinryoucode, src.name, +src.tensuu,
+	        +src.tensuu_shikibetsu, src.houkatsukensa, +src.oushinkubun,
+	        src.kensagroup, +src.roujintekiyou, +src.code_shou,
+	        src.code_bu, src.code_alpha, src.code_kubun, src.valid_from, src.valid_upto);
+	    let errs = validateShinryouMaster(master);
+	    if( errs.length > 0 ){
+	        return new V.ValidationError(errs);
+	    } else {
+	        return master;
+	    }
+	}
+	export function validateShinryouMaster(shinryouMaster: ShinryouMaster): string[] {
+	    let errs: string[] = [];
 	    V.validate("診療コード", shinryouMaster.shinryoucode, errs, [
 	        V.isDefined, V.isInteger, V.isPositive
 	    ]);
@@ -27743,18 +27999,7 @@
 	    ]);
 	    return errs;
 	}
-	exports.validateShinryouMaster = validateShinryouMaster;
-	function fromJsonToShinryouMaster(src) {
-	    let master = new ShinryouMaster(src.shinryoucode, src.name, +src.tensuu, +src.tensuu_shikibetsu, src.houkatsukensa, +src.oushinkubun, src.kensagroup, +src.roujintekiyou, +src.code_shou, src.code_bu, src.code_alpha, src.code_kubun, src.valid_from, src.valid_upto);
-	    let errs = validateShinryouMaster(master);
-	    if (errs.length > 0) {
-	        return new V.ValidationError(errs);
-	    }
-	    else {
-	        return master;
-	    }
-	}
-	exports.fromJsonToShinryouMaster = fromJsonToShinryouMaster;
+	**/
 
 
 /***/ },
@@ -27762,92 +28007,93 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	const V = __webpack_require__(118);
 	const conduct_1 = __webpack_require__(129);
 	const full_conduct_shinryou_1 = __webpack_require__(141);
 	const full_conduct_drug_1 = __webpack_require__(142);
 	const full_conduct_kizai_1 = __webpack_require__(143);
 	class FullConduct extends conduct_1.Conduct {
-	    constructor(conductId, visitId, kind, gazouLabel, drugs, shinryouList, kizaiList) {
-	        super(conductId, visitId, kind);
-	        this.gazouLabel = gazouLabel;
-	        this.drugs = drugs;
-	        this.shinryouList = shinryouList;
-	        this.kizaiList = kizaiList;
-	    }
 	}
 	exports.FullConduct = FullConduct;
-	function validateFullConduct(conduct) {
-	    let errs = conduct_1.validateConduct(conduct);
+	function jsonToFullConduct(src) {
+	    let conduct = new FullConduct();
+	    conduct.gazouLabel = src.gazou_label;
+	    let drugs = src.drugs || [];
+	    conduct.drugs = drugs.map(full_conduct_drug_1.jsonToFullConductDrug);
+	    let shinryouList = src.shinryou_list || [];
+	    conduct.shinryouList = shinryouList.map(full_conduct_shinryou_1.jsonToFullConductShinryou);
+	    let kizaiList = src.kizai_list || [];
+	    conduct.kizaiList = kizaiList.map(full_conduct_kizai_1.jsonToFullConductKizai);
+	    return conduct;
+	}
+	exports.jsonToFullConduct = jsonToFullConduct;
+	/**
+	export function validateFullConduct(conduct: FullConduct): string[] {
+	    let errs = validateConduct(conduct);
 	    V.validate("画像ラベル", conduct.gazouLabel, errs, [
 	        V.isDefined, V.isOptionalString
 	    ]);
 	    conduct.drugs.forEach(s => {
-	        errs = errs.concat(full_conduct_drug_1.validateFullConductDrug(s));
-	    });
+	        errs = errs.concat(validateFullConductDrug(s));
+	    })
 	    conduct.shinryouList.forEach(s => {
-	        errs = errs.concat(full_conduct_shinryou_1.validateFullConductShinryou(s));
-	    });
+	        errs = errs.concat(validateFullConductShinryou(s));
+	    })
 	    conduct.kizaiList.forEach(s => {
-	        errs = errs.concat(full_conduct_kizai_1.validateFullConductKizai(s));
-	    });
+	        errs = errs.concat(validateFullConductKizai(s));
+	    })
 	    return errs;
 	}
-	exports.validateFullConduct = validateFullConduct;
-	function fromJsonToFullConduct(src) {
-	    let gazouLabel;
+
+	export function fromJsonToFullConduct(src: any): FullConduct | V.ValidationError {
+	    let gazouLabel: string | null;
 	    {
 	        let val = src.gazou_label;
-	        if (typeof val === "string") {
+	        if( typeof val === "string" ){
 	            gazouLabel = val;
-	        }
-	        else if (val === undefined || val === null) {
+	        } else if( val === undefined || val === null ){
 	            gazouLabel = null;
-	        }
-	        else {
+	        } else {
 	            return new V.ValidationError(["invalid gazou_label"]);
 	        }
 	    }
-	    let drugs;
+	    let drugs: FullConductDrug[];
 	    {
-	        let result = V.mapConvert(src.drugs, full_conduct_drug_1.fromJsonToFullConductDrug);
-	        if (result instanceof V.ValidationError) {
+	        let result = V.mapConvert(src.drugs, fromJsonToFullConductDrug);
+	        if( result instanceof V.ValidationError ){
 	            return result;
-	        }
-	        else {
+	        } else {
 	            drugs = result;
 	        }
 	    }
-	    let shinryouList;
+	    let shinryouList: FullConductShinryou[];
 	    {
-	        let result = V.mapConvert(src.shinryou_list, full_conduct_shinryou_1.fromJsonToFullConductShinryou);
-	        if (result instanceof V.ValidationError) {
+	        let result = V.mapConvert(src.shinryou_list, fromJsonToFullConductShinryou);
+	        if( result instanceof V.ValidationError ){
 	            return result;
-	        }
-	        else {
+	        } else {
 	            shinryouList = result;
 	        }
 	    }
-	    let kizaiList;
+	    let kizaiList: FullConductKizai[];
 	    {
-	        let result = V.mapConvert(src.kizai_list, full_conduct_kizai_1.fromJsonToFullConductKizai);
-	        if (result instanceof V.ValidationError) {
+	        let result = V.mapConvert(src.kizai_list, fromJsonToFullConductKizai);
+	        if( result instanceof V.ValidationError ){
 	            return result;
-	        }
-	        else {
+	        } else {
 	            kizaiList = result;
 	        }
 	    }
-	    let conduct = new FullConduct(src.id, src.visit_id, src.kind, gazouLabel, drugs, shinryouList, kizaiList);
+	    let conduct = new FullConduct(src.id, src.visit_id, src.kind, gazouLabel,
+	        drugs, shinryouList, kizaiList);
 	    let errs = validateFullConduct(conduct);
-	    if (errs.length > 0) {
+	    if( errs.length > 0 ){
 	        return new V.ValidationError(errs);
-	    }
-	    else {
+	    } else {
 	        return conduct;
 	    }
 	}
-	exports.fromJsonToFullConduct = fromJsonToFullConduct;
+
+	**/ 
 
 
 /***/ },
@@ -27855,48 +28101,42 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	const V = __webpack_require__(118);
 	const conduct_shinryou_1 = __webpack_require__(132);
 	const shinryou_master_1 = __webpack_require__(139);
 	class FullConductShinryou extends conduct_shinryou_1.ConductShinryou {
-	    constructor(conductShinryouId, conductId, shinryoucode, name, tensuu, tensuuShikibetsu, houketsuKensa, oushinKubun, kensaGroup, roujinTekiyou, codeShou, codeBu, codeAlpha, codeKubun, validFrom, validUpto) {
-	        super(conductShinryouId, conductId, shinryoucode);
-	        this.name = name;
-	        this.tensuu = tensuu;
-	        this.tensuuShikibetsu = tensuuShikibetsu;
-	        this.houketsuKensa = houketsuKensa;
-	        this.oushinKubun = oushinKubun;
-	        this.kensaGroup = kensaGroup;
-	        this.roujinTekiyou = roujinTekiyou;
-	        this.codeShou = codeShou;
-	        this.codeBu = codeBu;
-	        this.codeAlpha = codeAlpha;
-	        this.codeKubun = codeKubun;
-	        this.validFrom = validFrom;
-	        this.validUpto = validUpto;
-	    }
 	}
 	exports.FullConductShinryou = FullConductShinryou;
-	function validateFullConductShinryou(shinryou) {
-	    let errs = conduct_shinryou_1.validateConductShinryou(shinryou);
-	    if (errs.length > 0) {
+	function jsonToFullConductShinryou(src) {
+	    let shinryou = new FullConductShinryou();
+	    conduct_shinryou_1.fillConductShinryouFromJson(shinryou, src);
+	    shinryou_master_1.fillShinryouMasterFromJson(shinryou, src);
+	    return shinryou;
+	}
+	exports.jsonToFullConductShinryou = jsonToFullConductShinryou;
+	/*
+	export function validateFullConductShinryou(shinryou: FullConductShinryou): string[] {
+	    let errs: string[] = validateConductShinryou(shinryou);
+	    if( errs.length > 0 ){
 	        return errs;
 	    }
-	    errs = errs.concat(shinryou_master_1.validateShinryouMaster(shinryou));
+	    errs = errs.concat(validateShinryouMaster(shinryou));
 	    return errs;
 	}
-	exports.validateFullConductShinryou = validateFullConductShinryou;
-	function fromJsonToFullConductShinryou(src) {
-	    let shinryou = new FullConductShinryou(src.id, src.visit_conduct_id, src.shinryoucode, src.name, +src.tensuu, +src.tensuu_shikibetsu, src.houkatsukensa, +src.oushinkubun, src.kensagroup, +src.roujintekiyou, +src.code_shou, src.code_bu, src.code_alpha, src.code_kubun, src.valid_from, src.valid_upto);
+
+	export function fromJsonToFullConductShinryou(src: any): FullConductShinryou | V.ValidationError {
+	    let shinryou = new FullConductShinryou(src.id, src.visit_conduct_id, src.shinryoucode,
+	        src.name, +src.tensuu,
+	        +src.tensuu_shikibetsu, src.houkatsukensa, +src.oushinkubun,
+	        src.kensagroup, +src.roujintekiyou, +src.code_shou,
+	        src.code_bu, src.code_alpha, src.code_kubun, src.valid_from, src.valid_upto);
 	    let errs = validateFullConductShinryou(shinryou);
-	    if (errs.length > 0) {
+	    if( errs.length > 0 ){
 	        return new V.ValidationError(errs);
-	    }
-	    else {
+	    } else {
 	        return shinryou;
 	    }
 	}
-	exports.fromJsonToFullConductShinryou = fromJsonToFullConductShinryou;
+	*/
 
 
 /***/ },
@@ -27904,44 +28144,42 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	const V = __webpack_require__(118);
 	const conduct_drug_1 = __webpack_require__(131);
 	const iyakuhin_master_1 = __webpack_require__(137);
 	class FullConductDrug extends conduct_drug_1.ConductDrug {
-	    constructor(conductDrugId, conductId, iyakuhincode, amount, name, yomi, unit, yakka, madoku, kouhatsu, zaikei, validFrom, validUpto) {
-	        super(conductDrugId, conductId, iyakuhincode, amount);
-	        this.name = name;
-	        this.yomi = yomi;
-	        this.unit = unit;
-	        this.yakka = yakka;
-	        this.madoku = madoku;
-	        this.kouhatsu = kouhatsu;
-	        this.zaikei = zaikei;
-	        this.validFrom = validFrom;
-	        this.validUpto = validUpto;
-	    }
 	}
 	exports.FullConductDrug = FullConductDrug;
-	function validateFullConductDrug(drug) {
-	    let errs = conduct_drug_1.validateConductDrug(drug);
-	    if (errs.length > 0) {
+	function jsonToFullConductDrug(src) {
+	    let drug = new FullConductDrug();
+	    conduct_drug_1.fillConductDrugFromJson(drug, src);
+	    iyakuhin_master_1.fillIyakuhinMasterFromJson(drug, src);
+	    return drug;
+	}
+	exports.jsonToFullConductDrug = jsonToFullConductDrug;
+	/*
+	export function validateFullConductDrug(drug: FullConductDrug): string[] {
+	    let errs: string[] = validateConductDrug(drug);
+	    if( errs.length > 0 ){
 	        return errs;
 	    }
-	    errs = errs.concat(iyakuhin_master_1.validateIyakuhinMaster(drug));
+	    errs = errs.concat(validateIyakuhinMaster(drug));
 	    return errs;
 	}
-	exports.validateFullConductDrug = validateFullConductDrug;
-	function fromJsonToFullConductDrug(src) {
-	    let drug = new FullConductDrug(src.id, src.visit_conduct_id, src.iyakuhincode, src.amount, src.name, src.yomi, src.unit, +src.yakka, +src.madoku, src.kouhatsu === 0 ? false : true, +src.zaikei, src.valid_from, src.valid_upto);
+
+	export function fromJsonToFullConductDrug(src: any): FullConductDrug | V.ValidationError {
+	    let drug = new FullConductDrug(src.id, src.visit_conduct_id,
+	        src.iyakuhincode, src.amount,
+	        src.name, src.yomi, src.unit,
+	        +src.yakka, +src.madoku, src.kouhatsu === 0 ? false : true,
+	        +src.zaikei, src.valid_from, src.valid_upto);
 	    let errs = validateFullConductDrug(drug);
-	    if (errs.length > 0) {
+	    if( errs.length > 0 ){
 	        return new V.ValidationError(errs);
-	    }
-	    else {
+	    } else {
 	        return drug;
 	    }
 	}
-	exports.fromJsonToFullConductDrug = fromJsonToFullConductDrug;
+	*/
 
 
 /***/ },
@@ -27949,63 +28187,87 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	const V = __webpack_require__(118);
 	const conduct_kizai_1 = __webpack_require__(133);
 	const kizai_master_1 = __webpack_require__(144);
 	class FullConductKizai extends conduct_kizai_1.ConductKizai {
-	    constructor(conductKizaiId, conductId, kizaicode, amount, name, yomi, unit, kingaku, validFrom, validUpto) {
-	        super(conductKizaiId, conductId, kizaicode, amount);
-	        this.name = name;
-	        this.yomi = yomi;
-	        this.unit = unit;
-	        this.kingaku = kingaku;
-	        this.validFrom = validFrom;
-	        this.validUpto = validUpto;
-	    }
 	}
 	exports.FullConductKizai = FullConductKizai;
-	function validateFullConductKizai(kizai) {
-	    let errs = conduct_kizai_1.validateConductKizai(kizai);
-	    if (errs.length > 0) {
+	function jsonToFullConductKizai(src) {
+	    let kizai = new FullConductKizai();
+	    conduct_kizai_1.fillConductKizaiFromJson(kizai, src);
+	    kizai_master_1.fillKizaiMasterFromJson(kizai, src);
+	    return kizai;
+	}
+	exports.jsonToFullConductKizai = jsonToFullConductKizai;
+	/*
+	export function validateFullConductKizai(kizai: FullConductKizai): string[] {
+	    let errs: string[] = validateConductKizai(kizai);
+	    if( errs.length > 0 ){
 	        return errs;
 	    }
-	    errs = errs.concat(kizai_master_1.validateKizaiMaster(kizai));
+	    errs = errs.concat(validateKizaiMaster(kizai));
 	    return errs;
 	}
-	exports.validateFullConductKizai = validateFullConductKizai;
-	function fromJsonToFullConductKizai(src) {
-	    let kizai = new FullConductKizai(src.id, src.visit_conduct_id, src.kizaicode, src.amount, src.name, src.yomi, src.unit, +src.kingaku, src.valid_from, src.valid_upto);
+
+	export function fromJsonToFullConductKizai(src: any): FullConductKizai | V.ValidationError {
+	    let kizai = new FullConductKizai(src.id, src.visit_conduct_id,
+	            src.kizaicode, src.amount,src.name, src.yomi, src.unit,
+	        +src.kingaku, src.valid_from, src.valid_upto);
 	    let errs = validateFullConductKizai(kizai);
-	    if (errs.length > 0) {
+	    if( errs.length > 0 ){
 	        return new V.ValidationError(errs);
-	    }
-	    else {
+	    } else {
 	        return kizai;
 	    }
 	}
-	exports.fromJsonToFullConductKizai = fromJsonToFullConductKizai;
+	*/
 
 
 /***/ },
 /* 144 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	"use strict";
-	const V = __webpack_require__(118);
 	class KizaiMaster {
-	    constructor(kizaicode, name, yomi, unit, kingaku, validFrom, validUpto) {
-	        this.kizaicode = kizaicode;
-	        this.name = name;
-	        this.yomi = yomi;
-	        this.unit = unit;
-	        this.kingaku = kingaku;
-	        this.validFrom = validFrom;
-	        this.validUpto = validUpto;
-	    }
 	}
 	exports.KizaiMaster = KizaiMaster;
-	function validateKizaiMaster(kizaiMaster) {
-	    let errs = [];
+	function fillKizaiMasterFromJson(m, src) {
+	    m.kizaicode = src.kizaicode;
+	    m.name = src.name;
+	    m.yomi = src.yomi;
+	    m.unit = src.unit;
+	    m.kingaku = +src.kingaku;
+	    m.validFrom = src.valid_from;
+	    m.validUpto = src.valid_upto;
+	}
+	exports.fillKizaiMasterFromJson = fillKizaiMasterFromJson;
+	function jsonToKizaiMaster(src) {
+	    let m = new KizaiMaster();
+	    fillKizaiMasterFromJson(m, src);
+	    return m;
+	}
+	exports.jsonToKizaiMaster = jsonToKizaiMaster;
+	/*
+	export function fromJsonToKizaiMaster(src: any): KizaiMaster | V.ValidationError {
+	    let master = new KizaiMaster(
+	        src.kizaicode,
+	        src.name,
+	        src.yomi,
+	        src.unit,
+	        +src.kingaku,
+	        src.valid_from,
+	        src.valid_upto
+	    );
+	    let errs = validateKizaiMaster(master);
+	    if( errs.length > 0 ){
+	        return new V.ValidationError(errs);
+	    } else {
+	        return master;
+	    }
+	}
+
+	export function validateKizaiMaster(kizaiMaster: KizaiMaster): string[] {
+	    let errs: string[] = [];
 	    V.validate("器材コード", kizaiMaster.kizaicode, errs, [
 	        V.isDefined, V.isInteger, V.isPositive
 	    ]);
@@ -28029,18 +28291,7 @@
 	    ]);
 	    return errs;
 	}
-	exports.validateKizaiMaster = validateKizaiMaster;
-	function fromJsonToKizaiMaster(src) {
-	    let master = new KizaiMaster(src.kizaicode, src.name, src.yomi, src.unit, +src.kingaku, src.valid_from, src.valid_upto);
-	    let errs = validateKizaiMaster(master);
-	    if (errs.length > 0) {
-	        return new V.ValidationError(errs);
-	    }
-	    else {
-	        return master;
-	    }
-	}
-	exports.fromJsonToKizaiMaster = fromJsonToKizaiMaster;
+	*/
 
 
 /***/ },
@@ -28501,148 +28752,6 @@
 	exports.HOUKATSU_COAGULO = "06";
 	exports.HOUKATSU_AUTOANTIBODY = "07";
 	exports.HOUKATSU_TOLERANCE = "08";
-
-
-/***/ },
-/* 147 */,
-/* 148 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	const moment = __webpack_require__(4);
-	class ValidationError {
-	    constructor(body) {
-	        this.body = body;
-	    }
-	    toString() {
-	        return JSON.stringify(this.body);
-	    }
-	}
-	exports.ValidationError = ValidationError;
-	class ValidatorBase {
-	    constructor(value, err = null) {
-	        this.value = value;
-	        this.err = err;
-	    }
-	    oneOf(candidates) {
-	        return this.confirm(() => {
-	            let value = this.value;
-	            for (let i = 0; i < candidates.length; i++) {
-	                if (value === candidates[i]) {
-	                    return true;
-	                }
-	            }
-	            return false;
-	        }, "正しい値のうちのひとつでありません。");
-	    }
-	    get hasError() {
-	        return this.err !== null;
-	    }
-	    getError() {
-	        let err = this.err;
-	        if (err instanceof ValidationError) {
-	            return err.body;
-	        }
-	        else {
-	            throw new Error("there is no error");
-	        }
-	    }
-	    getValue() {
-	        if (this.hasError) {
-	            throw new Error("cannot get value (Validation failed)");
-	        }
-	        return this.value;
-	    }
-	    confirm(pred, errString) {
-	        if (this.hasError) {
-	            return this;
-	        }
-	        if (pred()) {
-	            return this;
-	        }
-	        else {
-	            let msg = `${errString} ${JSON.stringify(this.value)}`;
-	            this.err = new ValidationError(msg);
-	            return this;
-	        }
-	    }
-	}
-	exports.ValidatorBase = ValidatorBase;
-	class Validator extends ValidatorBase {
-	    constructor(value, err = null) {
-	        super(value, err);
-	    }
-	    isDefined() {
-	        return this.confirm(() => typeof this.value !== "undefined", "値が設定されていません。");
-	    }
-	    ensureNumber() {
-	        if (this.hasError) {
-	            return new NumberValidator(0, this.err);
-	        }
-	        else {
-	            if (typeof this.value === "number") {
-	                let num = this.value;
-	                return new NumberValidator(num);
-	            }
-	            else {
-	                let msg = `数値でありません。${JSON.stringify(this.value)}`;
-	                return new NumberValidator(0, new ValidationError(msg));
-	            }
-	        }
-	    }
-	    ensureString() {
-	        if (this.hasError) {
-	            return new StringValidator("", this.err);
-	        }
-	        else {
-	            if (typeof this.value === "string") {
-	                let str = this.value;
-	                return new StringValidator(str);
-	            }
-	            else {
-	                let msg = `数値でありません。${JSON.stringify(this.value)}`;
-	                return new StringValidator("", new ValidationError(msg));
-	            }
-	        }
-	    }
-	}
-	exports.Validator = Validator;
-	class NumberValidator extends ValidatorBase {
-	    constructor(value, err = null) {
-	        super(value, err);
-	    }
-	    isInteger() {
-	        return this.confirm(() => Number.isInteger(this.value), "整数でありません。");
-	    }
-	    isPositive() {
-	        return this.confirm(() => this.value > 0, "正の数値でありません。");
-	    }
-	    isZeroPositive() {
-	        return this.confirm(() => this.value >= 0, "正またはｾﾞﾛでありません。");
-	    }
-	}
-	exports.NumberValidator = NumberValidator;
-	class StringValidator extends ValidatorBase {
-	    constructor(value, err = null) {
-	        super(value, err);
-	    }
-	    isNotEmpty() {
-	        return this.confirm(() => this.value !== "", "空の文字列です。");
-	    }
-	    matches(re) {
-	        return this.confirm(() => re.test(this.value), "文字列の値が不適切です。");
-	    }
-	    isValidDate() {
-	        return this.confirm(() => moment(this.value).isValid(), "正しい日付でありません。");
-	    }
-	    isSqlDate() {
-	        return this.confirm(() => /^\d{4}-\d{2}-\d{2}$/.test(this.value), "日付の形式に合致しません。");
-	    }
-	    isSqlDateTime() {
-	        return this.confirm(() => /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(this.value), "日付時間の形式に合致しません。");
-	    }
-	}
-	exports.StringValidator = StringValidator;
 
 
 /***/ }

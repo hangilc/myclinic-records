@@ -1,21 +1,28 @@
 "use strict";
-const V = require("../validation");
 class Drug {
-    constructor(drugId, visitId, iyakuhincode, amount, usage, days, category, prescribed) {
-        this.drugId = drugId;
-        this.visitId = visitId;
-        this.iyakuhincode = iyakuhincode;
-        this.amount = amount;
-        this.usage = usage;
-        this.days = days;
-        this.category = category;
-        this.prescribed = prescribed;
-    }
 }
 exports.Drug = Drug;
-function validateDrug(drug, checkDrugId = true) {
-    let errs = [];
-    if (checkDrugId) {
+function fillDrugFromJson(drug, src) {
+    drug.drugId = src.drug_id;
+    drug.visitId = src.visit_id;
+    drug.iyakuhincode = src.d_iyakuhincode;
+    drug.amount = src.d_amount;
+    drug.usage = src.d_usage;
+    drug.category = src.d_category;
+    drug.prescribed = src.d_prescribed === 0 ? false : true;
+}
+exports.fillDrugFromJson = fillDrugFromJson;
+function jsonToDrug(src) {
+    let drug = new Drug();
+    fillDrugFromJson(drug, src);
+    return drug;
+}
+exports.jsonToDrug = jsonToDrug;
+/**
+export function validateDrug(drug: Drug,
+    checkDrugId: boolean = true): string[] {
+    let errs: string[] = [];
+    if( checkDrugId ){
         V.validate("drugId", drug.drugId, errs, [
             V.isDefined, V.isInteger, V.isPositive
         ]);
@@ -43,15 +50,16 @@ function validateDrug(drug, checkDrugId = true) {
     ]);
     return errs;
 }
-exports.validateDrug = validateDrug;
-function fromJsonToDrug(src) {
-    let drug = new Drug(src.drug_id, src.visit_id, src.d_iyakuhincode, src.d_amount, src.d_usage, src.d_days, src.d_category, src.d_prescribed === 0 ? false : true);
+
+export function fromJsonToDrug(src: any): Drug | V.ValidationError {
+    let drug = new Drug(src.drug_id, src.visit_id, src.d_iyakuhincode,
+        src.d_amount, src.d_usage, src.d_days, src.d_category,
+        src.d_prescribed === 0 ? false : true);
     let errs = validateDrug(drug, true);
-    if (errs.length > 0) {
+    if( errs.length > 0 ){
         return new V.ValidationError(errs);
-    }
-    else {
+    } else {
         return drug;
     }
 }
-exports.fromJsonToDrug = fromJsonToDrug;
+**/ 

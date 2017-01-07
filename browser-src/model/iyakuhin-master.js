@@ -1,22 +1,40 @@
 "use strict";
-const V = require("../validation");
 class IyakuhinMaster {
-    constructor(iyakuhincode, name, yomi, unit, yakka, madoku, kouhatsu, zaikei, validFrom, validUpto) {
-        this.iyakuhincode = iyakuhincode;
-        this.name = name;
-        this.yomi = yomi;
-        this.unit = unit;
-        this.yakka = yakka;
-        this.madoku = madoku;
-        this.kouhatsu = kouhatsu;
-        this.zaikei = zaikei;
-        this.validFrom = validFrom;
-        this.validUpto = validUpto;
-    }
 }
 exports.IyakuhinMaster = IyakuhinMaster;
-function validateIyakuhinMaster(iyakuhinMaster) {
-    let errs = [];
+function fillIyakuhinMasterFromJson(m, src) {
+    m.iyakuhincode = src.iyakuhincode;
+    m.name = src.name;
+    m.yomi = src.yomi;
+    m.unit = src.unit;
+    m.yakka = +src.yakka;
+    m.madoku = +src.madoku;
+    m.kouhatsu = src.kouhatsu === 0 ? false : true;
+    m.zaikei = +src.zaikei;
+    m.validFrom = src.valid_from;
+    m.validUpto = src.valid_upto;
+}
+exports.fillIyakuhinMasterFromJson = fillIyakuhinMasterFromJson;
+function jsonToIyakuhinMaster(src) {
+    let m = new IyakuhinMaster();
+    fillIyakuhinMasterFromJson(m, src);
+    return m;
+}
+exports.jsonToIyakuhinMaster = jsonToIyakuhinMaster;
+/*
+export function fromJsonToIyakuhinMaster(src: any): IyakuhinMaster | V.ValidationError {
+    let master = new IyakuhinMaster(src.iyakuhincode, src.name, src.yomi, src.unit,
+        +src.yakka, +src.madoku, src.kouhatsu === 0 ? false : true,
+        +src.zaikei, src.valid_from, src.valid_upto);
+    let errs = validateIyakuhinMaster(master);
+    if( errs.length > 0 ){
+        return new V.ValidationError(errs);
+    } else {
+        return master;
+    }
+}
+export function validateIyakuhinMaster(iyakuhinMaster: IyakuhinMaster): string[] {
+    let errs: string[] = [];
     V.validate("医薬品コード", iyakuhinMaster.iyakuhincode, errs, [
         V.isDefined, V.isInteger, V.isPositive
     ]);
@@ -49,15 +67,4 @@ function validateIyakuhinMaster(iyakuhinMaster) {
     ]);
     return errs;
 }
-exports.validateIyakuhinMaster = validateIyakuhinMaster;
-function fromJsonToIyakuhinMaster(src) {
-    let master = new IyakuhinMaster(src.iyakuhincode, src.name, src.yomi, src.unit, +src.yakka, +src.madoku, src.kouhatsu === 0 ? false : true, +src.zaikei, src.valid_from, src.valid_upto);
-    let errs = validateIyakuhinMaster(master);
-    if (errs.length > 0) {
-        return new V.ValidationError(errs);
-    }
-    else {
-        return master;
-    }
-}
-exports.fromJsonToIyakuhinMaster = fromJsonToIyakuhinMaster;
+*/

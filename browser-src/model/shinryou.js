@@ -1,16 +1,24 @@
 "use strict";
-const V = require("../validation");
 class Shinryou {
-    constructor(shinryouId, visitId, shinryoucode) {
-        this.shinryouId = shinryouId;
-        this.visitId = visitId;
-        this.shinryoucode = shinryoucode;
-    }
 }
 exports.Shinryou = Shinryou;
-function validateShinryou(shinryou, checkShinryouId = true) {
-    let errs = [];
-    if (checkShinryouId) {
+function fillShinryouFromJson(shinryou, src) {
+    shinryou.shinryouId = src.shinryou_id;
+    shinryou.visitId = src.visit_id;
+    shinryou.shinryoucode = src.shinryoucode;
+}
+exports.fillShinryouFromJson = fillShinryouFromJson;
+function jsonToShinryou(src) {
+    let shinryou = new Shinryou();
+    fillShinryouFromJson(shinryou, src);
+    return shinryou;
+}
+exports.jsonToShinryou = jsonToShinryou;
+/**
+export function validateShinryou(shinryou: Shinryou,
+    checkShinryouId: boolean = true): string[] {
+    let errs: string[] = [];
+    if( checkShinryouId ){
         V.validate("shinryouId", shinryou.shinryouId, errs, [
             V.isDefined, V.isInteger, V.isPositive
         ]);
@@ -23,15 +31,14 @@ function validateShinryou(shinryou, checkShinryouId = true) {
     ]);
     return errs;
 }
-exports.validateShinryou = validateShinryou;
-function fromJsonToShinryou(src) {
+
+export function fromJsonToShinryou(src: any): Shinryou | V.ValidationError {
     let shinryou = new Shinryou(src.shinryou_id, src.visit_id, src.shinryoucode);
     let errs = validateShinryou(shinryou, true);
-    if (errs.length > 0) {
+    if( errs.length > 0 ){
         return new V.ValidationError(errs);
-    }
-    else {
+    } else {
         return shinryou;
     }
 }
-exports.fromJsonToShinryou = fromJsonToShinryou;
+**/ 

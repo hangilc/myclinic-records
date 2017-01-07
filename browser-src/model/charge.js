@@ -1,14 +1,17 @@
 "use strict";
-const V = require("../validation");
 class Charge {
-    constructor(visitId, charge) {
-        this.visitId = visitId;
-        this.charge = charge;
-    }
 }
 exports.Charge = Charge;
-function validateCharge(charge) {
-    let errs = [];
+function jsonToCharge(src) {
+    let charge = new Charge();
+    charge.visitId = src.visit_id;
+    charge.charge = src.charge;
+    return charge;
+}
+exports.jsonToCharge = jsonToCharge;
+/*
+export function validateCharge(charge: Charge): string[] {
+    let errs: string[] = [];
     V.validate("visitId", charge.visitId, errs, [
         V.isDefined, V.isInteger, V.isPositive
     ]);
@@ -17,15 +20,14 @@ function validateCharge(charge) {
     ]);
     return errs;
 }
-exports.validateCharge = validateCharge;
-function fromJsonToCharge(src) {
+
+export function fromJsonToCharge(src: any): Charge | V.ValidationError {
     let charge = new Charge(src.visit_id, src.charge);
     let errs = validateCharge(charge);
-    if (errs.length > 0) {
+    if( errs.length > 0 ){
         return new V.ValidationError(errs);
-    }
-    else {
+    } else {
         return charge;
     }
 }
-exports.fromJsonToCharge = fromJsonToCharge;
+*/

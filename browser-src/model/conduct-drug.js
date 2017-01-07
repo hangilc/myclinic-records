@@ -1,17 +1,25 @@
 "use strict";
-const V = require("../validation");
 class ConductDrug {
-    constructor(conductDrugId, conductId, iyakuhincode, amount) {
-        this.conductDrugId = conductDrugId;
-        this.conductId = conductId;
-        this.iyakuhincode = iyakuhincode;
-        this.amount = amount;
-    }
 }
 exports.ConductDrug = ConductDrug;
-function validateConductDrug(conductDrug, checkConductDrugId = true) {
-    let errs = [];
-    if (checkConductDrugId) {
+function fillConductDrugFromJson(drug, src) {
+    drug.conductDrugId = src.id;
+    drug.conductId = src.visit_conduct_id;
+    drug.iyakuhincode = src.iyakuhincode;
+    drug.amount = src.amount;
+}
+exports.fillConductDrugFromJson = fillConductDrugFromJson;
+function jsonToConductDrug(src) {
+    let drug = new ConductDrug();
+    fillConductDrugFromJson(drug, src);
+    return drug;
+}
+exports.jsonToConductDrug = jsonToConductDrug;
+/**
+export function validateConductDrug(conductDrug: ConductDrug,
+        checkConductDrugId: boolean = true): string[] {
+    let errs: string[] = [];
+    if( checkConductDrugId ){
         V.validate("conductDrugId", conductDrug.conductDrugId, errs, [
             V.isDefined, V.isInteger, V.isPositive
         ]);
@@ -27,15 +35,15 @@ function validateConductDrug(conductDrug, checkConductDrugId = true) {
     ]);
     return errs;
 }
-exports.validateConductDrug = validateConductDrug;
-function fromJsonToConductDrug(src) {
-    let conductDrug = new ConductDrug(src.id, src.visit_conduct_id, src.iyakuhincode, src.amount);
+
+export function fromJsonToConductDrug(src: any): ConductDrug | V.ValidationError {
+    let conductDrug = new ConductDrug(src.id, src.visit_conduct_id,
+            src.iyakuhincode, src.amount);
     let errs = validateConductDrug(conductDrug, true);
-    if (errs.length > 0) {
+    if( errs.length > 0 ){
         return new V.ValidationError(errs);
-    }
-    else {
+    } else {
         return conductDrug;
     }
 }
-exports.fromJsonToConductDrug = fromJsonToConductDrug;
+**/
