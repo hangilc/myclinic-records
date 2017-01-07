@@ -1,4 +1,4 @@
-import { Visit, validateVisit } from "./visit";
+import { Visit, fillVisitFromJson } from "./visit";
 import { Text, jsonToText } from "./text";
 import { Shahokokuho, jsonToShahokokuho } from "./shahokokuho";
 import { Koukikourei, jsonToKoukikourei } from "./koukikourei";
@@ -10,30 +10,41 @@ import { FullConduct, jsonToFullConduct } from "./full-conduct";
 import { Charge, jsonToCharge } from "./charge";
 
 export class FullVisit extends Visit {
-	constructor(
-		visitId: number,
-		patientId: number,
-		visitedAt: string,
-		shahokokuhoId: number,
-		koukikoureiId: number,
-		roujinId: number,
-		kouhi1Id: number,
-		kouhi2Id: number,
-		kouhi3Id: number,
-		readonly texts: Text[], 
-		readonly shahokokuho: Shahokokuho | null,
-		readonly koukikourei: Koukikourei | null,
-		readonly roujin: Roujin | null,
-		readonly kouhiList: Kouhi[],
-		readonly drugs: FullDrug[],
-		readonly shinryouList: FullShinryou[],
-		readonly conducts: FullConduct[],
-		readonly charge: Charge | null
-	){
-		super(visitId, patientId, visitedAt, shahokokuhoId,
-			koukikoureiId, roujinId, kouhi1Id, kouhi2Id, kouhi3Id)
+	texts: Text[]; 
+	shahokokuho: Shahokokuho | null;
+	koukikourei: Koukikourei | null;
+	roujin: Roujin | null;
+	kouhiList: Kouhi[];
+	drugs: FullDrug[];
+	shinryouList: FullShinryou[];
+	conducts: FullConduct[];
+	charge: Charge | null;
+}
+
+function opt<T>(src: any, cvt: (s: any) => T): T | null {
+	if( src === null || src === undefined ){
+		return null;
+	} else {
+		return cvt(src);
 	}
 }
+
+export function jsonToFullVisit(src: any){
+	let visit = new FullVisit();
+	fillVisitFromJson(visit, src);
+	visit.texts = src.texts.map(jsonToText);
+	visit.shahokokuho = opt(src.shahokokuho, jsonToShahokokuho);
+	visit.koukikourei = opt(src.koukikourei, jsonToKoukikourei);
+	visit.roujin = opt(src.roujin, jsonToRoujin);
+	visit.kouhiList = src.kouhi_list.map(jsonToKouhi);
+	visit.drugs = src.drugs.map(jsonToFullDrug);
+	visit.shinryouList = src.shinryou_list.map(jsonToFullShinryou);
+	visit.conducts = src.conducts.map(jsonToFullConduct);
+	charge = opt(src.charge, jsonToCharge);
+	return visit;
+}
+
+/*
 
 export function validateFullVisit(visit: FullVisit): string[] {
 	let errs: string[];
@@ -157,4 +168,4 @@ export function fromJsonToFullVisit(src: any): FullVisit | V.ValidationError {
 	}
 }
 
-
+*/

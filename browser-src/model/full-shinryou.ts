@@ -1,30 +1,30 @@
-import * as V from "../validation";
-import { Shinryou, validateShinryou } from "./shinryou";
-import { validateShinryouMaster } from "./shinryou-master";
+import { Shinryou, fillShinryouFromJson } from "./shinryou";
+import { fillShinryouMasterFromJson } from "./shinryou-master";
 
 export class FullShinryou extends Shinryou {
-	constructor(
-		shinryouId: number,
-		visitId: number,
-		shinryoucode: number,
-		readonly name: string,
-		readonly tensuu: number,
-		readonly tensuuShikibetsu: number,
-		readonly houketsuKensa: string,
-		readonly oushinKubun: number,
-		readonly kensaGroup: string,
-		readonly roujinTekiyou: number,
-		readonly codeShou: number,
-		readonly codeBu: string,
-		readonly codeAlpha: string,
-		readonly codeKubun: string,
-		readonly validFrom: string,
-		readonly validUpto: string
-	){
-		super(shinryouId, visitId, shinryoucode)
-	}
+	name: string;
+	tensuu: number;
+	tensuuShikibetsu: number;
+	houketsuKensa: string;
+	oushinKubun: number;
+	kensaGroup: string;
+	roujinTekiyou: number;
+	codeShou: number;
+	codeBu: string;
+	codeAlpha: string;
+	codeKubun: string;
+	validFrom: string;
+	validUpto: string;
 }
 
+export function jsonToFullShinryou(src: any): FullShinryou {
+	let shinryou = new FullShinryou();
+	fillShinryouFromJson(shinryou, src);
+	fillShinryouMasterFromJson(shinryou, src);
+	return shinryou;
+}
+
+/**
 export function validateFullShinryou(shinryou: FullShinryou): string[] {
 	let errs: string[] = validateShinryou(shinryou);
 	if( errs.length > 0 ){
@@ -47,5 +47,7 @@ export function fromJsonToFullShinryou(src: any): FullShinryou | V.ValidationErr
 		return shinryou;
 	}
 }
+
+**/
 
 

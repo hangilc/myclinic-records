@@ -54,8 +54,7 @@ export function validateVisit(visit: Visit): null | VisitValues {
 	return hasError(v) ? v : null;
 }
 
-export function jsonToVisit(src: any): Visit {
-	let visit = new Visit();
+export function fillVisitFromJson(visit: Visit, src: any): void {
 	visit.visitId = src.visit_id;
 	visit.patientId = src.patient_id;
 	visit.visitedAt = src.v_datetime;
@@ -65,6 +64,11 @@ export function jsonToVisit(src: any): Visit {
 	visit.kouhi1Id = src.kouhi_1_id;
 	visit.kouhi2Id = src.kouhi_2_id;
 	visit.kouhi3Id = src.kouhi_3_id;
+}
+
+export function jsonToVisit(src: any): Visit {
+	let visit = new Visit();
+	fillVisitFromJson(visit, src);
 	return visit;
 }
 

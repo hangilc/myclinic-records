@@ -18,8 +18,7 @@ export class ShinryouMaster {
 	validUpto: string;
 }
 
-export function jsonToShinryouMaster(src: any): ShinryouMaster {
-	let m = new ShinryouMaster();
+export function fillShinryouMasterFromJson(m: ShinryouMaster, src: any): void {
 	m.shinryoucode = src.shinryoucode;
 	m.name = src.name;
 	m.tensuu = +src.tensuu;
@@ -34,6 +33,11 @@ export function jsonToShinryouMaster(src: any): ShinryouMaster {
 	m.codeKubun = src.code_kubun;
 	m.validFrom = src.valid_from;
 	m.validUpto = src.valid_upto;
+}
+
+export function jsonToShinryouMaster(src: any): ShinryouMaster {
+	let m = new ShinryouMaster();
+	fillShinryouMasterFromJson(m, src);
 	return m;
 }
 

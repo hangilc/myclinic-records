@@ -12,16 +12,20 @@ export class KizaiMaster {
 	validUpto: string;
 }
 
+export function fillKizaiMasterFromJson(m: KizaiMaster, src: any): void {
+	m.kizaicode = src.kizaicode;
+	m.name = src.name;
+	m.yomi = src.yomi;
+	m.unit = src.unit;
+	m.kingaku = +src.kingaku;
+	m.validFrom = src.valid_from;
+	m.validUpto = src.valid_upto;
+}
+
 export function jsonToKizaiMaster(src: any): KizaiMaster {
-	let kizai = new KizaiMaster();
-	kizai.kizaicode = src.kizaicode;
-	kizai.name = src.name;
-	kizai.yomi = src.yomi;
-	kizai.unit = src.unit;
-	kizai.kingaku = +src.kingaku;
-	kizai.validFrom = src.valid_from;
-	kizai.validUpto = src.valid_upto;
-	return kizai;
+	let m = new KizaiMaster();
+	fillKizaiMasterFromJson(m, src);
+	return m;
 }
 
 /*

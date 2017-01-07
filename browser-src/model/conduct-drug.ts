@@ -8,12 +8,16 @@ export class ConductDrug {
 	amount: number;
 }
 
-export function jsonToConductDrug(src: any): ConductDrug {
-	let drug = new ConductDrug();
+export function fillConductDrugFromJson(drug: ConductDrug, src: any): void {
 	drug.conductDrugId = src.id;
 	drug.conductId = src.visit_conduct_id;
 	drug.iyakuhincode = src.iyakuhincode;
 	drug.amount = src.amount;
+}
+
+export function jsonToConductDrug(src: any): ConductDrug {
+	let drug = new ConductDrug();
+	fillConductDrugFromJson(drug, src);
 	return drug;
 }
 

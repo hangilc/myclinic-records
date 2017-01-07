@@ -1,24 +1,23 @@
-import * as V from "../validation";
-import { ConductKizai, validateConductKizai } from "./conduct-kizai";
-import { validateKizaiMaster } from "./kizai-master";
+import { ConductKizai, fillConductKizaiFromJson } from "./conduct-kizai";
+import { fillKizaiMasterFromJson } from "./kizai-master";
 
 export class FullConductKizai extends ConductKizai {
-	constructor(
-		conductKizaiId: number,
-		conductId: number,
-		kizaicode: number,
-		amount: number,
-		readonly name: string,
-		readonly yomi: string,
-		readonly unit: string,
-		readonly kingaku: number,
-		readonly validFrom: string,
-		readonly validUpto: string
-	){
-		super(conductKizaiId, conductId, kizaicode, amount)
-	}
+	name: string;
+	yomi: string;
+	unit: string;
+	kingaku: number;
+	validFrom: string;
+	validUpto: string;
 }
 
+export function jsonToFullConductKizai(src: any): FullConductKizai {
+	let kizai = new FullConductKizai();
+	fillConductKizaiFromJson(kizai, src);
+	fillKizaiMasterFromJson(kizai, src);
+	return kizai;
+}
+
+/*
 export function validateFullConductKizai(kizai: FullConductKizai): string[] {
 	let errs: string[] = validateConductKizai(kizai);
 	if( errs.length > 0 ){
@@ -39,5 +38,6 @@ export function fromJsonToFullConductKizai(src: any): FullConductKizai | V.Valid
 		return kizai;
 	}
 }
+*/
 
 

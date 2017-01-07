@@ -1,26 +1,29 @@
-import * as V from "../validation";
-import { Conduct, validateConduct } from "./conduct";
-import { FullConductShinryou, validateFullConductShinryou,
-	fromJsonToFullConductShinryou } from "./full-conduct-shinryou";
-import { FullConductDrug, validateFullConductDrug,
-	fromJsonToFullConductDrug } from "./full-conduct-drug";
-import { FullConductKizai, validateFullConductKizai,
-	fromJsonToFullConductKizai } from "./full-conduct-kizai";
+import { Conduct } from "./conduct";
+import { GazouLabel } from "./gazou-label";
+import { FullConductShinryou, jsonToFullConductShinryou } from "./full-conduct-shinryou";
+import { FullConductDrug, jsonToFullConductDrug } from "./full-conduct-drug";
+import { FullConductKizai, jsonToFullConductKizai } from "./full-conduct-kizai";
 
 export class FullConduct extends Conduct {
-	constructor(
-		conductId,
-		visitId,
-		kind,
-		readonly gazouLabel: string | null,
-		readonly drugs: FullConductDrug[],
-		readonly shinryouList: FullConductShinryou[],
-		readonly kizaiList: FullConductKizai[],
-	){
-		super(conductId, visitId, kind)
-	}
+	gazouLabel: string | null;
+	drugs: FullConductDrug[];
+	shinryouList: FullConductShinryou[];
+	kizaiList: FullConductKizai[];
 }
 
+export function jsonToFullConduct(src: any){
+	let conduct = new FullConduct();
+	conduct.gazouLabel = src.gazou_label;
+	let drugs = src.drugs || [];
+	conduct.drugs = drugs.map(jsonToFullConductDrug);
+	let shinryouList = src.shinryou_list || [];
+	conduct.shinryouList = shinryouList.map(jsonToFullConductShinryou);
+	let kizaiList = src.kizai_list || [];
+	conduct.kizaiList = kizaiList.map(jsonToFullConductKizai);
+	return conduct;
+}
+
+/**
 export function validateFullConduct(conduct: FullConduct): string[] {
 	let errs = validateConduct(conduct);
 	V.validate("画像ラベル", conduct.gazouLabel, errs, [
@@ -86,3 +89,5 @@ export function fromJsonToFullConduct(src: any): FullConduct | V.ValidationError
 		return conduct;
 	}
 }
+
+**/

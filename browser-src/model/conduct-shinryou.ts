@@ -7,11 +7,15 @@ export class ConductShinryou {
 	shinryoucode: number;
 }
 
-export function jsonToConductShinryou(src: any): ConductShinryou {
-	let shinryou = new ConductShinryou();
+export function fillConductShinryouFromJson(shinryou: ConductShinryou, src: any): void {
 	shinryou.conductShinryouId = src.id;
 	shinryou.conductId = src.visit_conduct_id;
 	shinryou.shinryoucode = src.shinryoucode;
+}
+
+export function jsonToConductShinryou(src: any): ConductShinryou {
+	let shinryou = new ConductShinryou();
+	fillConductShinryouFromJson(shinryou, src);
 	return shinryou;
 }
 

@@ -8,12 +8,16 @@ export class ConductKizai {
 	amount: number;
 }
 
-export function jsonToConductKizai(src: any): ConductKizai {
-	let kizai = new ConductKizai();
+export function fillConductKizaiFromJson(kizai: ConductKizai, src: any): void {
 	kizai.conductKizaiId = src.id;
 	kizai.conductId = src.visit_conduct_id;
 	kizai.kizaicode = src.kizaicode;
 	kizai.amount = src.amount;
+}
+
+export function jsonToConductKizai(src: any): ConductKizai {
+	let kizai = new ConductKizai();
+	fillConductKizaiFromJson(kizai, src);
 	return kizai;
 }
 
