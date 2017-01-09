@@ -7,11 +7,15 @@ export class Conduct {
 	kind: number;
 }
 
-export function jsonToConduct(src: any): Conduct {
-	let conduct = new Conduct();
+export function fillConductFromJson(conduct: Conduct, src: any): void {
 	conduct.conductId = src.id;
 	conduct.visitId = src.visit_id;
 	conduct.kind = src.kind;
+}
+
+export function jsonToConduct(src: any): Conduct {
+	let conduct = new Conduct();
+	fillConductFromJson(conduct, src);
 	return conduct;
 }
 

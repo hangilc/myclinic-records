@@ -8,6 +8,7 @@ class FullConduct extends conduct_1.Conduct {
 exports.FullConduct = FullConduct;
 function jsonToFullConduct(src) {
     let conduct = new FullConduct();
+    conduct_1.fillConductFromJson(conduct, src);
     conduct.gazouLabel = src.gazou_label;
     let drugs = src.drugs || [];
     conduct.drugs = drugs.map(full_conduct_drug_1.jsonToFullConductDrug);

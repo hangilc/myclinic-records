@@ -1,4 +1,4 @@
-import { Conduct } from "./conduct";
+import { Conduct, fillConductFromJson } from "./conduct";
 import { GazouLabel } from "./gazou-label";
 import { FullConductShinryou, jsonToFullConductShinryou } from "./full-conduct-shinryou";
 import { FullConductDrug, jsonToFullConductDrug } from "./full-conduct-drug";
@@ -13,6 +13,7 @@ export class FullConduct extends Conduct {
 
 export function jsonToFullConduct(src: any){
 	let conduct = new FullConduct();
+	fillConductFromJson(conduct, src);
 	conduct.gazouLabel = src.gazou_label;
 	let drugs = src.drugs || [];
 	conduct.drugs = drugs.map(jsonToFullConductDrug);

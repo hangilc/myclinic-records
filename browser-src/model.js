@@ -24,3 +24,6 @@ __export(require("./model/kizai-master"));
 __export(require("./model/full-drug"));
 __export(require("./model/full-shinryou"));
 __export(require("./model/full-conduct"));
+__export(require("./model/full-conduct-drug"));
+__export(require("./model/full-conduct-shinryou"));
+__export(require("./model/full-conduct-kizai"));

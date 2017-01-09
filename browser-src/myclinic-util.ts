@@ -1,22 +1,6 @@
 import { FullDrug } from "./model";
 import * as mConsts from "myclinic-consts";
 
-// export function drugRep(drug){
-// 	var category = parseInt(drug.d_category, 10);
-// 	switch(category){
-// 		case mConsts.DrugCategoryNaifuku:
-// 			return drug.name + " " + drug.d_amount + drug.unit + " " + drug.d_usage + 
-// 				" " + drug.d_days + "日分";
-// 		case mConsts.DrugCategoryTonpuku:
-// 			return drug.name + " １回 " + drug.d_amount + drug.unit + " " + drug.d_usage +
-// 				" " + drug.d_days + "回分";
-// 		case mConsts.DrugCategoryGaiyou:
-// 			return drug.name + " " + drug.d_amount + drug.unit + " " + drug.d_usage;
-// 		default:
-// 			return drug.name + " " + drug.d_amount + drug.unit;
-// 	}
-// };
-
 export function drugRep(drug: FullDrug){
 	switch( drug.category ){
 		case mConsts.DrugCategoryNaifuku:
@@ -30,7 +14,15 @@ export function drugRep(drug: FullDrug){
 	}
 };
 
-
+export function conductKindToKanji(kind: number): string {
+	switch(kind){
+		case mConsts.ConductKindGazou: return "画像";
+		case mConsts.ConductKindHikaChuusha: return "皮下・筋肉注射";
+		case mConsts.ConductKindJoumyakuChuusha: return "静脈注射";
+		case mConsts.ConductKindOtherChuusha: return "その他の注射";
+		default: return "不明";
+	}
+}
 
 /**
 "use strict";

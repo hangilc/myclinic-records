@@ -2,11 +2,15 @@
 class Conduct {
 }
 exports.Conduct = Conduct;
-function jsonToConduct(src) {
-    let conduct = new Conduct();
+function fillConductFromJson(conduct, src) {
     conduct.conductId = src.id;
     conduct.visitId = src.visit_id;
     conduct.kind = src.kind;
+}
+exports.fillConductFromJson = fillConductFromJson;
+function jsonToConduct(src) {
+    let conduct = new Conduct();
+    fillConductFromJson(conduct, src);
     return conduct;
 }
 exports.jsonToConduct = jsonToConduct;

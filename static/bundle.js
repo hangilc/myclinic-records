@@ -264,15 +264,9 @@
 	            wrapper.appendChild(tmpDom);
 	            for (let i = 0; i < visits.length; i++) {
 	                let visit = visits[i];
-	                let fullVisit = yield service_1.getFullVisit(visit.visitId);
-	                let patient = yield service_1.getPatient(visit.patientId);
-	                this.renderVisit(fullVisit, patient, tmpDom);
+	                wrapper.appendChild(new RecordItem(visit).dom);
 	            }
 	        });
-	    }
-	    renderVisit(visit, patient, wrapper) {
-	        let rec = new RecordItem(visit, patient);
-	        wrapper.appendChild(rec.dom);
 	    }
 	}
 	exports.RecordsByDate = RecordsByDate;
@@ -358,21 +352,29 @@
 	    }
 	}
 	class RecordItem {
-	    constructor(visit, patient) {
-	        let content = new RecordContent(visit);
-	        this.dom = typed_dom_1.h.div({}, [
-	            typed_dom_1.h.h3({}, [
-	                `${patient.lastName} ${patient.firstName}`,
-	                " ",
-	                `(患者番号 ${patient.patientId})`,
-	                "[",
-	                typed_dom_1.f.a(e => { }, {}, ["全診療記録"]),
-	                "]",
-	                " ",
-	                this.formatVisitTime(visit.visitedAt),
-	            ]),
-	            content.dom
-	        ]);
+	    constructor(visit) {
+	        this.dom = typed_dom_1.h.div({}, ["Loading..."]);
+	        Promise.all([service_1.getFullVisit(visit.visitId), service_1.getPatient(visit.patientId)])
+	            .then(values => {
+	            let [fullVisit, patient] = values;
+	            let newDom = typed_dom_1.h.div({}, [
+	                typed_dom_1.h.h3({}, [
+	                    `${patient.lastName} ${patient.firstName}`,
+	                    " ",
+	                    `(患者番号 ${patient.patientId})`,
+	                    "[",
+	                    typed_dom_1.f.a(e => { }, {}, ["全診療記録"]),
+	                    "]",
+	                    " ",
+	                    this.formatVisitTime(visit.visitedAt),
+	                ]),
+	                new RecordContent(fullVisit).dom
+	            ]);
+	            let parent = this.dom.parentNode;
+	            if (parent !== null) {
+	                parent.replaceChild(newDom, this.dom);
+	            }
+	        });
 	    }
 	    formatVisitTime(at) {
 	        return kanjidate.format("{h:2}時{m:2}分", at);
@@ -475,9 +477,26 @@
 	}
 	class RecordConduct {
 	    constructor(conduct) {
+	        let label = "";
+	        if (conduct.gazouLabel !== null) {
+	            label = conduct.gazouLabel;
+	        }
 	        this.dom = typed_dom_1.h.div({}, [
-	            "CONDUCT"
+	            typed_dom_1.h.div({}, [`[${myclinic_util_1.conductKindToKanji(conduct.kind)}]`]),
+	            ...(label === "" ? [] : [label]),
+	            ...conduct.shinryouList.map(s => this.renderShinryou(s)),
+	            ...conduct.drugs.map(d => this.renderDrug(d)),
+	            ...conduct.kizaiList.map(k => this.renderKizai(k))
 	        ]);
+	    }
+	    renderShinryou(shinryou) {
+	        return typed_dom_1.h.div({}, [shinryou.name]);
+	    }
+	    renderDrug(drug) {
+	        return typed_dom_1.h.div({}, [`${drug.name} ${drug.amount}${drug.unit}`]);
+	    }
+	    renderKizai(kizai) {
+	        return typed_dom_1.h.div({}, [`${kizai.name} ${kizai.amount}${kizai.unit}`]);
 	    }
 	}
 
@@ -26289,6 +26308,9 @@
 	__export(__webpack_require__(136));
 	__export(__webpack_require__(138));
 	__export(__webpack_require__(140));
+	__export(__webpack_require__(142));
+	__export(__webpack_require__(141));
+	__export(__webpack_require__(143));
 
 
 /***/ },
@@ -27294,6 +27316,7 @@
 	    drug.iyakuhincode = src.d_iyakuhincode;
 	    drug.amount = src.d_amount;
 	    drug.usage = src.d_usage;
+	    drug.days = src.d_days;
 	    drug.category = src.d_category;
 	    drug.prescribed = src.d_prescribed === 0 ? false : true;
 	}
@@ -27409,11 +27432,15 @@
 	class Conduct {
 	}
 	exports.Conduct = Conduct;
-	function jsonToConduct(src) {
-	    let conduct = new Conduct();
+	function fillConductFromJson(conduct, src) {
 	    conduct.conductId = src.id;
 	    conduct.visitId = src.visit_id;
 	    conduct.kind = src.kind;
+	}
+	exports.fillConductFromJson = fillConductFromJson;
+	function jsonToConduct(src) {
+	    let conduct = new Conduct();
+	    fillConductFromJson(conduct, src);
 	    return conduct;
 	}
 	exports.jsonToConduct = jsonToConduct;
@@ -28122,6 +28149,7 @@
 	exports.FullConduct = FullConduct;
 	function jsonToFullConduct(src) {
 	    let conduct = new FullConduct();
+	    conduct_1.fillConductFromJson(conduct, src);
 	    conduct.gazouLabel = src.gazou_label;
 	    let drugs = src.drugs || [];
 	    conduct.drugs = drugs.map(full_conduct_drug_1.jsonToFullConductDrug);
@@ -28406,21 +28434,6 @@
 
 	"use strict";
 	const mConsts = __webpack_require__(146);
-	// export function drugRep(drug){
-	// 	var category = parseInt(drug.d_category, 10);
-	// 	switch(category){
-	// 		case mConsts.DrugCategoryNaifuku:
-	// 			return drug.name + " " + drug.d_amount + drug.unit + " " + drug.d_usage + 
-	// 				" " + drug.d_days + "日分";
-	// 		case mConsts.DrugCategoryTonpuku:
-	// 			return drug.name + " １回 " + drug.d_amount + drug.unit + " " + drug.d_usage +
-	// 				" " + drug.d_days + "回分";
-	// 		case mConsts.DrugCategoryGaiyou:
-	// 			return drug.name + " " + drug.d_amount + drug.unit + " " + drug.d_usage;
-	// 		default:
-	// 			return drug.name + " " + drug.d_amount + drug.unit;
-	// 	}
-	// };
 	function drugRep(drug) {
 	    switch (drug.category) {
 	        case mConsts.DrugCategoryNaifuku:
@@ -28435,6 +28448,16 @@
 	}
 	exports.drugRep = drugRep;
 	;
+	function conductKindToKanji(kind) {
+	    switch (kind) {
+	        case mConsts.ConductKindGazou: return "画像";
+	        case mConsts.ConductKindHikaChuusha: return "皮下・筋肉注射";
+	        case mConsts.ConductKindJoumyakuChuusha: return "静脈注射";
+	        case mConsts.ConductKindOtherChuusha: return "その他の注射";
+	        default: return "不明";
+	    }
+	}
+	exports.conductKindToKanji = conductKindToKanji;
 	/**
 	"use strict";
 

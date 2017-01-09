@@ -68,15 +68,9 @@ class RecordsByDate {
             wrapper.appendChild(tmpDom);
             for (let i = 0; i < visits.length; i++) {
                 let visit = visits[i];
-                let fullVisit = yield service_1.getFullVisit(visit.visitId);
-                let patient = yield service_1.getPatient(visit.patientId);
-                this.renderVisit(fullVisit, patient, tmpDom);
+                wrapper.appendChild(new RecordItem(visit).dom);
             }
         });
-    }
-    renderVisit(visit, patient, wrapper) {
-        let rec = new RecordItem(visit, patient);
-        wrapper.appendChild(rec.dom);
     }
 }
 exports.RecordsByDate = RecordsByDate;
@@ -162,21 +156,29 @@ class RecordNav {
     }
 }
 class RecordItem {
-    constructor(visit, patient) {
-        let content = new RecordContent(visit);
-        this.dom = typed_dom_1.h.div({}, [
-            typed_dom_1.h.h3({}, [
-                `${patient.lastName} ${patient.firstName}`,
-                " ",
-                `(患者番号 ${patient.patientId})`,
-                "[",
-                typed_dom_1.f.a(e => { }, {}, ["全診療記録"]),
-                "]",
-                " ",
-                this.formatVisitTime(visit.visitedAt),
-            ]),
-            content.dom
-        ]);
+    constructor(visit) {
+        this.dom = typed_dom_1.h.div({}, ["Loading..."]);
+        Promise.all([service_1.getFullVisit(visit.visitId), service_1.getPatient(visit.patientId)])
+            .then(values => {
+            let [fullVisit, patient] = values;
+            let newDom = typed_dom_1.h.div({}, [
+                typed_dom_1.h.h3({}, [
+                    `${patient.lastName} ${patient.firstName}`,
+                    " ",
+                    `(患者番号 ${patient.patientId})`,
+                    "[",
+                    typed_dom_1.f.a(e => { }, {}, ["全診療記録"]),
+                    "]",
+                    " ",
+                    this.formatVisitTime(visit.visitedAt),
+                ]),
+                new RecordContent(fullVisit).dom
+            ]);
+            let parent = this.dom.parentNode;
+            if (parent !== null) {
+                parent.replaceChild(newDom, this.dom);
+            }
+        });
     }
     formatVisitTime(at) {
         return kanjidate.format("{h:2}時{m:2}分", at);
@@ -279,8 +281,25 @@ class RecordConductList {
 }
 class RecordConduct {
     constructor(conduct) {
+        let label = "";
+        if (conduct.gazouLabel !== null) {
+            label = conduct.gazouLabel;
+        }
         this.dom = typed_dom_1.h.div({}, [
-            "CONDUCT"
+            typed_dom_1.h.div({}, [`[${myclinic_util_1.conductKindToKanji(conduct.kind)}]`]),
+            ...(label === "" ? [] : [label]),
+            ...conduct.shinryouList.map(s => this.renderShinryou(s)),
+            ...conduct.drugs.map(d => this.renderDrug(d)),
+            ...conduct.kizaiList.map(k => this.renderKizai(k))
         ]);
+    }
+    renderShinryou(shinryou) {
+        return typed_dom_1.h.div({}, [shinryou.name]);
+    }
+    renderDrug(drug) {
+        return typed_dom_1.h.div({}, [`${drug.name} ${drug.amount}${drug.unit}`]);
+    }
+    renderKizai(kizai) {
+        return typed_dom_1.h.div({}, [`${kizai.name} ${kizai.amount}${kizai.unit}`]);
     }
 }

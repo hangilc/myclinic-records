@@ -4,8 +4,9 @@ import * as moment from "moment";
 import { listVisitsByDate, getFullVisit, getPatient } from "./service";
 import * as kanjidate from "kanjidate";
 import { Visit, FullVisit, Patient, Text, FullDrug, FullShinryou,
-	FullConduct, Charge } from "./model";
-import { drugRep } from "./myclinic-util";
+	FullConduct, FullConductShinryou, FullConductDrug,
+	FullConductKizai, Charge } from "./model";
+import { drugRep, conductKindToKanji } from "./myclinic-util";
 
 export class RecordsByDate {
 	dom: HTMLElement;
@@ -66,15 +67,8 @@ export class RecordsByDate {
 		wrapper.appendChild(tmpDom);
 		for(let i=0;i<visits.length;i++){
 			let visit = visits[i];
-			let fullVisit = await getFullVisit(visit.visitId);
-			let patient = await getPatient(visit.patientId);
-			this.renderVisit(fullVisit, patient, tmpDom);
+			wrapper.appendChild(new RecordItem(visit).dom);
 		}
-	}
-
-	private renderVisit(visit: FullVisit, patient: Patient, wrapper: HTMLElement){
-		let rec = new RecordItem(visit, patient);
-		wrapper.appendChild(rec.dom);
 	}
 }
 
@@ -177,21 +171,29 @@ class RecordNav {
 class RecordItem {
 	dom: HTMLElement;
 
-	constructor(visit: FullVisit, patient: Patient) {
-		let content = new RecordContent(visit);
-		this.dom = h.div({}, [
-			h.h3({}, [
-				`${ patient.lastName } ${ patient.firstName }`,
-				" ",
-				`(患者番号 ${ patient.patientId })`,
-				"[",
-				f.a(e => {}, {}, ["全診療記録"]),
-				"]",
-				" ",
-				this.formatVisitTime(visit.visitedAt),
-			]),
-			content.dom
-		]);
+	constructor(visit: Visit){
+		this.dom = h.div({}, ["Loading..."]);
+		Promise.all([getFullVisit(visit.visitId), getPatient(visit.patientId)])
+		.then(values => {
+			let [fullVisit, patient] = values;
+			let newDom = h.div({}, [
+				h.h3({}, [
+					`${ patient.lastName } ${ patient.firstName }`,
+					" ",
+					`(患者番号 ${ patient.patientId })`,
+					"[",
+					f.a(e => {}, {}, ["全診療記録"]),
+					"]",
+					" ",
+					this.formatVisitTime(visit.visitedAt),
+				]),
+				new RecordContent(fullVisit).dom
+			]);
+			let parent = this.dom.parentNode;
+			if( parent !== null ){
+				parent.replaceChild(newDom, this.dom);
+			}
+		})
 	}
 
 	private formatVisitTime(at: string): string {
@@ -322,8 +324,28 @@ class RecordConduct {
 	dom:HTMLElement;
 
 	constructor(conduct: FullConduct){
+		let label: string = "";
+		if( conduct.gazouLabel !== null ){
+			label = conduct.gazouLabel;
+		}
 		this.dom = h.div({}, [
-			"CONDUCT"
+			h.div({}, [`[${ conductKindToKanji(conduct.kind) }]`]),
+			...(label === "" ? [] : [label]),
+			...conduct.shinryouList.map(s => this.renderShinryou(s)),
+			...conduct.drugs.map(d => this.renderDrug(d)),
+			...conduct.kizaiList.map(k => this.renderKizai(k))
 		])
+	}
+
+	renderShinryou(shinryou: FullConductShinryou): HTMLElement {
+		return h.div({}, [shinryou.name])
+	}
+
+	renderDrug(drug: FullConductDrug): HTMLElement {
+		return h.div({}, [`${ drug.name } ${ drug.amount }${drug.unit}`]);
+	}
+
+	renderKizai(kizai: FullConductKizai): HTMLElement {
+		return h.div({}, [`${ kizai.name } ${ kizai.amount }${kizai.unit}`]);
 	}
 }

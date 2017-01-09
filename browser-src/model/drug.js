@@ -8,6 +8,7 @@ function fillDrugFromJson(drug, src) {
     drug.iyakuhincode = src.d_iyakuhincode;
     drug.amount = src.d_amount;
     drug.usage = src.d_usage;
+    drug.days = src.d_days;
     drug.category = src.d_category;
     drug.prescribed = src.d_prescribed === 0 ? false : true;
 }
