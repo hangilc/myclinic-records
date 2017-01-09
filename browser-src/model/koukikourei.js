@@ -14,6 +14,10 @@ function jsonToKoukikourei(src) {
     return hoken;
 }
 exports.jsonToKoukikourei = jsonToKoukikourei;
+function koukikoureiRep(hoken) {
+    return "後期高齢" + hoken.futanWari + "割";
+}
+exports.koukikoureiRep = koukikoureiRep;
 // export function validateKoukikourei(koukikourei: Koukikourei,
 // 	checkKoukikoureiId: boolean = true): string[] {
 // 	let errs: string[] = [];

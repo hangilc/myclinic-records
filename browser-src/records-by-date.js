@@ -11,6 +11,7 @@ const typed_dom_1 = require("./typed-dom");
 const date_input_1 = require("./date-input");
 const service_1 = require("./service");
 const kanjidate = require("kanjidate");
+const model_1 = require("./model");
 const myclinic_util_1 = require("./myclinic-util");
 class RecordsByDate {
     constructor() {
@@ -209,9 +210,27 @@ class RecordContent {
                         new RecordDrugList(visit.drugs).dom,
                         new RecordConductList(visit.conducts).dom,
                     ])
+                ]),
+                typed_dom_1.h.tr({}, [
+                    typed_dom_1.h.td({ colspan: 2, style: "font-family:sans-serif; font-size:14px; padding:10px; background-color:#eee" }, [
+                        this.chargeAndHokenRep(visit)
+                    ])
                 ])
             ])
         ]);
+    }
+    chargeAndHokenRep(visit) {
+        let charge = this.chargeRep(visit.charge);
+        let hoken = model_1.hokenRep(visit);
+        return charge + ` ${hoken}`;
+    }
+    chargeRep(charge) {
+        if (charge === null) {
+            return "未請求";
+        }
+        else {
+            return `請求額： ${charge.charge.toLocaleString()}円`;
+        }
     }
 }
 class RecordTextList {

@@ -1,9 +1,9 @@
 import { Visit, fillVisitFromJson } from "./visit";
 import { Text, jsonToText } from "./text";
-import { Shahokokuho, jsonToShahokokuho } from "./shahokokuho";
-import { Koukikourei, jsonToKoukikourei } from "./koukikourei";
-import { Roujin, jsonToRoujin } from "./roujin";
-import { Kouhi, jsonToKouhi } from "./kouhi";
+import { Shahokokuho, jsonToShahokokuho, shahokokuhoRep } from "./shahokokuho";
+import { Koukikourei, jsonToKoukikourei, koukikoureiRep } from "./koukikourei";
+import { Roujin, jsonToRoujin, roujinRep } from "./roujin";
+import { Kouhi, jsonToKouhi, kouhiRep } from "./kouhi";
 import { FullDrug, jsonToFullDrug } from "./full-drug";
 import { FullShinryou, jsonToFullShinryou } from "./full-shinryou";
 import { FullConduct, jsonToFullConduct } from "./full-conduct";
@@ -42,6 +42,21 @@ export function jsonToFullVisit(src: any){
 	visit.conducts = src.conducts.map(jsonToFullConduct);
 	visit.charge = opt(src.charge, jsonToCharge);
 	return visit;
+}
+
+export function hokenRep(visit: FullVisit): string {
+	let items: string[] = [];
+	if( visit.shahokokuho !== null ){
+		items.push(shahokokuhoRep(visit.shahokokuho));
+	}
+	if( visit.koukikourei !== null ){
+		items.push(koukikoureiRep(visit.koukikourei));
+	}
+	if( visit.roujin !== null ){
+		items.push(roujinRep(visit.roujin));
+	}
+	items = items.concat(visit.kouhiList.map(kouhiRep));
+	return items.length > 0 ? items.join("・") : "保険なし";
 }
 
 /*

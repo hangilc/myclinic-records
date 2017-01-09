@@ -21,6 +21,24 @@ export function jsonToKouhi(src: any): Kouhi {
 	return kouhi;
 }
 
+export function kouhiRep(kouhi: Kouhi): string {
+	let futanshaBangou = kouhi.futansha;
+	if (Math.floor(futanshaBangou / 1000000)  == 41)
+		return "マル福";
+	else if (Math.floor(futanshaBangou / 1000) == 80136)
+		return "マル障（１割負担）";
+	else if (Math.floor(futanshaBangou / 1000) == 80137)
+		return "マル障（負担なし）";
+	else if (Math.floor(futanshaBangou / 1000) == 81136)
+		return "マル親（１割負担）";
+	else if (Math.floor(futanshaBangou / 1000) == 81137)
+		return "マル親（負担なし）";
+	else if (Math.floor(futanshaBangou / 1000000) == 88)
+		return "マル乳";
+	else
+		return "公費負担";
+}
+
 // export function validateKouhi(kouhi: Kouhi,
 // 	checkKouhiId: boolean = true): string[] {
 // 	let errs: string[] = [];

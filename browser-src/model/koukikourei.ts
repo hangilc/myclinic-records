@@ -23,6 +23,10 @@ export function jsonToKoukikourei(src: any): Koukikourei {
 	return hoken;
 }
 
+export function koukikoureiRep(hoken: Koukikourei): string {
+	return "後期高齢" + hoken.futanWari + "割";
+}
+
 // export function validateKoukikourei(koukikourei: Koukikourei,
 // 	checkKoukikoureiId: boolean = true): string[] {
 // 	let errs: string[] = [];

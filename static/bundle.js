@@ -207,6 +207,7 @@
 	const date_input_1 = __webpack_require__(3);
 	const service_1 = __webpack_require__(116);
 	const kanjidate = __webpack_require__(115);
+	const model_1 = __webpack_require__(118);
 	const myclinic_util_1 = __webpack_require__(145);
 	class RecordsByDate {
 	    constructor() {
@@ -405,9 +406,27 @@
 	                        new RecordDrugList(visit.drugs).dom,
 	                        new RecordConductList(visit.conducts).dom,
 	                    ])
+	                ]),
+	                typed_dom_1.h.tr({}, [
+	                    typed_dom_1.h.td({ colspan: 2, style: "font-family:sans-serif; font-size:14px; padding:10px; background-color:#eee" }, [
+	                        this.chargeAndHokenRep(visit)
+	                    ])
 	                ])
 	            ])
 	        ]);
+	    }
+	    chargeAndHokenRep(visit) {
+	        let charge = this.chargeRep(visit.charge);
+	        let hoken = model_1.hokenRep(visit);
+	        return charge + ` ${hoken}`;
+	    }
+	    chargeRep(charge) {
+	        if (charge === null) {
+	            return "未請求";
+	        }
+	        else {
+	            return `請求額： ${charge.charge.toLocaleString()}円`;
+	        }
 	    }
 	}
 	class RecordTextList {
@@ -27076,6 +27095,40 @@
 	    return shaho;
 	}
 	exports.jsonToShahokokuho = jsonToShahokokuho;
+	function rep(hoken) {
+	    let hokenshaBangou = hoken.hokenshaBangou;
+	    if (hokenshaBangou <= 9999)
+	        return "政管健保";
+	    if (hokenshaBangou <= 999999)
+	        return "国保";
+	    switch (Math.floor(hokenshaBangou / 1000000)) {
+	        case 1: return "協会けんぽ";
+	        case 2: return "船員";
+	        case 3: return "日雇一般";
+	        case 4: return "日雇特別";
+	        case 6: return "組合健保";
+	        case 7: return "自衛官";
+	        case 31: return "国家公務員共済";
+	        case 32: return "地方公務員共済";
+	        case 33: return "警察公務員共済";
+	        case 34: return "学校共済";
+	        case 63: return "特定健保退職";
+	        case 67: return "国保退職";
+	        case 72: return "国家公務員共済退職";
+	        case 73: return "地方公務員共済退職";
+	        case 74: return "警察公務員共済退職";
+	        case 75: return "学校共済退職";
+	        default: return "不明";
+	    }
+	}
+	function shahokokuhoRep(hoken) {
+	    let s = rep(hoken);
+	    if (hoken.kourei > 0) {
+	        s += `(高齢${hoken.kourei}割)`;
+	    }
+	    return s;
+	}
+	exports.shahokokuhoRep = shahokokuhoRep;
 	// export function validateShahokokuho(shahokokuho: Shahokokuho,
 	// 	checkShahokokuhoId: boolean = true): string[] {
 	// 	let errs: string[] = [];
@@ -27144,6 +27197,10 @@
 	    return hoken;
 	}
 	exports.jsonToKoukikourei = jsonToKoukikourei;
+	function koukikoureiRep(hoken) {
+	    return "後期高齢" + hoken.futanWari + "割";
+	}
+	exports.koukikoureiRep = koukikoureiRep;
 	// export function validateKoukikourei(koukikourei: Koukikourei,
 	// 	checkKoukikoureiId: boolean = true): string[] {
 	// 	let errs: string[] = [];
@@ -27205,6 +27262,10 @@
 	    return hoken;
 	}
 	exports.jsonToRoujin = jsonToRoujin;
+	function roujinRep(roujin) {
+	    return "老人" + roujin.futanWari + "割";
+	}
+	exports.roujinRep = roujinRep;
 	// export function validateRoujin(roujin: Roujin,
 	// 	checkRoujinId: boolean = true): string[] {
 	// 	let errs: string[] = [];
@@ -27265,6 +27326,24 @@
 	    return kouhi;
 	}
 	exports.jsonToKouhi = jsonToKouhi;
+	function kouhiRep(kouhi) {
+	    let futanshaBangou = kouhi.futansha;
+	    if (Math.floor(futanshaBangou / 1000000) == 41)
+	        return "マル福";
+	    else if (Math.floor(futanshaBangou / 1000) == 80136)
+	        return "マル障（１割負担）";
+	    else if (Math.floor(futanshaBangou / 1000) == 80137)
+	        return "マル障（負担なし）";
+	    else if (Math.floor(futanshaBangou / 1000) == 81136)
+	        return "マル親（１割負担）";
+	    else if (Math.floor(futanshaBangou / 1000) == 81137)
+	        return "マル親（負担なし）";
+	    else if (Math.floor(futanshaBangou / 1000000) == 88)
+	        return "マル乳";
+	    else
+	        return "公費負担";
+	}
+	exports.kouhiRep = kouhiRep;
 	// export function validateKouhi(kouhi: Kouhi,
 	// 	checkKouhiId: boolean = true): string[] {
 	// 	let errs: string[] = [];
@@ -27751,6 +27830,21 @@
 	    return visit;
 	}
 	exports.jsonToFullVisit = jsonToFullVisit;
+	function hokenRep(visit) {
+	    let items = [];
+	    if (visit.shahokokuho !== null) {
+	        items.push(shahokokuho_1.shahokokuhoRep(visit.shahokokuho));
+	    }
+	    if (visit.koukikourei !== null) {
+	        items.push(koukikourei_1.koukikoureiRep(visit.koukikourei));
+	    }
+	    if (visit.roujin !== null) {
+	        items.push(roujin_1.roujinRep(visit.roujin));
+	    }
+	    items = items.concat(visit.kouhiList.map(kouhi_1.kouhiRep));
+	    return items.length > 0 ? items.join("・") : "保険なし";
+	}
+	exports.hokenRep = hokenRep;
 	/*
 
 	export function validateFullVisit(visit: FullVisit): string[] {

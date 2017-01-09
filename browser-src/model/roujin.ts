@@ -23,6 +23,10 @@ export function jsonToRoujin(src: any): Roujin {
 	return hoken;
 }
 
+export function roujinRep(roujin: Roujin): string {
+	return "老人" + roujin.futanWari + "割";
+}
+
 // export function validateRoujin(roujin: Roujin,
 // 	checkRoujinId: boolean = true): string[] {
 // 	let errs: string[] = [];

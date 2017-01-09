@@ -24,6 +24,7 @@ export function conductKindToKanji(kind: number): string {
 	}
 }
 
+
 /**
 "use strict";
 

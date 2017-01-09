@@ -35,6 +35,21 @@ function jsonToFullVisit(src) {
     return visit;
 }
 exports.jsonToFullVisit = jsonToFullVisit;
+function hokenRep(visit) {
+    let items = [];
+    if (visit.shahokokuho !== null) {
+        items.push(shahokokuho_1.shahokokuhoRep(visit.shahokokuho));
+    }
+    if (visit.koukikourei !== null) {
+        items.push(koukikourei_1.koukikoureiRep(visit.koukikourei));
+    }
+    if (visit.roujin !== null) {
+        items.push(roujin_1.roujinRep(visit.roujin));
+    }
+    items = items.concat(visit.kouhiList.map(kouhi_1.kouhiRep));
+    return items.length > 0 ? items.join("・") : "保険なし";
+}
+exports.hokenRep = hokenRep;
 /*
 
 export function validateFullVisit(visit: FullVisit): string[] {
