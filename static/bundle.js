@@ -71,6 +71,9 @@
 	    app.setOnGotoRecordsByDate(() => {
 	        appRecordsByDate(wrapper);
 	    });
+	    app.setOnGotoSearchPatient(() => {
+	        appSearchRecords(wrapper);
+	    });
 	    wrapper.innerHTML = "";
 	    let tmpDom = typed_dom_1.h.div({}, [app.dom]);
 	    wrapper.appendChild(tmpDom);
@@ -250,7 +253,7 @@
 	        this.dateInput = new date_input_1.DateInput();
 	        this.dom = typed_dom_1.h.div({}, [
 	            this.topMenu(),
-	            typed_dom_1.h.h1({}, ["診察日ごとの診療録リスト"]),
+	            typed_dom_1.h.h1({}, ["患者検索へ"]),
 	            this.dateInput.dom,
 	            typed_dom_1.f.div(e => this.domDispWrapper = e, {}, [])
 	        ]);
@@ -28971,11 +28974,15 @@
 	    constructor(patientId) {
 	        this.patientId = patientId;
 	        this.onGotoRecordsByDate = () => { };
+	        this.onGotoSearchPatient = () => { };
 	        this.dom = typed_dom_1.h.div({}, ["Loading..."]);
 	        this.setup(patientId);
 	    }
 	    setOnGotoRecordsByDate(cb) {
 	        this.onGotoRecordsByDate = cb;
+	    }
+	    setOnGotoSearchPatient(cb) {
+	        this.onGotoSearchPatient = cb;
 	    }
 	    setup(patientId) {
 	        return __awaiter(this, void 0, void 0, function* () {
@@ -29004,8 +29011,15 @@
 	                this.onGotoRecordsByDate();
 	            });
 	        };
+	        let bindGotoSearch = (e) => {
+	            e.addEventListener("click", event => {
+	                this.onGotoSearchPatient();
+	            });
+	        };
 	        return typed_dom_1.h.div({}, [
-	            typed_dom_1.f.a(bindGotoByDates, {}, ["診察日ごとの診療録へ"])
+	            typed_dom_1.f.a(bindGotoByDates, {}, ["診察日ごとの診療録へ"]),
+	            " | ",
+	            typed_dom_1.f.a(bindGotoSearch, {}, ["患者検索へ"]),
 	        ]);
 	    }
 	    renderVisits(wrapper, visits) {

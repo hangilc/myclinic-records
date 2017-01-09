@@ -8,6 +8,7 @@ import { RecordContent } from "./record-content";
 export class RecordsByPatient {
 	dom: HTMLElement;
 	private onGotoRecordsByDate: () => void = () => {};
+	private onGotoSearchPatient: () => void = () => {};
 
 	constructor(private patientId: number){
 		this.dom = h.div({}, ["Loading..."]);
@@ -16,6 +17,10 @@ export class RecordsByPatient {
 
 	setOnGotoRecordsByDate(cb: () => void){
 		this.onGotoRecordsByDate = cb;
+	}
+
+	setOnGotoSearchPatient(cb: () => void){
+		this.onGotoSearchPatient = cb;
 	}
 
 	private async setup(patientId: number){
@@ -44,8 +49,15 @@ export class RecordsByPatient {
 				this.onGotoRecordsByDate();
 			})
 		};
+		let bindGotoSearch = (e: HTMLElement) => {
+			e.addEventListener("click", event => {
+				this.onGotoSearchPatient();
+			})
+		};
 		return h.div({}, [
-			f.a(bindGotoByDates, {}, ["診察日ごとの診療録へ"])
+			f.a(bindGotoByDates, {}, ["診察日ごとの診療録へ"]),
+			" | ",
+			f.a(bindGotoSearch, {}, ["患者検索へ"]),
 		])
 	}
 

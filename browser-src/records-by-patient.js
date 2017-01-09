@@ -16,11 +16,15 @@ class RecordsByPatient {
     constructor(patientId) {
         this.patientId = patientId;
         this.onGotoRecordsByDate = () => { };
+        this.onGotoSearchPatient = () => { };
         this.dom = typed_dom_1.h.div({}, ["Loading..."]);
         this.setup(patientId);
     }
     setOnGotoRecordsByDate(cb) {
         this.onGotoRecordsByDate = cb;
+    }
+    setOnGotoSearchPatient(cb) {
+        this.onGotoSearchPatient = cb;
     }
     setup(patientId) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -49,8 +53,15 @@ class RecordsByPatient {
                 this.onGotoRecordsByDate();
             });
         };
+        let bindGotoSearch = (e) => {
+            e.addEventListener("click", event => {
+                this.onGotoSearchPatient();
+            });
+        };
         return typed_dom_1.h.div({}, [
-            typed_dom_1.f.a(bindGotoByDates, {}, ["診察日ごとの診療録へ"])
+            typed_dom_1.f.a(bindGotoByDates, {}, ["診察日ごとの診療録へ"]),
+            " | ",
+            typed_dom_1.f.a(bindGotoSearch, {}, ["患者検索へ"]),
         ]);
     }
     renderVisits(wrapper, visits) {

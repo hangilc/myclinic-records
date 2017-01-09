@@ -26,6 +26,9 @@ function appPatientRecords(wrapper: HTMLElement, patientId: number): void {
 	let app = new RecordsByPatient(patientId);
 	app.setOnGotoRecordsByDate(() => {
 		appRecordsByDate(wrapper);
+	});
+	app.setOnGotoSearchPatient(() => {
+		appSearchRecords(wrapper);
 	})
 	wrapper.innerHTML = "";
 	let tmpDom = h.div({}, [app.dom]);

@@ -17,7 +17,7 @@ export class RecordsByDate {
 		this.dateInput = new DateInput();
 		this.dom = h.div({}, [
 			this.topMenu(),
-			h.h1({}, ["診察日ごとの診療録リスト"]),
+			h.h1({}, ["患者検索へ"]),
 			this.dateInput.dom,
 			f.div(e => this.domDispWrapper = e, {}, [])
 		]);

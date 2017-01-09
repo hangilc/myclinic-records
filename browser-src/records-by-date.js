@@ -19,7 +19,7 @@ class RecordsByDate {
         this.dateInput = new date_input_1.DateInput();
         this.dom = typed_dom_1.h.div({}, [
             this.topMenu(),
-            typed_dom_1.h.h1({}, ["診察日ごとの診療録リスト"]),
+            typed_dom_1.h.h1({}, ["患者検索へ"]),
             this.dateInput.dom,
             typed_dom_1.f.div(e => this.domDispWrapper = e, {}, [])
         ]);
