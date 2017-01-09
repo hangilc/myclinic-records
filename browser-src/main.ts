@@ -13,7 +13,7 @@ function appRecordsByDate(wrapper: HTMLElement): void{
 		appPatientRecords(wrapper, patientId);
 	});
 	app.setOnSearchRecords(() => {
-		appSearchRecords(wrapper);
+		appSearchPatient(wrapper);
 	})
 	wrapper.innerHTML = "";
 	let tmpDom = h.div({}, [app.dom]);
@@ -28,14 +28,14 @@ function appPatientRecords(wrapper: HTMLElement, patientId: number): void {
 		appRecordsByDate(wrapper);
 	});
 	app.setOnGotoSearchPatient(() => {
-		appSearchRecords(wrapper);
+		appSearchPatient(wrapper);
 	})
 	wrapper.innerHTML = "";
 	let tmpDom = h.div({}, [app.dom]);
 	wrapper.appendChild(tmpDom);
 }
 
-function appSearchRecords(wrapper: HTMLElement): void {
+function appSearchPatient(wrapper: HTMLElement): void {
 	let app = new RecordsSearchPatient();
 	app.setOnSelect(patientId => {
 		appPatientRecords(wrapper, patientId);

@@ -12,7 +12,7 @@ function appRecordsByDate(wrapper) {
         appPatientRecords(wrapper, patientId);
     });
     app.setOnSearchRecords(() => {
-        appSearchRecords(wrapper);
+        appSearchPatient(wrapper);
     });
     wrapper.innerHTML = "";
     let tmpDom = typed_dom_1.h.div({}, [app.dom]);
@@ -26,13 +26,13 @@ function appPatientRecords(wrapper, patientId) {
         appRecordsByDate(wrapper);
     });
     app.setOnGotoSearchPatient(() => {
-        appSearchRecords(wrapper);
+        appSearchPatient(wrapper);
     });
     wrapper.innerHTML = "";
     let tmpDom = typed_dom_1.h.div({}, [app.dom]);
     wrapper.appendChild(tmpDom);
 }
-function appSearchRecords(wrapper) {
+function appSearchPatient(wrapper) {
     let app = new records_search_patient_1.RecordsSearchPatient();
     app.setOnSelect(patientId => {
         appPatientRecords(wrapper, patientId);
