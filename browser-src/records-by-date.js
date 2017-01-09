@@ -35,10 +35,7 @@ class RecordsByDate {
             let at = m.format("YYYY-MM-DD");
             try {
                 let visits = yield service_1.listVisitsByDate(at);
-                let fullVisits = yield Promise.all(visits.map(v => {
-                    return service_1.getFullVisit(v.visitId);
-                }));
-                this.renderDisp(m, fullVisits);
+                this.renderDisp(m, visits);
             }
             catch (ex) {
                 alert(ex);
@@ -46,28 +43,123 @@ class RecordsByDate {
             }
         });
     }
-    renderDisp(m, fullVisits) {
-        var wrapper = this.domDispWrapper;
-        wrapper.innerHTML = "";
-        wrapper.appendChild(createHeader(m));
-        fullVisits.forEach(v => {
-            this.renderVisit(v, wrapper);
+    renderDisp(m, visits) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var wrapper = this.domDispWrapper;
+            var nav = new RecordNav(visits);
+            nav.setOnChange(() => {
+                let curVisits = nav.getCurrentVisits();
+                this.renderVisits(vWrapper, curVisits);
+                nav.updateDoms();
+            });
+            wrapper.innerHTML = "";
+            wrapper.appendChild(createHeader(m));
+            wrapper.appendChild(nav.createDom());
+            let vWrapper = typed_dom_1.h.div({}, []);
+            wrapper.appendChild(vWrapper);
+            this.renderVisits(vWrapper, nav.getCurrentVisits());
+            wrapper.appendChild(nav.createDom());
         });
     }
-    renderVisit(visit, wrapper) {
+    renderVisits(wrapper, visits) {
         return __awaiter(this, void 0, void 0, function* () {
-            let patient = yield service_1.getPatient(visit.patientId);
-            let rec = new RecordItem(visit, patient);
-            wrapper.appendChild(rec.dom);
+            let tmpDom = typed_dom_1.h.div({}, []);
+            wrapper.innerHTML = "";
+            wrapper.appendChild(tmpDom);
+            for (let i = 0; i < visits.length; i++) {
+                let visit = visits[i];
+                let fullVisit = yield service_1.getFullVisit(visit.visitId);
+                let patient = yield service_1.getPatient(visit.patientId);
+                this.renderVisit(fullVisit, patient, tmpDom);
+            }
         });
+    }
+    renderVisit(visit, patient, wrapper) {
+        let rec = new RecordItem(visit, patient);
+        wrapper.appendChild(rec.dom);
     }
 }
 exports.RecordsByDate = RecordsByDate;
 function createHeader(m) {
     return typed_dom_1.h.h2({}, [kanjidate.format(kanjidate.f1, m.format("YYYY-MM-DD"))]);
 }
-function formatVisitTime(at) {
-    return kanjidate.format("{h:2}時{m:2}分", at);
+class RecordNav {
+    constructor(visits) {
+        this.visits = visits;
+        this.doms = [];
+        this.visitsPerPage = 10;
+        this.onChange = () => { };
+        this.totalPages = this.calcTotalPages(visits.length);
+        this.currentPage = 1;
+    }
+    createDom() {
+        let dom = typed_dom_1.h.div({ style: "margin: 10px 0" }, [
+            this.prevLink(),
+            " ",
+            ...this.pageLinks(),
+            " ",
+            this.nextLink()
+        ]);
+        this.doms.push(dom);
+        return dom;
+    }
+    updateDoms() {
+        this.doms.forEach(dom => {
+            let newDom = this.createDom();
+            let parent = dom.parentNode;
+            if (parent !== null) {
+                parent.replaceChild(newDom, dom);
+            }
+        });
+    }
+    setOnChange(cb) {
+        this.onChange = cb;
+    }
+    getCurrentVisits() {
+        let offset = (this.currentPage - 1) * this.visitsPerPage;
+        return this.visits.slice(offset, offset + this.visitsPerPage);
+    }
+    calcTotalPages(n) {
+        return Math.floor((n + this.visitsPerPage - 1) / this.visitsPerPage);
+    }
+    prevLink() {
+        let a = typed_dom_1.h.a({}, ["<"]);
+        a.addEventListener("click", () => {
+            if (this.currentPage > 1) {
+                this.currentPage -= 1;
+                this.onChange();
+            }
+        });
+        return a;
+    }
+    nextLink() {
+        let a = typed_dom_1.h.a({}, [">"]);
+        a.addEventListener("click", () => {
+            if (this.currentPage < this.totalPages) {
+                this.currentPage += 1;
+                this.onChange();
+            }
+        });
+        return a;
+    }
+    pageLinks() {
+        let links = typed_dom_1.range(1, this.totalPages).map(i => {
+            return this.createPageLink(i);
+        });
+        return typed_dom_1.interpose(" | ", links);
+    }
+    createPageLink(i) {
+        let attr = { style: {} };
+        if (i === this.currentPage) {
+            attr.style.color = "red";
+        }
+        let a = typed_dom_1.h.a(attr, [i.toString()]);
+        a.addEventListener("click", () => {
+            this.currentPage = i;
+            this.onChange();
+        });
+        return a;
+    }
 }
 class RecordItem {
     constructor(visit, patient) {
@@ -81,10 +173,13 @@ class RecordItem {
                 typed_dom_1.f.a(e => { }, {}, ["全診療記録"]),
                 "]",
                 " ",
-                formatVisitTime(visit.visitedAt),
+                this.formatVisitTime(visit.visitedAt),
             ]),
             content.dom
         ]);
+    }
+    formatVisitTime(at) {
+        return kanjidate.format("{h:2}時{m:2}分", at);
     }
 }
 class RecordContent {

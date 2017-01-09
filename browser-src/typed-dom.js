@@ -104,11 +104,22 @@ var f;
     }
     f.a = a;
 })(f = exports.f || (exports.f = {}));
-function click(e, handler) {
-    e.addEventListener("click", handler);
+function range(from, to) {
+    let r = [];
+    for (let i = from; i <= to; i++) {
+        r.push(i);
+    }
+    return r;
 }
-exports.click = click;
-function submit(e, handler) {
-    e.addEventListener("submit", handler);
+exports.range = range;
+function interpose(sep, arr) {
+    let r = [];
+    for (let i = 0; i < arr.length; i++) {
+        r.push(arr[i]);
+        if (i !== (arr.length - 1)) {
+            r.push(sep);
+        }
+    }
+    return r;
 }
-exports.submit = submit;
+exports.interpose = interpose;

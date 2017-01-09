@@ -1,16 +1,16 @@
-import { h, f } from "./typed-dom";
+import { h, f, range, interpose } from "./typed-dom";
 import { DateInput } from "./date-input";
 import * as moment from "moment";
 import { listVisitsByDate, getFullVisit, getPatient } from "./service";
 import * as kanjidate from "kanjidate";
-import { FullVisit, Patient, Text, FullDrug, FullShinryou,
+import { Visit, FullVisit, Patient, Text, FullDrug, FullShinryou,
 	FullConduct, Charge } from "./model";
 import { drugRep } from "./myclinic-util";
 
 export class RecordsByDate {
 	dom: HTMLElement;
-	dateInput: DateInput;
-	domDispWrapper: HTMLElement;
+	private dateInput: DateInput;
+	private domDispWrapper: HTMLElement;
 
 	constructor(){
 		this.dateInput = new DateInput();
@@ -36,27 +36,43 @@ export class RecordsByDate {
 		let at = m.format("YYYY-MM-DD");
 		try {
 			let visits = await listVisitsByDate(at);
-			let fullVisits = await Promise.all(visits.map(v => {
-				return getFullVisit(v.visitId);
-			}))
-			this.renderDisp(m, fullVisits);
+			this.renderDisp(m, visits);
 		} catch(ex){
 			alert(ex);
 			return;
 		}
 	}
 
-	private renderDisp(m: moment.Moment, fullVisits: FullVisit[]){
+	private async renderDisp(m: moment.Moment, visits: Visit[]) {
 		var wrapper = this.domDispWrapper;
+		var nav = new RecordNav(visits);
+		nav.setOnChange(() => {
+			let curVisits = nav.getCurrentVisits();
+			this.renderVisits(vWrapper, curVisits);
+			nav.updateDoms();
+		});
 		wrapper.innerHTML = "";
 		wrapper.appendChild(createHeader(m));
-		fullVisits.forEach(v => {
-			this.renderVisit(v, wrapper);
-		})
+		wrapper.appendChild(nav.createDom());
+		let vWrapper = h.div({}, []);
+		wrapper.appendChild(vWrapper);
+		this.renderVisits(vWrapper, nav.getCurrentVisits());
+		wrapper.appendChild(nav.createDom());
 	}
 
-	private async renderVisit(visit: FullVisit, wrapper: HTMLElement){
-		let patient = await getPatient(visit.patientId);
+	private async renderVisits(wrapper: HTMLElement, visits: Visit[]){
+		let tmpDom = h.div({}, []);
+		wrapper.innerHTML = "";
+		wrapper.appendChild(tmpDom);
+		for(let i=0;i<visits.length;i++){
+			let visit = visits[i];
+			let fullVisit = await getFullVisit(visit.visitId);
+			let patient = await getPatient(visit.patientId);
+			this.renderVisit(fullVisit, patient, tmpDom);
+		}
+	}
+
+	private renderVisit(visit: FullVisit, patient: Patient, wrapper: HTMLElement){
 		let rec = new RecordItem(visit, patient);
 		wrapper.appendChild(rec.dom);
 	}
@@ -66,8 +82,96 @@ function createHeader(m: moment.Moment): HTMLElement {
 	return h.h2({}, [kanjidate.format(kanjidate.f1, m.format("YYYY-MM-DD"))]);
 }
 
-function formatVisitTime(at: string): string {
-	return kanjidate.format("{h:2}時{m:2}分", at)
+class RecordNav {
+	private doms: HTMLElement[] = [];
+	private currentPage: number;
+	private totalPages: number;
+	private visitsPerPage: number = 10;
+	private onChange: () => void = () => {};
+
+	constructor(
+		private visits: Visit[]
+	){
+		this.totalPages = this.calcTotalPages(visits.length);
+		this.currentPage = 1;
+	}
+
+	createDom(): HTMLElement {
+		let dom = h.div({style: "margin: 10px 0"}, [
+			this.prevLink(),
+			" ",
+			...this.pageLinks(),
+			" ",
+			this.nextLink()
+		]);
+		this.doms.push(dom);
+		return dom;
+	}
+
+	updateDoms(): void {
+		this.doms.forEach(dom => {
+			let newDom = this.createDom();
+			let parent = dom.parentNode;
+			if( parent !== null ){
+				parent.replaceChild(newDom, dom);
+			}
+		})
+	}
+
+	setOnChange(cb: () => void) {
+		this.onChange = cb;
+	}
+
+	getCurrentVisits(): Visit[] {
+		let offset = (this.currentPage - 1) * this.visitsPerPage;
+		return this.visits.slice(offset, offset + this.visitsPerPage);
+	}
+
+	private calcTotalPages(n: number): number {
+		return Math.floor((n+this.visitsPerPage-1)/this.visitsPerPage);
+	}
+
+	private prevLink(): HTMLElement {
+		let a = h.a({}, ["<"]);
+		a.addEventListener("click", () => {
+			if( this.currentPage > 1 ){
+				this.currentPage -= 1;
+				this.onChange();
+			}
+		})
+		return a;
+	}
+
+	private nextLink(): HTMLElement {
+		let a = h.a({}, [">"]);
+		a.addEventListener("click", () => {
+			if( this.currentPage < this.totalPages ){
+				this.currentPage += 1;
+				this.onChange();
+			}
+		})
+		return a;
+	}
+
+	private pageLinks(): (HTMLElement | string)[] {
+		let links =  range(1, this.totalPages).map(i => {
+			return this.createPageLink(i);
+		});
+		return interpose(" | ", links);
+	}
+
+	private createPageLink(i: number): HTMLElement {
+		let attr: any = {style: {}};
+		if( i === this.currentPage ){
+			attr.style.color = "red";
+		}
+		let a = h.a(attr, [i.toString()]);
+		a.addEventListener("click", () => {
+			this.currentPage = i;
+			this.onChange();
+		})
+		return a;
+	}
 }
 
 class RecordItem {
@@ -84,10 +188,14 @@ class RecordItem {
 				f.a(e => {}, {}, ["全診療記録"]),
 				"]",
 				" ",
-				formatVisitTime(visit.visitedAt),
+				this.formatVisitTime(visit.visitedAt),
 			]),
 			content.dom
 		]);
+	}
+
+	private formatVisitTime(at: string): string {
+		return kanjidate.format("{h:2}時{m:2}分", at)
 	}
 }
 

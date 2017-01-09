@@ -109,10 +109,21 @@ export namespace f {
 	}
 }
 
-export function click(e: HTMLElement, handler: (event: MouseEvent) => void): void {
-	e.addEventListener("click", handler);
+export function range(from: number, to: number): number[] {
+	let r: number[] = [];
+	for(let i=from;i<=to;i++){
+		r.push(i);
+	}
+	return r;
 }
 
-export function submit(e: HTMLFormElement, handler: (event: Event) => void): void {
-	e.addEventListener("submit", handler);
+export function interpose(sep: any, arr: any[]): any[] {
+	let r: any[] = [];
+	for(let i=0;i<arr.length;i++){
+		r.push(arr[i]);
+		if( i !== (arr.length-1) ){
+			r.push(sep);
+		}
+	}
+	return r;
 }
