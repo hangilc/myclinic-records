@@ -28,6 +28,9 @@ function appPatientRecords(wrapper, patientId) {
 }
 function appSearchRecords(wrapper) {
     let app = new records_search_patient_1.RecordsSearchPatient();
+    app.setOnSelect(patientId => {
+        appPatientRecords(wrapper, patientId);
+    });
     wrapper.innerHTML = "";
     let tmpDom = typed_dom_1.h.div({}, [app.dom]);
     wrapper.appendChild(tmpDom);

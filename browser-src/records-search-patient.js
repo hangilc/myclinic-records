@@ -11,15 +11,20 @@ const typed_dom_1 = require("./typed-dom");
 const service_1 = require("./service");
 class RecordsSearchPatient {
     constructor() {
+        this.search = new SearchPatient();
         this.dom = typed_dom_1.h.div({}, [
             typed_dom_1.h.h1({}, ["患者ごとの診療録リスト"]),
-            new SearchPatient().dom
+            this.search.dom
         ]);
+    }
+    setOnSelect(cb) {
+        this.search.setOnSelect(cb);
     }
 }
 exports.RecordsSearchPatient = RecordsSearchPatient;
 class SearchPatient {
     constructor() {
+        this.onSelect = _ => { };
         let textInput;
         let bindSubmit = (e) => {
             e.addEventListener("submit", event => {
@@ -36,11 +41,30 @@ class SearchPatient {
                 ])
             ])
         ]);
+        this.select.addEventListener("dblclick", event => {
+            let target = event.target;
+            if (target instanceof HTMLOptionElement) {
+                let value = +target.value;
+                if (value > 0) {
+                    this.onSelect(value);
+                }
+            }
+        });
+    }
+    setOnSelect(cb) {
+        this.onSelect = cb;
     }
     doSearch(text) {
         return __awaiter(this, void 0, void 0, function* () {
             let patients = yield service_1.searchPatient(text);
-            console.log(patients);
+            let select = this.select;
+            select.innerHTML = "";
+            patients.forEach(patient => {
+                let label = `${patient.lastName} ${patient.firstName}`;
+                let opt = typed_dom_1.h.option({ value: patient.patientId }, [label]);
+                select.appendChild(opt);
+            });
+            select.style.display = "";
         });
     }
 }

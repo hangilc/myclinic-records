@@ -31,6 +31,9 @@ function appPatientRecords(wrapper: HTMLElement, patientId: number): void {
 
 function appSearchRecords(wrapper: HTMLElement): void {
 	let app = new RecordsSearchPatient();
+	app.setOnSelect(patientId => {
+		appPatientRecords(wrapper, patientId);
+	})
 	wrapper.innerHTML = "";
 	let tmpDom = h.div({}, [app.dom]);
 	wrapper.appendChild(tmpDom);
