@@ -11,10 +11,12 @@ export class RecordsByDate {
 	private dateInput: DateInput;
 	private domDispWrapper: HTMLElement;
 	private onGotoPatientRecords: (patientId: number) => void = _ => {};
+	private onGotoSearchRecords: () => void = () => {};
 
 	constructor(){
 		this.dateInput = new DateInput();
 		this.dom = h.div({}, [
+			this.topMenu(),
 			h.h1({}, ["診察日ごとの診療録リスト"]),
 			this.dateInput.dom,
 			f.div(e => this.domDispWrapper = e, {}, [])
@@ -28,12 +30,28 @@ export class RecordsByDate {
 		this.onGotoPatientRecords = cb;
 	}
 
+	setOnSearchRecords(cb: () => void): void {
+		this.onGotoSearchRecords = cb;
+	}
+
 	setToday(): void {
 		this.dateInput.setToday();
 	}
 
 	set(m: moment.Moment): void {
 		this.dateInput.set(m);
+	}
+
+	private topMenu(): HTMLElement {
+		let bind = (a: HTMLElement): void => {
+			a.addEventListener("click", () => {
+				this.onGotoSearchRecords();
+			})
+		}
+		return h.div({}, [
+			f.a(bind, {}, ["患者ごとの診療記録へ"])
+		])
+
 	}
 
 	private async onDateInputSubmit(m: moment.Moment) {

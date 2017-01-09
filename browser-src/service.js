@@ -201,3 +201,11 @@ function listVisits(patientId, offset, n) {
     return request("list_visits", { patient_id: patientId, offset: offset, n: n }, "GET", arrayConverter(model.jsonToVisit));
 }
 exports.listVisits = listVisits;
+function searchPatient(text) {
+    let t = text.trim();
+    if (t === "") {
+        return Promise.resolve([]);
+    }
+    return request("search_patient", { text: t }, "GET", arrayConverter(model.jsonToPatient));
+}
+exports.searchPatient = searchPatient;

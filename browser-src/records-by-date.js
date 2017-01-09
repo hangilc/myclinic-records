@@ -15,8 +15,10 @@ const record_content_1 = require("./record-content");
 class RecordsByDate {
     constructor() {
         this.onGotoPatientRecords = _ => { };
+        this.onGotoSearchRecords = () => { };
         this.dateInput = new date_input_1.DateInput();
         this.dom = typed_dom_1.h.div({}, [
+            this.topMenu(),
             typed_dom_1.h.h1({}, ["診察日ごとの診療録リスト"]),
             this.dateInput.dom,
             typed_dom_1.f.div(e => this.domDispWrapper = e, {}, [])
@@ -28,11 +30,24 @@ class RecordsByDate {
     setOnGotoPatientRecords(cb) {
         this.onGotoPatientRecords = cb;
     }
+    setOnSearchRecords(cb) {
+        this.onGotoSearchRecords = cb;
+    }
     setToday() {
         this.dateInput.setToday();
     }
     set(m) {
         this.dateInput.set(m);
+    }
+    topMenu() {
+        let bind = (a) => {
+            a.addEventListener("click", () => {
+                this.onGotoSearchRecords();
+            });
+        };
+        return typed_dom_1.h.div({}, [
+            typed_dom_1.f.a(bind, {}, ["患者ごとの診療記録へ"])
+        ]);
     }
     onDateInputSubmit(m) {
         return __awaiter(this, void 0, void 0, function* () {

@@ -48,6 +48,7 @@
 	const typed_dom_1 = __webpack_require__(1);
 	const records_by_date_1 = __webpack_require__(2);
 	const records_by_patient_1 = __webpack_require__(147);
+	const records_search_patient_1 = __webpack_require__(149);
 	const moment = __webpack_require__(4);
 	let main = typed_dom_1.h.div({}, []);
 	document.body.appendChild(main);
@@ -55,6 +56,9 @@
 	    let app = new records_by_date_1.RecordsByDate();
 	    app.setOnGotoPatientRecords(patientId => {
 	        appPatientRecords(wrapper, patientId);
+	    });
+	    app.setOnSearchRecords(() => {
+	        appSearchRecords(wrapper);
 	    });
 	    wrapper.innerHTML = "";
 	    let tmpDom = typed_dom_1.h.div({}, [app.dom]);
@@ -64,6 +68,12 @@
 	}
 	function appPatientRecords(wrapper, patientId) {
 	    let app = new records_by_patient_1.RecordsByPatient(patientId);
+	    wrapper.innerHTML = "";
+	    let tmpDom = typed_dom_1.h.div({}, [app.dom]);
+	    wrapper.appendChild(tmpDom);
+	}
+	function appSearchRecords(wrapper) {
+	    let app = new records_search_patient_1.RecordsSearchPatient();
 	    wrapper.innerHTML = "";
 	    let tmpDom = typed_dom_1.h.div({}, [app.dom]);
 	    wrapper.appendChild(tmpDom);
@@ -132,6 +142,8 @@
 	    h.td = makeCreator("td");
 	    h.br = makeCreator("br");
 	    h.p = makeCreator("p");
+	    h.select = makeCreator("select");
+	    h.option = makeCreator("option");
 	    function form(attrs, children) {
 	        if (!("onSubmit" in attrs)) {
 	            attrs.onSubmit = "return false";
@@ -166,6 +178,8 @@
 	    f.td = makeCreator("td");
 	    f.br = makeCreator("br");
 	    f.p = makeCreator("p");
+	    f.select = makeCreator("select");
+	    f.option = makeCreator("option");
 	    function form(fn, attrs, children) {
 	        if (!("onSubmit" in attrs)) {
 	            attrs.onSubmit = "return false";
@@ -223,8 +237,10 @@
 	class RecordsByDate {
 	    constructor() {
 	        this.onGotoPatientRecords = _ => { };
+	        this.onGotoSearchRecords = () => { };
 	        this.dateInput = new date_input_1.DateInput();
 	        this.dom = typed_dom_1.h.div({}, [
+	            this.topMenu(),
 	            typed_dom_1.h.h1({}, ["診察日ごとの診療録リスト"]),
 	            this.dateInput.dom,
 	            typed_dom_1.f.div(e => this.domDispWrapper = e, {}, [])
@@ -236,11 +252,24 @@
 	    setOnGotoPatientRecords(cb) {
 	        this.onGotoPatientRecords = cb;
 	    }
+	    setOnSearchRecords(cb) {
+	        this.onGotoSearchRecords = cb;
+	    }
 	    setToday() {
 	        this.dateInput.setToday();
 	    }
 	    set(m) {
 	        this.dateInput.set(m);
+	    }
+	    topMenu() {
+	        let bind = (a) => {
+	            a.addEventListener("click", () => {
+	                this.onGotoSearchRecords();
+	            });
+	        };
+	        return typed_dom_1.h.div({}, [
+	            typed_dom_1.f.a(bind, {}, ["患者ごとの診療記録へ"])
+	        ]);
 	    }
 	    onDateInputSubmit(m) {
 	        return __awaiter(this, void 0, void 0, function* () {
@@ -15968,6 +15997,14 @@
 	    return request("list_visits", { patient_id: patientId, offset: offset, n: n }, "GET", arrayConverter(model.jsonToVisit));
 	}
 	exports.listVisits = listVisits;
+	function searchPatient(text) {
+	    let t = text.trim();
+	    if (t === "") {
+	        return Promise.resolve([]);
+	    }
+	    return request("search_patient", { text: t }, "GET", arrayConverter(model.jsonToPatient));
+	}
+	exports.searchPatient = searchPatient;
 
 
 /***/ },
@@ -28922,12 +28959,10 @@
 	const kanjidate = __webpack_require__(115);
 	const record_content_1 = __webpack_require__(148);
 	class RecordsByPatient {
-	    constructor(patientId = 0) {
+	    constructor(patientId) {
 	        this.patientId = patientId;
 	        this.dom = typed_dom_1.h.div({}, ["Loading..."]);
-	        if (patientId > 0) {
-	            this.setup(patientId);
-	        }
+	        this.setup(patientId);
 	    }
 	    setup(patientId) {
 	        return __awaiter(this, void 0, void 0, function* () {
@@ -29230,6 +29265,58 @@
 	    }
 	    renderKizai(kizai) {
 	        return typed_dom_1.h.div({}, [`${kizai.name} ${kizai.amount}${kizai.unit}`]);
+	    }
+	}
+
+
+/***/ },
+/* 149 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+	    return new (P || (P = Promise))(function (resolve, reject) {
+	        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+	        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+	        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+	        step((generator = generator.apply(thisArg, _arguments)).next());
+	    });
+	};
+	const typed_dom_1 = __webpack_require__(1);
+	const service_1 = __webpack_require__(116);
+	class RecordsSearchPatient {
+	    constructor() {
+	        this.dom = typed_dom_1.h.div({}, [
+	            typed_dom_1.h.h1({}, ["患者ごとの診療録リスト"]),
+	            new SearchPatient().dom
+	        ]);
+	    }
+	}
+	exports.RecordsSearchPatient = RecordsSearchPatient;
+	class SearchPatient {
+	    constructor() {
+	        let textInput;
+	        let bindSubmit = (e) => {
+	            e.addEventListener("submit", event => {
+	                let text = textInput.value;
+	                this.doSearch(text);
+	            });
+	        };
+	        this.dom = typed_dom_1.h.div({}, [
+	            typed_dom_1.f.form(bindSubmit, {}, [
+	                typed_dom_1.f.input(e => textInput = e, {}, []), " ",
+	                typed_dom_1.h.input({ type: "submit", value: "検索" }, []),
+	                typed_dom_1.h.div({}, [
+	                    typed_dom_1.f.select(e => this.select = e, { size: "12", style: "width:360px; display:none" }, [])
+	                ])
+	            ])
+	        ]);
+	    }
+	    doSearch(text) {
+	        return __awaiter(this, void 0, void 0, function* () {
+	            let patients = yield service_1.searchPatient(text);
+	            console.log(patients);
+	        });
 	    }
 	}
 

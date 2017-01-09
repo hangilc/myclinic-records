@@ -13,12 +13,10 @@ const model_1 = require("./model");
 const kanjidate = require("kanjidate");
 const record_content_1 = require("./record-content");
 class RecordsByPatient {
-    constructor(patientId = 0) {
+    constructor(patientId) {
         this.patientId = patientId;
         this.dom = typed_dom_1.h.div({}, ["Loading..."]);
-        if (patientId > 0) {
-            this.setup(patientId);
-        }
+        this.setup(patientId);
     }
     setup(patientId) {
         return __awaiter(this, void 0, void 0, function* () {

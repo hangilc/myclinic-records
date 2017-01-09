@@ -8,11 +8,9 @@ import { RecordContent } from "./record-content";
 export class RecordsByPatient {
 	dom: HTMLElement;
 
-	constructor(private patientId: number = 0){
+	constructor(private patientId: number){
 		this.dom = h.div({}, ["Loading..."]);
-		if( patientId > 0 ){
-			this.setup(patientId);
-		}
+		this.setup(patientId);
 	}
 
 	private async setup(patientId: number){

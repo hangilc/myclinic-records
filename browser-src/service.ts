@@ -248,3 +248,11 @@ export function listVisits(patientId: number, offset: number, n: number): Promis
 		arrayConverter(model.jsonToVisit));
 }
 
+export function searchPatient(text: string): Promise<Patient[]> {
+	let t = text.trim();
+	if( t === "" ){
+		return Promise.resolve([]);
+	}
+	return request<Patient[]>("search_patient", { text: t }, "GET", 
+		arrayConverter(model.jsonToPatient));
+}
