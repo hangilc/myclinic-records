@@ -181,3 +181,23 @@ function getFullVisit(visitId) {
     return request("get_full_visit", { visit_id: visitId }, "GET", model.jsonToFullVisit);
 }
 exports.getFullVisit = getFullVisit;
+function calcVisits(patientId) {
+    if (!(Number.isInteger(patientId) && patientId > 0)) {
+        return Promise.reject("invalid patientId");
+    }
+    return request("calc_visits", { patient_id: patientId }, "GET", (src) => +src);
+}
+exports.calcVisits = calcVisits;
+function listVisits(patientId, offset, n) {
+    if (!(Number.isInteger(patientId) && patientId > 0)) {
+        return Promise.reject("invalid patientId");
+    }
+    if (!(offset >= 0)) {
+        return Promise.reject("invalid offset");
+    }
+    if (!(n >= 0)) {
+        return Promise.reject("invaid n");
+    }
+    return request("list_visits", { patient_id: patientId, offset: offset, n: n }, "GET", arrayConverter(model.jsonToVisit));
+}
+exports.listVisits = listVisits;

@@ -226,3 +226,25 @@ export function getFullVisit(visitId: number): Promise<FullVisit> {
 		"GET", model.jsonToFullVisit);
 }
 
+export function calcVisits(patientId: number): Promise<number> {
+	if( !(Number.isInteger(patientId) && patientId > 0) ){
+		return Promise.reject("invalid patientId");
+	}
+	return request<number>("calc_visits", { patient_id: patientId }, "GET",
+		(src: any) => +src)	
+}
+
+export function listVisits(patientId: number, offset: number, n: number): Promise<Visit[]> {
+	if( !(Number.isInteger(patientId) && patientId > 0) ){
+		return Promise.reject("invalid patientId");
+	}
+	if( !(offset >= 0) ){
+		return Promise.reject("invalid offset");
+	}
+	if( !(n >= 0) ){
+		return Promise.reject("invaid n");
+	}
+	return request<Visit[]>("list_visits", { patient_id: patientId, offset: offset, n: n }, "GET",
+		arrayConverter(model.jsonToVisit));
+}
+

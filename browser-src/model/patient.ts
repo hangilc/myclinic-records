@@ -1,4 +1,6 @@
 import { Value, ensureNumber, ensureString, NumberValue, StringValue } from "../value";
+import * as moment from "moment";
+import * as kanjidate from "kanjidate";
 
 export class Patient {
 	public patientId: number;
@@ -22,6 +24,31 @@ export class PatientValues {
 	public sex: StringValue;
 	public address: StringValue;
 	public phone: StringValue
+}
+
+export function patientBirthdayRep(patient: Patient): string {
+	let b = patient.birthday;
+	if( b === "0000-00-00" ){
+		return "";
+	}
+	let m = moment(b);
+	if( !m.isValid() ){
+		return `（生年月日が不適切：${ b }）`;
+	}
+	return kanjidate.format(kanjidate.f2, m.format("YYYY-MM-DD")) + "生";
+}
+
+export function patientAge(patient: Patient): number {
+	let m = moment(patient.birthday);
+	return moment().diff(m, "years");
+}
+
+export function patientSexRep(patient: Patient): string {
+	switch(patient.sex){
+		case "M": return "男";
+		case "F": return "女";
+		default: return "不明";
+	}
 }
 
 function hasError(values: PatientValues): boolean {

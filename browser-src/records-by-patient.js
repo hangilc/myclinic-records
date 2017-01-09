@@ -8,90 +8,81 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 const typed_dom_1 = require("./typed-dom");
-const date_input_1 = require("./date-input");
 const service_1 = require("./service");
+const model_1 = require("./model");
 const kanjidate = require("kanjidate");
 const record_content_1 = require("./record-content");
-class RecordsByDate {
-    constructor() {
-        this.onGotoPatientRecords = _ => { };
-        this.dateInput = new date_input_1.DateInput();
-        this.dom = typed_dom_1.h.div({}, [
-            typed_dom_1.h.h1({}, ["診察日ごとの診療録リスト"]),
-            this.dateInput.dom,
-            typed_dom_1.f.div(e => this.domDispWrapper = e, {}, [])
-        ]);
-        this.dateInput.setOnSubmit((m) => {
-            this.onDateInputSubmit(m);
-        });
+class RecordsByPatient {
+    constructor(patientId = 0) {
+        this.patientId = patientId;
+        this.dom = typed_dom_1.h.div({}, ["Loading..."]);
+        if (patientId > 0) {
+            this.setup(patientId);
+        }
     }
-    setOnGotoPatientRecords(cb) {
-        this.onGotoPatientRecords = cb;
-    }
-    setToday() {
-        this.dateInput.setToday();
-    }
-    set(m) {
-        this.dateInput.set(m);
-    }
-    onDateInputSubmit(m) {
+    setup(patientId) {
         return __awaiter(this, void 0, void 0, function* () {
-            let at = m.format("YYYY-MM-DD");
-            try {
-                let visits = yield service_1.listVisitsByDate(at);
-                this.renderDisp(m, visits);
-            }
-            catch (ex) {
-                alert(ex);
-            }
+            let patient = yield service_1.getPatient(patientId);
+            let totalVisits = yield service_1.calcVisits(patientId);
+            let nav = new RecordNav(patientId, totalVisits);
+            nav.setOnChange(visits => {
+                this.renderVisits(visitsWrapper, visits);
+                nav.updateDoms();
+            });
+            let dom = this.dom;
+            dom.innerHTML = "";
+            dom.appendChild(typed_dom_1.h.h2({}, [this.titleLabel(patient)]));
+            dom.appendChild(this.patientInfo(patient));
+            dom.appendChild(nav.createDom());
+            let visitsWrapper = typed_dom_1.h.div({}, []);
+            dom.appendChild(visitsWrapper);
+            dom.appendChild(nav.createDom());
+            nav.invokeOnChange();
         });
-    }
-    renderDisp(m, visits) {
-        var wrapper = this.domDispWrapper;
-        var nav = new RecordNav(visits);
-        nav.setOnChange(() => {
-            let curVisits = nav.getCurrentVisits();
-            this.renderVisits(vWrapper, curVisits);
-            nav.updateDoms();
-        });
-        wrapper.innerHTML = "";
-        wrapper.appendChild(this.createHeader(m));
-        wrapper.appendChild(nav.createDom());
-        let vWrapper = typed_dom_1.h.div({}, []);
-        wrapper.appendChild(vWrapper);
-        this.renderVisits(vWrapper, nav.getCurrentVisits());
-        wrapper.appendChild(nav.createDom());
     }
     renderVisits(wrapper, visits) {
         let tmpDom = typed_dom_1.h.div({}, []);
-        let cb = (patientId) => this.onGotoPatientRecords(patientId);
         wrapper.innerHTML = "";
         wrapper.appendChild(tmpDom);
         for (let i = 0; i < visits.length; i++) {
             let visit = visits[i];
-            wrapper.appendChild(new RecordItem(visit, cb).dom);
+            wrapper.appendChild(new RecordItem(visit).dom);
         }
     }
-    createHeader(m) {
-        return typed_dom_1.h.h2({}, [kanjidate.format(kanjidate.f1, m.format("YYYY-MM-DD"))]);
+    titleLabel(patient) {
+        return `${patient.lastName} ${patient.firstName}（患者番号 ${patient.patientId}）様の診療記録`;
+    }
+    patientInfo(patient) {
+        let birthdayPart = model_1.patientBirthdayRep(patient);
+        if (birthdayPart !== "") {
+            birthdayPart += `(${model_1.patientAge(patient)}才)`;
+        }
+        return typed_dom_1.h.p({}, [
+            `(${patient.lastNameYomi} ${patient.firstNameYomi})`,
+            " ",
+            birthdayPart,
+            " ",
+            `${model_1.patientSexRep(patient)}性`
+        ]);
     }
 }
-exports.RecordsByDate = RecordsByDate;
+exports.RecordsByPatient = RecordsByPatient;
 class RecordNav {
-    constructor(visits) {
-        this.visits = visits;
+    constructor(patientId, totalVisits) {
+        this.patientId = patientId;
         this.doms = [];
-        this.visitsPerPage = 10;
-        this.onChange = () => { };
-        this.totalPages = this.calcTotalPages(visits.length);
         this.currentPage = 1;
+        this.visitsPerPage = 10;
+        this.onChange = _ => { };
+        this.totalPages = this.calcTotalPages(totalVisits);
     }
     createDom() {
-        let dom = typed_dom_1.h.div({}, [this.createContentDom()]);
+        let contentDom = this.createConentDom();
+        let dom = typed_dom_1.h.div({}, [this.createConentDom()]);
         this.doms.push(dom);
         return dom;
     }
-    createContentDom() {
+    createConentDom() {
         return typed_dom_1.h.div({ style: "margin: 10px 0" }, [
             this.prevLink(),
             " ",
@@ -103,15 +94,23 @@ class RecordNav {
     updateDoms() {
         this.doms.forEach(dom => {
             dom.innerHTML = "";
-            dom.appendChild(this.createContentDom());
+            dom.appendChild(this.createConentDom());
         });
     }
     setOnChange(cb) {
         this.onChange = cb;
     }
+    invokeOnChange() {
+        return __awaiter(this, void 0, void 0, function* () {
+            let currentVisits = yield this.getCurrentVisits();
+            this.onChange(currentVisits);
+        });
+    }
     getCurrentVisits() {
-        let offset = (this.currentPage - 1) * this.visitsPerPage;
-        return this.visits.slice(offset, offset + this.visitsPerPage);
+        return __awaiter(this, void 0, void 0, function* () {
+            let offset = (this.currentPage - 1) * this.visitsPerPage;
+            return yield service_1.listVisits(this.patientId, offset, this.visitsPerPage);
+        });
     }
     calcTotalPages(n) {
         return Math.floor((n + this.visitsPerPage - 1) / this.visitsPerPage);
@@ -121,7 +120,7 @@ class RecordNav {
         a.addEventListener("click", () => {
             if (this.currentPage > 1) {
                 this.currentPage -= 1;
-                this.onChange();
+                this.invokeOnChange();
             }
         });
         return a;
@@ -131,7 +130,7 @@ class RecordNav {
         a.addEventListener("click", () => {
             if (this.currentPage < this.totalPages) {
                 this.currentPage += 1;
-                this.onChange();
+                this.invokeOnChange();
             }
         });
         return a;
@@ -150,26 +149,18 @@ class RecordNav {
         let a = typed_dom_1.h.a(attr, [i.toString()]);
         a.addEventListener("click", () => {
             this.currentPage = i;
-            this.onChange();
+            this.invokeOnChange();
         });
         return a;
     }
 }
 class RecordItem {
-    constructor(visit, cb) {
+    constructor(visit) {
         this.dom = typed_dom_1.h.div({}, ["Loading..."]);
-        Promise.all([service_1.getFullVisit(visit.visitId), service_1.getPatient(visit.patientId)])
-            .then(values => {
-            let [fullVisit, patient] = values;
+        service_1.getFullVisit(visit.visitId)
+            .then(fullVisit => {
             let newDom = typed_dom_1.h.div({}, [
                 typed_dom_1.h.h3({}, [
-                    `${patient.lastName} ${patient.firstName}`,
-                    " ",
-                    `(患者番号 ${patient.patientId})`,
-                    "[",
-                    typed_dom_1.f.a(e => bindGotoPatientRecords(e), {}, ["全診療記録"]),
-                    "]",
-                    " ",
                     this.formatVisitTime(visit.visitedAt),
                 ]),
                 new record_content_1.RecordContent(fullVisit).dom
@@ -179,13 +170,8 @@ class RecordItem {
                 parent.replaceChild(newDom, this.dom);
             }
         });
-        function bindGotoPatientRecords(a) {
-            a.addEventListener("click", () => {
-                cb(visit.patientId);
-            });
-        }
     }
     formatVisitTime(at) {
-        return kanjidate.format("{h:2}時{m:2}分", at);
+        return kanjidate.format("{G}{N:2}年{M:2}月{D:2}日（{W}）{h:2}時{m:2}分", at);
     }
 }

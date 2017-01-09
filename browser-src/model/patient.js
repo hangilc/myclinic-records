@@ -1,5 +1,7 @@
 "use strict";
 const value_1 = require("../value");
+const moment = require("moment");
+const kanjidate = require("kanjidate");
 class Patient {
 }
 exports.Patient = Patient;
@@ -7,6 +9,31 @@ exports.Patient = Patient;
 class PatientValues {
 }
 exports.PatientValues = PatientValues;
+function patientBirthdayRep(patient) {
+    let b = patient.birthday;
+    if (b === "0000-00-00") {
+        return "";
+    }
+    let m = moment(b);
+    if (!m.isValid()) {
+        return `（生年月日が不適切：${b}）`;
+    }
+    return kanjidate.format(kanjidate.f2, m.format("YYYY-MM-DD")) + "生";
+}
+exports.patientBirthdayRep = patientBirthdayRep;
+function patientAge(patient) {
+    let m = moment(patient.birthday);
+    return moment().diff(m, "years");
+}
+exports.patientAge = patientAge;
+function patientSexRep(patient) {
+    switch (patient.sex) {
+        case "M": return "男";
+        case "F": return "女";
+        default: return "不明";
+    }
+}
+exports.patientSexRep = patientSexRep;
 function hasError(values) {
     return values.patientId.isError || values.lastName.isError ||
         values.firstName.isError || values.lastNameYomi.isError ||
