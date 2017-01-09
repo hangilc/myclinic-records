@@ -15,8 +15,12 @@ const record_content_1 = require("./record-content");
 class RecordsByPatient {
     constructor(patientId) {
         this.patientId = patientId;
+        this.onGotoRecordsByDate = () => { };
         this.dom = typed_dom_1.h.div({}, ["Loading..."]);
         this.setup(patientId);
+    }
+    setOnGotoRecordsByDate(cb) {
+        this.onGotoRecordsByDate = cb;
     }
     setup(patientId) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -29,6 +33,7 @@ class RecordsByPatient {
             });
             let dom = this.dom;
             dom.innerHTML = "";
+            dom.appendChild(this.topMenu());
             dom.appendChild(typed_dom_1.h.h2({}, [this.titleLabel(patient)]));
             dom.appendChild(this.patientInfo(patient));
             dom.appendChild(nav.createDom());
@@ -37,6 +42,16 @@ class RecordsByPatient {
             dom.appendChild(nav.createDom());
             nav.invokeOnChange();
         });
+    }
+    topMenu() {
+        let bindGotoByDates = (e) => {
+            e.addEventListener("click", event => {
+                this.onGotoRecordsByDate();
+            });
+        };
+        return typed_dom_1.h.div({}, [
+            typed_dom_1.f.a(bindGotoByDates, {}, ["診察日ごとの診療録へ"])
+        ]);
     }
     renderVisits(wrapper, visits) {
         let tmpDom = typed_dom_1.h.div({}, []);

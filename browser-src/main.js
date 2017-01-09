@@ -22,6 +22,9 @@ function appRecordsByDate(wrapper) {
 }
 function appPatientRecords(wrapper, patientId) {
     let app = new records_by_patient_1.RecordsByPatient(patientId);
+    app.setOnGotoRecordsByDate(() => {
+        appRecordsByDate(wrapper);
+    });
     wrapper.innerHTML = "";
     let tmpDom = typed_dom_1.h.div({}, [app.dom]);
     wrapper.appendChild(tmpDom);
@@ -30,6 +33,9 @@ function appSearchRecords(wrapper) {
     let app = new records_search_patient_1.RecordsSearchPatient();
     app.setOnSelect(patientId => {
         appPatientRecords(wrapper, patientId);
+    });
+    app.setOnGotoRecordsByDate(() => {
+        appRecordsByDate(wrapper);
     });
     wrapper.innerHTML = "";
     let tmpDom = typed_dom_1.h.div({}, [app.dom]);

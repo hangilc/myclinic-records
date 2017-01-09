@@ -68,6 +68,9 @@
 	}
 	function appPatientRecords(wrapper, patientId) {
 	    let app = new records_by_patient_1.RecordsByPatient(patientId);
+	    app.setOnGotoRecordsByDate(() => {
+	        appRecordsByDate(wrapper);
+	    });
 	    wrapper.innerHTML = "";
 	    let tmpDom = typed_dom_1.h.div({}, [app.dom]);
 	    wrapper.appendChild(tmpDom);
@@ -76,6 +79,9 @@
 	    let app = new records_search_patient_1.RecordsSearchPatient();
 	    app.setOnSelect(patientId => {
 	        appPatientRecords(wrapper, patientId);
+	    });
+	    app.setOnGotoRecordsByDate(() => {
+	        appRecordsByDate(wrapper);
 	    });
 	    wrapper.innerHTML = "";
 	    let tmpDom = typed_dom_1.h.div({}, [app.dom]);
@@ -28964,8 +28970,12 @@
 	class RecordsByPatient {
 	    constructor(patientId) {
 	        this.patientId = patientId;
+	        this.onGotoRecordsByDate = () => { };
 	        this.dom = typed_dom_1.h.div({}, ["Loading..."]);
 	        this.setup(patientId);
+	    }
+	    setOnGotoRecordsByDate(cb) {
+	        this.onGotoRecordsByDate = cb;
 	    }
 	    setup(patientId) {
 	        return __awaiter(this, void 0, void 0, function* () {
@@ -28978,6 +28988,7 @@
 	            });
 	            let dom = this.dom;
 	            dom.innerHTML = "";
+	            dom.appendChild(this.topMenu());
 	            dom.appendChild(typed_dom_1.h.h2({}, [this.titleLabel(patient)]));
 	            dom.appendChild(this.patientInfo(patient));
 	            dom.appendChild(nav.createDom());
@@ -28986,6 +28997,16 @@
 	            dom.appendChild(nav.createDom());
 	            nav.invokeOnChange();
 	        });
+	    }
+	    topMenu() {
+	        let bindGotoByDates = (e) => {
+	            e.addEventListener("click", event => {
+	                this.onGotoRecordsByDate();
+	            });
+	        };
+	        return typed_dom_1.h.div({}, [
+	            typed_dom_1.f.a(bindGotoByDates, {}, ["診察日ごとの診療録へ"])
+	        ]);
 	    }
 	    renderVisits(wrapper, visits) {
 	        let tmpDom = typed_dom_1.h.div({}, []);
@@ -29277,6 +29298,43 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+	const typed_dom_1 = __webpack_require__(1);
+	const search_patient_1 = __webpack_require__(150);
+	class RecordsSearchPatient {
+	    constructor() {
+	        this.onGotoRecordsByDate = () => { };
+	        this.search = new search_patient_1.SearchPatient();
+	        this.dom = typed_dom_1.h.div({}, [
+	            this.topMenu(),
+	            typed_dom_1.h.h1({}, ["患者ごとの診療録リスト"]),
+	            this.search.dom
+	        ]);
+	    }
+	    setOnSelect(cb) {
+	        this.search.setOnSelect(cb);
+	    }
+	    setOnGotoRecordsByDate(cb) {
+	        this.onGotoRecordsByDate = cb;
+	    }
+	    topMenu() {
+	        let bindClick = (e) => {
+	            e.addEventListener("click", event => {
+	                this.onGotoRecordsByDate();
+	            });
+	        };
+	        return typed_dom_1.h.div({}, [
+	            typed_dom_1.f.a(bindClick, {}, ["診察日ごとの診療録へ"])
+	        ]);
+	    }
+	}
+	exports.RecordsSearchPatient = RecordsSearchPatient;
+
+
+/***/ },
+/* 150 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
 	var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
 	    return new (P || (P = Promise))(function (resolve, reject) {
 	        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -29287,19 +29345,6 @@
 	};
 	const typed_dom_1 = __webpack_require__(1);
 	const service_1 = __webpack_require__(116);
-	class RecordsSearchPatient {
-	    constructor() {
-	        this.search = new SearchPatient();
-	        this.dom = typed_dom_1.h.div({}, [
-	            typed_dom_1.h.h1({}, ["患者ごとの診療録リスト"]),
-	            this.search.dom
-	        ]);
-	    }
-	    setOnSelect(cb) {
-	        this.search.setOnSelect(cb);
-	    }
-	}
-	exports.RecordsSearchPatient = RecordsSearchPatient;
 	class SearchPatient {
 	    constructor() {
 	        this.onSelect = _ => { };
@@ -29346,6 +29391,7 @@
 	        });
 	    }
 	}
+	exports.SearchPatient = SearchPatient;
 
 
 /***/ }

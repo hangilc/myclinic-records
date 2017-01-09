@@ -7,10 +7,15 @@ import { RecordContent } from "./record-content";
 
 export class RecordsByPatient {
 	dom: HTMLElement;
+	private onGotoRecordsByDate: () => void = () => {};
 
 	constructor(private patientId: number){
 		this.dom = h.div({}, ["Loading..."]);
 		this.setup(patientId);
+	}
+
+	setOnGotoRecordsByDate(cb: () => void){
+		this.onGotoRecordsByDate = cb;
 	}
 
 	private async setup(patientId: number){
@@ -23,6 +28,7 @@ export class RecordsByPatient {
 		})
 		let dom = this.dom;
 		dom.innerHTML = "";
+		dom.appendChild(this.topMenu());
 		dom.appendChild(h.h2({}, [this.titleLabel(patient)]));
 		dom.appendChild(this.patientInfo(patient));
 		dom.appendChild(nav.createDom());
@@ -30,6 +36,17 @@ export class RecordsByPatient {
 		dom.appendChild(visitsWrapper);
 		dom.appendChild(nav.createDom());
 		nav.invokeOnChange();
+	}
+
+	private topMenu(): HTMLElement {
+		let bindGotoByDates = (e: HTMLElement) => {
+			e.addEventListener("click", event => {
+				this.onGotoRecordsByDate();
+			})
+		};
+		return h.div({}, [
+			f.a(bindGotoByDates, {}, ["診察日ごとの診療録へ"])
+		])
 	}
 
 	private renderVisits(wrapper: HTMLElement, visits: Visit[]){

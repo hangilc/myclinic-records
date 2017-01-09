@@ -24,6 +24,9 @@ function appRecordsByDate(wrapper: HTMLElement): void{
 
 function appPatientRecords(wrapper: HTMLElement, patientId: number): void {
 	let app = new RecordsByPatient(patientId);
+	app.setOnGotoRecordsByDate(() => {
+		appRecordsByDate(wrapper);
+	})
 	wrapper.innerHTML = "";
 	let tmpDom = h.div({}, [app.dom]);
 	wrapper.appendChild(tmpDom);
@@ -33,7 +36,10 @@ function appSearchRecords(wrapper: HTMLElement): void {
 	let app = new RecordsSearchPatient();
 	app.setOnSelect(patientId => {
 		appPatientRecords(wrapper, patientId);
-	})
+	});
+	app.setOnGotoRecordsByDate(() => {
+		appRecordsByDate(wrapper);
+	});
 	wrapper.innerHTML = "";
 	let tmpDom = h.div({}, [app.dom]);
 	wrapper.appendChild(tmpDom);
