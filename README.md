@@ -1,4 +1,4 @@
-# myclinic-refer
+# myclinic-records
 
 Medical records listing for myclinic
 
